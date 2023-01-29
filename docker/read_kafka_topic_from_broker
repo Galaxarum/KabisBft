@@ -1,0 +1,6 @@
+kafka-console-consumer.sh --topic topic-9 --bootstrap-server localhost:9092 \
+ --from-beginning \
+ --property print.key=true \
+ --property print.value=false \
+ --property key.separator=" : " \
+ --key-deserializer "org.apache.kafka.common.serialization.IntegerDeserializer"

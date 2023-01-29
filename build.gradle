@@ -1,0 +1,221 @@
+plugins {
+    id 'java'
+    id 'idea'
+    id 'com.github.johnrengelman.shadow' version '7.0.0'
+}
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+
+group 'org.example'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+
+    // https://mvnrepository.com/artifact/org.apache.kafka/kafka-clients
+    implementation 'org.apache.kafka:kafka-clients:3.2.3'
+
+    // https://mvnrepository.com/artifact/org.slf4j/slf4j-api
+    implementation 'org.slf4j:slf4j-api:1.7.32'
+
+    // https://mvnrepository.com/artifact/org.slf4j/slf4j-simple
+    implementation 'org.slf4j:slf4j-simple:1.7.32'
+
+    implementation files('BFT-SMaRt.jar')
+
+    //implementation files('bcprov-jdk18on-172.jar')
+
+    //implementation fileTree('lib'){include '*.jar'}
+    // https://mvnrepository.com/artifact/org.bouncycastle/bcpkix-jdk15on
+    implementation 'org.bouncycastle:bcpkix-jdk15on:1.68'
+
+    // https://mvnrepository.com/artifact/org.bouncycastle/bcprov-jdk15on
+    implementation 'org.bouncycastle:bcprov-jdk15on:1.68'
+
+    // https://mvnrepository.com/artifact/commons-codec/commons-codec
+    implementation 'commons-codec:commons-codec:1.15'
+
+    // https://mvnrepository.com/artifact/io.netty/netty-all
+    implementation 'io.netty:netty-all:4.1.77.Final'
+}
+
+java{
+    sourceCompatibility = '1.11'
+    targetCompatibility = '1.11'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+idea{
+    module{
+        downloadJavadoc = true
+        downloadSources = true
+    }
+}
+
+task kabisServiceReplicaShadowJar(type: ShadowJar) {
+    manifest {
+        attributes 'Main-Class': 'kabis.validation.KabisServiceReplica'
+    }
+
+    archiveName 'service-replica.jar'
+    from sourceSets.main.output
+    configurations = [project.configurations.compileClasspath]
+    exclude("META-INF/*.SF")
+    exclude("META-INF/*.DSA")
+}
+
+task kabisServiceReplicaJar(type: Copy){
+    dependsOn kabisServiceReplicaShadowJar
+    copy {
+        from 'build/libs/service-replica.jar'
+        into 'docker/kabis_benchmark'
+    }
+}
+
+task kabisSenderShadowJar(type: ShadowJar) {
+    manifest {
+        attributes 'Main-Class': 'kabis.benchmark.KabisSender'
+    }
+
+    archiveName 'kabis-sender.jar'
+    from sourceSets.main.output
+    configurations = [project.configurations.compileClasspath]
+    exclude("META-INF/*.SF")
+    exclude("META-INF/*.DSA")
+}
+
+task kabisSenderJar(type: Copy){
+    dependsOn kabisSenderShadowJar
+    copy {
+        from 'build/libs/kabis-sender.jar'
+        into 'docker/kabis_benchmark'
+    }
+}
+
+task kabisReceiverShadowJar(type: ShadowJar) {
+    manifest {
+        attributes 'Main-Class': 'kabis.benchmark.KabisReceiver'
+    }
+
+    archiveName 'kabis-receiver.jar'
+    from sourceSets.main.output
+    configurations = [project.configurations.compileClasspath]
+    exclude("META-INF/*.SF")
+    exclude("META-INF/*.DSA")
+}
+
+task kabisReceiverJar(type: Copy){
+    dependsOn kabisReceiverShadowJar
+    copy{
+        from 'build/libs/kabis-receiver.jar'
+        into 'docker/kabis_benchmark'
+    }
+}
+
+task kafkaSenderShadowJar(type: ShadowJar) {
+    manifest {
+        attributes 'Main-Class': 'kabis.benchmark.kafka.KafkaOnlySender'
+    }
+
+    archiveName 'kafka-sender.jar'
+    from sourceSets.main.output
+    configurations = [project.configurations.compileClasspath]
+    exclude("META-INF/*.SF")
+    exclude("META-INF/*.DSA")
+}
+
+task kafkaSenderJar(type: Copy){
+    dependsOn kafkaSenderShadowJar
+    copy {
+        from 'build/libs/kafka-sender.jar'
+        into 'docker/kafka_benchmark'
+    }
+}
+
+task kafkaReceiverShadowJar(type: ShadowJar) {
+    manifest {
+        attributes 'Main-Class': 'kabis.benchmark.kafka.KafkaOnlyReceiver'
+    }
+
+    archiveName 'kafka-receiver.jar'
+    from sourceSets.main.output
+    configurations = [project.configurations.compileClasspath]
+    exclude("META-INF/*.SF")
+    exclude("META-INF/*.DSA")
+}
+
+task kafkaReceiverJar(type: Copy){
+    dependsOn kafkaReceiverShadowJar
+    copy{
+        from 'build/libs/kafka-receiver.jar'
+        into 'docker/kafka_benchmark'
+    }
+}
+
+task bftReceiverShadowJar(type: ShadowJar) {
+    manifest {
+        attributes 'Main-Class': 'kabis.benchmark.bft.BftOnlyReceiver'
+    }
+
+    archiveName 'bft-receiver.jar'
+    from sourceSets.main.output
+    configurations = [project.configurations.compileClasspath]
+    exclude("META-INF/*.SF")
+    exclude("META-INF/*.DSA")
+}
+
+task bftReceiverJar(type: Copy){
+    dependsOn bftReceiverShadowJar
+    copy{
+        from 'build/libs/bft-receiver.jar'
+        into 'docker/bft_benchmark'
+    }
+}
+
+task bftSenderShadowJar(type: ShadowJar) {
+    manifest {
+        attributes 'Main-Class': 'kabis.benchmark.bft.BftOnlySender'
+    }
+
+    archiveName 'bft-sender.jar'
+    from sourceSets.main.output
+    configurations = [project.configurations.compileClasspath]
+    exclude("META-INF/*.SF")
+    exclude("META-INF/*.DSA")
+}
+
+task bftSenderJar(type: Copy){
+    dependsOn bftSenderShadowJar
+    copy{
+        from 'build/libs/bft-sender.jar'
+        into 'docker/bft_benchmark'
+    }
+}
+
+
+task bftServiceReplicaShadowJar(type: ShadowJar) {
+    manifest {
+        attributes 'Main-Class': 'kabis.benchmark.bft.BftOnlyServiceReplica'
+    }
+
+    archiveName 'bft-service-replica.jar'
+    from sourceSets.main.output
+    configurations = [project.configurations.compileClasspath]
+    exclude("META-INF/*.SF")
+    exclude("META-INF/*.DSA")
+}
+
+task bftServiceReplicaJar(type: Copy){
+    dependsOn bftServiceReplicaShadowJar
+    copy {
+        from 'build/libs/bft-service-replica.jar'
+        into 'docker/bft_benchmark'
+    }
+}

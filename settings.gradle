@@ -1,0 +1,2 @@
+rootProject.name = 'KabisSmall'
+include 'DockerConfigurator'
