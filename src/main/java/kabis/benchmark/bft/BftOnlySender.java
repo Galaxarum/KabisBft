@@ -45,7 +45,7 @@ public class BftOnlySender {
         new Random().nextBytes(sentBytes);
         String message = new String(sentBytes);
 
-        Thread.sleep(10_000);
+        Thread.sleep(30000);
 
         KabisServiceProxy proxy = new KabisServiceProxy(clientId);
 

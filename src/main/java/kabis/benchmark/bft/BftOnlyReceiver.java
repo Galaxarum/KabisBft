@@ -42,7 +42,7 @@ public class BftOnlyReceiver {
         int payload = Integer.parseInt(args[3]);
         int totalMessages = messagesPerSender * numSenders;
 
-        Thread.sleep(10_000);
+        Thread.sleep(30000);
 
         KabisServiceProxy proxy = new KabisServiceProxy(clientId);
 
@@ -50,7 +50,7 @@ public class BftOnlyReceiver {
 
         BenchmarkResult.storeThroughputToDisk(BenchmarkResult.buildThroughputString(totalMessages,payload, Integer.MAX_VALUE, time));
         System.out.println("Experiment result persisted");
-        Thread.sleep(1_000);
+        Thread.sleep(1000);
         System.exit(0);
     }
 

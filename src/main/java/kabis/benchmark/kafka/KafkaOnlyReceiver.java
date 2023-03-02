@@ -44,12 +44,12 @@ public class KafkaOnlyReceiver {
         Properties properties = new Properties();
         properties.load(new FileInputStream("config.properties"));
         properties.setProperty("client.id", String.format("%d-consumer-1", clientId));
-        KafkaConsumer<Integer,String> consumer = new KafkaConsumer<Integer, String>(properties);
+        KafkaConsumer<Integer,String> consumer = new KafkaConsumer<>(properties);
         consumer.subscribe(TOPICS);
 
         //Prime kafka infrastructure
         measureTotalConsumeTime(consumer,numSenders*TOPICS.size());
-        Thread.sleep(10_000);
+        Thread.sleep(30000);
         System.out.println("Kafka infrastructure primed");
 
         var time = measureTotalConsumeTime(consumer,totalMessages);
@@ -57,7 +57,7 @@ public class KafkaOnlyReceiver {
         BenchmarkResult.storeThroughputToDisk(BenchmarkResult.buildThroughputString(totalMessages,payload,-1,time));
         System.out.println("Experiment result persisted");
         consumer.close();
-        Thread.sleep(1_000);
+        Thread.sleep(1000);
         System.exit(0);
     }
 

@@ -1,7 +1,6 @@
 package kabis.benchmark;
 
 import kabis.consumer.KabisConsumer;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,9 +9,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.security.Security;
 import java.time.Duration;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Properties;
 
 import static kabis.benchmark.BenchmarkResult.TOPICS;
@@ -54,7 +51,7 @@ public class KabisReceiver{
         properties.load(new FileInputStream("config.properties"));
         properties.setProperty("client.id", String.valueOf(clientId));
 
-        Thread.sleep(10_000);
+        Thread.sleep(30000);
 
         KabisConsumer<Integer,String> consumer = new KabisConsumer<>(properties);
         consumer.subscribe(TOPICS);
@@ -72,7 +69,7 @@ public class KabisReceiver{
         BenchmarkResult.storeThroughputToDisk(BenchmarkResult.buildThroughputString(totalMessages,payload,numValidatedTopics,time));
         System.out.println("Experiment result persisted");
         consumer.close();
-        Thread.sleep(1_000);
+        Thread.sleep(1000);
         System.exit(0);
     }
 

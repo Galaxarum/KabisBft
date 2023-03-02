@@ -1,7 +1,6 @@
 package kabis.benchmark;
 
 import kabis.producer.KabisProducer;
-import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.slf4j.Logger;
@@ -52,7 +51,7 @@ public class KabisSender{
         properties.load(new FileInputStream("config.properties"));
         properties.setProperty("client.id", String.valueOf(clientId));
 
-        Thread.sleep(10_000);
+        Thread.sleep(30000);
 
         KabisProducer<Integer,String> producer = new KabisProducer<>(properties);
         producer.updateTopology(TOPICS.subList(0,numValidatedTopics));
@@ -60,7 +59,7 @@ public class KabisSender{
         //Prime kafka infrastructure
         System.out.printf("Sending %d messages to prime the system. [%d/%d] validated topics%n",TOPICS.size(),numValidatedTopics,TOPICS.size());
         measureSendingTime(producer,TOPICS.size(),message);
-        Thread.sleep(1_000);
+        Thread.sleep(1000);
         System.out.println("Kafka infrastructure primed");
 
         //Real measure
