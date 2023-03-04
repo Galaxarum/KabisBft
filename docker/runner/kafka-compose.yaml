@@ -106,7 +106,7 @@ services:
 
   #Clients
   sender-1:
-    image: 'galaxarum/kafka_sender:latest'
+    image: 'redaellimattia/kafka-sender:latest'
     networks:
       - kafka-net
     depends_on:
@@ -121,7 +121,7 @@ services:
     volumes:
       - ./results/sender-1:/usr/kabis/result
   sender-2:
-    image: 'galaxarum/kafka_sender:latest'
+    image: 'redaellimattia/kafka-sender:latest'
     networks:
       - kafka-net
     depends_on:
@@ -136,7 +136,7 @@ services:
     volumes:
       - ./results/sender-2:/usr/kabis/result
   sender-3:
-    image: 'galaxarum/kafka_sender:latest'
+    image: 'redaellimattia/kafka-sender:latest'
     networks:
       - kafka-net
     depends_on:
@@ -151,7 +151,7 @@ services:
     volumes:
       - ./results/sender-3:/usr/kabis/result
   receiver-1:
-    image: 'galaxarum/kafka_receiver:latest'
+    image: 'redaellimattia/kafka-receiver:latest'
     networks:
       - kafka-net
     depends_on:

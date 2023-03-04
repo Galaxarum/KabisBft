@@ -207,25 +207,25 @@ services:
 
   #Bft service replicas
   bft-1:
-    image: 'galaxarum/kabis_service_replica:latest'
+    image: 'redaellimattia/kabis-service-replica:latest'
     networks:
       - bft
     environment:
       - ID=0
   bft-2:
-    image: 'galaxarum/kabis_service_replica:latest'
+    image: 'redaellimattia/kabis-service-replica:latest'
     networks:
       - bft
     environment:
       - ID=1
   bft-3:
-    image: 'galaxarum/kabis_service_replica:latest'
+    image: 'redaellimattia/kabis-service-replica:latest'
     networks:
       - bft
     environment:
       - ID=2
   bft-4:
-    image: 'galaxarum/kabis_service_replica:latest'
+    image: 'redaellimattia/kabis-service-replica:latest'
     networks:
       - bft
     environment:
@@ -233,7 +233,7 @@ services:
 
   #Clients
   sender-1:
-    image: 'galaxarum/kabis_sender:latest'
+    image: 'redaellimattia/kabis-sender:latest'
     networks:
       - kafka-net
       - bft
@@ -258,7 +258,7 @@ services:
     volumes:
       - ./results/sender-1:/usr/kabis/result
   sender-2:
-    image: 'galaxarum/kabis_sender:latest'
+    image: 'redaellimattia/kabis-sender:latest'
     networks:
       - kafka-net
       - bft
@@ -283,7 +283,7 @@ services:
     volumes:
       - ./results/sender-2:/usr/kabis/result
   sender-3:
-    image: 'galaxarum/kabis_sender:latest'
+    image: 'redaellimattia/kabis-sender:latest'
     networks:
       - kafka-net
       - bft
@@ -308,7 +308,7 @@ services:
     volumes:
       - ./results/sender-3:/usr/kabis/result
   receiver-1:
-    image: 'galaxarum/kabis_receiver:latest'
+    image: 'redaellimattia/kabis-receiver:latest'
     networks:
       - kafka-net
       - bft
