@@ -207,25 +207,25 @@ services:
 
   #Bft service replicas
   bft-1:
-    image: 'redaellimattia/kabis-service-replica:latest'
+    image: 'redaellimattia/service-replica:latest'
     networks:
       - bft
     environment:
       - ID=0
   bft-2:
-    image: 'redaellimattia/kabis-service-replica:latest'
+    image: 'redaellimattia/service-replica:latest'
     networks:
       - bft
     environment:
       - ID=1
   bft-3:
-    image: 'redaellimattia/kabis-service-replica:latest'
+    image: 'redaellimattia/service-replica:latest'
     networks:
       - bft
     environment:
       - ID=2
   bft-4:
-    image: 'redaellimattia/kabis-service-replica:latest'
+    image: 'redaellimattia/service-replica:latest'
     networks:
       - bft
     environment:
