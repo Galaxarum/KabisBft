@@ -1,44 +1,31 @@
-version: '3.9'
+version: "3.8"
 
 networks:
   bft:
     driver: bridge
 
 services:
-  base:
-    build: .
-    environment:
-      - DOCKERHUB_USERNAME
-
   #Bft service replicas
   bft-1:
-    extends:
-      service: base
-    image: '${DOCKERHUB_USERNAME}/bft-service-replica:latest'
+    image: "${$DOCKERHUB_USERNAME}/bft-service-replica:latest"
     networks:
       - bft
     environment:
       - ID=0
   bft-2:
-    extends:
-      service: base
-    image: '${DOCKERHUB_USERNAME}/bft-service-replica:latest'
+    image: "${$DOCKERHUB_USERNAME}/bft-service-replica:latest"
     networks:
       - bft
     environment:
       - ID=1
   bft-3:
-    extends:
-      service: base
-    image: '${DOCKERHUB_USERNAME}/bft-service-replica:latest'
+    image: "${$DOCKERHUB_USERNAME}/bft-service-replica:latest"
     networks:
       - bft
     environment:
       - ID=2
   bft-4:
-    extends:
-      service: base
-    image: '${DOCKERHUB_USERNAME}/bft-service-replica:latest'
+    image: "${$DOCKERHUB_USERNAME}/bft-service-replica:latest"
     networks:
       - bft
     environment:
@@ -46,16 +33,14 @@ services:
 
   #Clients
   sender-1:
-    extends:
-      service: base
-    image: '${DOCKERHUB_USERNAME}/bft-sender:latest'
+    image: "${$DOCKERHUB_USERNAME}/bft-sender:latest"
     networks:
       - bft
     depends_on:
-      - 'bft-1'
-      - 'bft-2'
-      - 'bft-3'
-      - 'bft-4'
+      - "bft-1"
+      - "bft-2"
+      - "bft-3"
+      - "bft-4"
     environment:
       - ID=1001
       - OPS_PER_SENDER=$SENDER_OPS
@@ -63,16 +48,14 @@ services:
     volumes:
       - ./results/sender-1:/usr/kabis/result
   sender-2:
-    extends:
-      service: base
-    image: '${DOCKERHUB_USERNAME}/bft-sender:latest'
+    image: "${$DOCKERHUB_USERNAME}/bft-sender:latest"
     networks:
       - bft
     depends_on:
-      - 'bft-1'
-      - 'bft-2'
-      - 'bft-3'
-      - 'bft-4'
+      - "bft-1"
+      - "bft-2"
+      - "bft-3"
+      - "bft-4"
     environment:
       - ID=1002
       - OPS_PER_SENDER=$SENDER_OPS
@@ -80,16 +63,14 @@ services:
     volumes:
       - ./results/sender-2:/usr/kabis/result
   sender-3:
-    extends:
-      service: base
-    image: '${DOCKERHUB_USERNAME}/bft-sender:latest'
+    image: "${$DOCKERHUB_USERNAME}/bft-sender:latest"
     networks:
       - bft
     depends_on:
-      - 'bft-1'
-      - 'bft-2'
-      - 'bft-3'
-      - 'bft-4'
+      - "bft-1"
+      - "bft-2"
+      - "bft-3"
+      - "bft-4"
     environment:
       - ID=1003
       - OPS_PER_SENDER=$SENDER_OPS
@@ -97,16 +78,14 @@ services:
     volumes:
       - ./results/sender-4:/usr/kabis/result
   receiver-1:
-    extends:
-      service: base
-    image: '${DOCKERHUB_USERNAME}/bft-receiver:latest'
+    image: "${$DOCKERHUB_USERNAME}/bft-receiver:latest"
     networks:
       - bft
     depends_on:
-      - 'bft-1'
-      - 'bft-2'
-      - 'bft-3'
-      - 'bft-4'
+      - "bft-1"
+      - "bft-2"
+      - "bft-3"
+      - "bft-4"
     environment:
       - ID=1004
       - OPS_PER_SENDER=$SENDER_OPS
