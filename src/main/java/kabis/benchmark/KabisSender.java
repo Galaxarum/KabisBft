@@ -51,7 +51,7 @@ public class KabisSender{
         properties.load(new FileInputStream("config.properties"));
         properties.setProperty("client.id", String.valueOf(clientId));
 
-        Thread.sleep(30000);
+        Thread.sleep(10000);
 
         KabisProducer<Integer,String> producer = new KabisProducer<>(properties);
         producer.updateTopology(TOPICS.subList(0,numValidatedTopics));
