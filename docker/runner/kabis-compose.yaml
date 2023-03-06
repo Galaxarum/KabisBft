@@ -8,9 +8,9 @@ networks:
 
 services:
   base:
-    build:
-      context: .
-    env_file: .env
+    build: .
+    environment:
+      - DOCKERHUB_USERNAME
 
   #First kafka replica
   zookeeper-1-1:
