@@ -6,5 +6,5 @@ docker image push $1/kafka-receiver:latest
 
 docker build -t kafka-sender -f kafka-sender.dockerfile .
 docker image tag kafka-sender $1/kafka-sender:latest
-docker image push $$1/kafka-sender:latest
+docker image push $1/kafka-sender:latest
 
