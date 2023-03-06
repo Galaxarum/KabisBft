@@ -1,4 +1,4 @@
-version: '2'
+version: '3.9'
 
 networks:
   kafka-net:
@@ -7,6 +7,10 @@ networks:
     driver: bridge
 
 services:
+  base:
+    build:
+      context: .
+    env_file: .env
 
   #First kafka replica
   zookeeper-1-1:
@@ -105,7 +109,6 @@ services:
       - KAFKA_BROKER_ID=4
       - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092
       - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka_1_4:9092
-
 
   #Second kafka replica
   zookeeper-2-1:
@@ -207,25 +210,33 @@ services:
 
   #Bft service replicas
   bft-1:
-    image: 'flavioriz/kabis-service-replica:latest'
+    extends:
+      service: base
+    image: '${DOCKERHUB_USERNAME}/kabis-service-replica:latest'
     networks:
       - bft
     environment:
       - ID=0
   bft-2:
-    image: 'flavioriz/kabis-service-replica:latest'
+    extends:
+      service: base
+    image: '${DOCKERHUB_USERNAME}/kabis-service-replica:latest'
     networks:
       - bft
     environment:
       - ID=1
   bft-3:
-    image: 'flavioriz/kabis-service-replica:latest'
+    extends:
+      service: base
+    image: '${DOCKERHUB_USERNAME}/kabis-service-replica:latest'
     networks:
       - bft
     environment:
       - ID=2
   bft-4:
-    image: 'flavioriz/kabis-service-replica:latest'
+    extends:
+      service: base
+    image: '${DOCKERHUB_USERNAME}/kabis-service-replica:latest'
     networks:
       - bft
     environment:
@@ -233,7 +244,9 @@ services:
 
   #Clients
   sender-1:
-    image: 'flavioriz/kabis-sender:latest'
+    extends:
+      service: base
+    image: '${DOCKERHUB_USERNAME}/kabis-sender:latest'
     networks:
       - kafka-net
       - bft
@@ -258,7 +271,9 @@ services:
     volumes:
       - ./results/sender-1:/usr/kabis/result
   sender-2:
-    image: 'flavioriz/kabis-sender:latest'
+    extends:
+      service: base
+    image: '${DOCKERHUB_USERNAME}/kabis-sender:latest'
     networks:
       - kafka-net
       - bft
@@ -283,7 +298,9 @@ services:
     volumes:
       - ./results/sender-2:/usr/kabis/result
   sender-3:
-    image: 'flavioriz/kabis-sender:latest'
+    extends:
+      service: base
+    image: '${DOCKERHUB_USERNAME}/kabis-sender:latest'
     networks:
       - kafka-net
       - bft
@@ -308,7 +325,9 @@ services:
     volumes:
       - ./results/sender-3:/usr/kabis/result
   receiver-1:
-    image: 'flavioriz/kabis-receiver:latest'
+    extends:
+      service: base
+    image: '${DOCKERHUB_USERNAME}/kabis-receiver:latest'
     networks:
       - kafka-net
       - bft

@@ -1,10 +1,14 @@
-version: '2'
+version: '3.9'
 
 networks:
   kafka-net:
     driver: bridge
 
 services:
+  base:
+    build:
+      context: .
+    env_file: .env
 
   #First kafka replica
   zookeeper-1-1:
@@ -106,7 +110,9 @@ services:
 
   #Clients
   sender-1:
-    image: 'flavioriz/kafka-sender:latest'
+    extends:
+      service: base
+    image: '${DOCKERHUB_USERNAME}/kafka-sender:latest'
     networks:
       - kafka-net
     depends_on:
@@ -121,7 +127,9 @@ services:
     volumes:
       - ./results/sender-1:/usr/kabis/result
   sender-2:
-    image: 'flavioriz/kafka-sender:latest'
+    extends:
+      service: base
+    image: '${DOCKERHUB_USERNAME}/kafka-sender:latest'
     networks:
       - kafka-net
     depends_on:
@@ -136,7 +144,9 @@ services:
     volumes:
       - ./results/sender-2:/usr/kabis/result
   sender-3:
-    image: 'flavioriz/kafka-sender:latest'
+    extends:
+      service: base
+    image: '${DOCKERHUB_USERNAME}/kafka-sender:latest'
     networks:
       - kafka-net
     depends_on:
@@ -151,7 +161,9 @@ services:
     volumes:
       - ./results/sender-3:/usr/kabis/result
   receiver-1:
-    image: 'flavioriz/kafka-receiver:latest'
+    extends:
+      service: base
+    image: '${DOCKERHUB_USERNAME}/kafka-receiver:latest'
     networks:
       - kafka-net
     depends_on:

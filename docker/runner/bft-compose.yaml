@@ -1,31 +1,44 @@
-version: '2'
+version: '3.9'
 
 networks:
   bft:
     driver: bridge
 
 services:
+  base:
+    build:
+      context: .
+    env_file: .env
+
   #Bft service replicas
   bft-1:
-    image: 'flavioriz/bft-service-replica:latest'
+    extends:
+      service: base
+    image: '${DOCKERHUB_USERNAME}/bft-service-replica:latest'
     networks:
       - bft
     environment:
       - ID=0
   bft-2:
-    image: 'flavioriz/bft-service-replica:latest'
+    extends:
+      service: base
+    image: '${DOCKERHUB_USERNAME}/bft-service-replica:latest'
     networks:
       - bft
     environment:
       - ID=1
   bft-3:
-    image: 'flavioriz/bft-service-replica:latest'
+    extends:
+      service: base
+    image: '${DOCKERHUB_USERNAME}/bft-service-replica:latest'
     networks:
       - bft
     environment:
       - ID=2
   bft-4:
-    image: 'flavioriz/bft-service-replica:latest'
+    extends:
+      service: base
+    image: '${DOCKERHUB_USERNAME}/bft-service-replica:latest'
     networks:
       - bft
     environment:
@@ -33,7 +46,9 @@ services:
 
   #Clients
   sender-1:
-    image: 'flavioriz/bft-sender:latest'
+    extends:
+      service: base
+    image: '${DOCKERHUB_USERNAME}/bft-sender:latest'
     networks:
       - bft
     depends_on:
@@ -48,7 +63,9 @@ services:
     volumes:
       - ./results/sender-1:/usr/kabis/result
   sender-2:
-    image: 'flavioriz/bft-sender:latest'
+    extends:
+      service: base
+    image: '${DOCKERHUB_USERNAME}/bft-sender:latest'
     networks:
       - bft
     depends_on:
@@ -63,7 +80,9 @@ services:
     volumes:
       - ./results/sender-2:/usr/kabis/result
   sender-3:
-    image: 'flavioriz/bft-sender:latest'
+    extends:
+      service: base
+    image: '${DOCKERHUB_USERNAME}/bft-sender:latest'
     networks:
       - bft
     depends_on:
@@ -78,7 +97,9 @@ services:
     volumes:
       - ./results/sender-4:/usr/kabis/result
   receiver-1:
-    image: 'flavioriz/bft-receiver:latest'
+    extends:
+      service: base
+    image: '${DOCKERHUB_USERNAME}/bft-receiver:latest'
     networks:
       - bft
     depends_on:
