@@ -205,25 +205,25 @@ services:
 
   #Bft service replicas
   bft-1:
-    image: "${$DOCKERHUB_USERNAME}/kabis-service-replica:latest"
+    image: "${DOCKERHUB_USERNAME}/kabis-service-replica:latest"
     networks:
       - bft
     environment:
       - ID=0
   bft-2:
-    image: "${$DOCKERHUB_USERNAME}/kabis-service-replica:latest"
+    image: "${DOCKERHUB_USERNAME}/kabis-service-replica:latest"
     networks:
       - bft
     environment:
       - ID=1
   bft-3:
-    image: "${$DOCKERHUB_USERNAME}/kabis-service-replica:latest"
+    image: "${DOCKERHUB_USERNAME}/kabis-service-replica:latest"
     networks:
       - bft
     environment:
       - ID=2
   bft-4:
-    image: "${$DOCKERHUB_USERNAME}/kabis-service-replica:latest"
+    image: "${DOCKERHUB_USERNAME}/kabis-service-replica:latest"
     networks:
       - bft
     environment:
@@ -231,7 +231,7 @@ services:
 
   #Clients
   sender-1:
-    image: "${$DOCKERHUB_USERNAME}/kabis-sender:latest"
+    image: "${DOCKERHUB_USERNAME}/kabis-sender:latest"
     networks:
       - kafka-net
       - bft
@@ -256,7 +256,7 @@ services:
     volumes:
       - ./results/sender-1:/usr/kabis/result
   sender-2:
-    image: "${$DOCKERHUB_USERNAME}/kabis-sender:latest"
+    image: "${DOCKERHUB_USERNAME}/kabis-sender:latest"
     networks:
       - kafka-net
       - bft
@@ -281,7 +281,7 @@ services:
     volumes:
       - ./results/sender-2:/usr/kabis/result
   sender-3:
-    image: "${$DOCKERHUB_USERNAME}/kabis-sender:latest"
+    image: "${DOCKERHUB_USERNAME}/kabis-sender:latest"
     networks:
       - kafka-net
       - bft
@@ -306,7 +306,7 @@ services:
     volumes:
       - ./results/sender-3:/usr/kabis/result
   receiver-1:
-    image: "${$DOCKERHUB_USERNAME}/kabis-receiver:latest"
+    image: "${DOCKERHUB_USERNAME}/kabis-receiver:latest"
     networks:
       - kafka-net
       - bft
