@@ -51,7 +51,7 @@ public class KabisReceiver{
         properties.load(new FileInputStream("config.properties"));
         properties.setProperty("client.id", String.valueOf(clientId));
 
-        Thread.sleep(30000);
+        Thread.sleep(10000);
 
         KabisConsumer<Integer,String> consumer = new KabisConsumer<>(properties);
         consumer.subscribe(TOPICS);

@@ -49,7 +49,7 @@ public class KafkaOnlyReceiver {
 
         //Prime kafka infrastructure
         measureTotalConsumeTime(consumer,numSenders*TOPICS.size());
-        Thread.sleep(30000);
+        Thread.sleep(10000);
         System.out.println("Kafka infrastructure primed");
 
         var time = measureTotalConsumeTime(consumer,totalMessages);

@@ -42,7 +42,7 @@ public class BftOnlyReceiver {
         int payload = Integer.parseInt(args[3]);
         int totalMessages = messagesPerSender * numSenders;
 
-        Thread.sleep(30000);
+        Thread.sleep(10000);
 
         KabisServiceProxy proxy = new KabisServiceProxy(clientId);
 
