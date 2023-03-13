@@ -1,167 +1,167 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="AutoImportSettings">
-    <option name="autoReloadType" value="SELECTIVE" />
+    <option name="autoReloadType" value="SELECTIVE"/>
   </component>
   <component name="ChangeListManager">
     <list default="true" id="fd8a8c28-189a-4e13-baa3-623d6010d22d" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/DockerConfigurator/KabisSmall.DockerConfigurator.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/KabisSmall.main.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/KabisSmall.test.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/KabisSmall.iml" beforeDir="false" afterPath="$PROJECT_DIR$/KabisSmall.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/KabisSmall.ipr" beforeDir="false" afterPath="$PROJECT_DIR$/KabisSmall.ipr" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/KabisSmall.iws" beforeDir="false" afterPath="$PROJECT_DIR$/KabisSmall.iws" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker/bft_benchmark/bft-receiver.jar" beforeDir="false" afterPath="$PROJECT_DIR$/docker/bft_benchmark/bft-receiver.jar" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker/bft_benchmark/bft-sender.jar" beforeDir="false" afterPath="$PROJECT_DIR$/docker/bft_benchmark/bft-sender.jar" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker/bft_benchmark/bft-service-replica.jar" beforeDir="false" afterPath="$PROJECT_DIR$/docker/bft_benchmark/bft-service-replica.jar" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker/kabis_benchmark/kabis-receiver.jar" beforeDir="false" afterPath="$PROJECT_DIR$/docker/kabis_benchmark/kabis-receiver.jar" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker/kabis_benchmark/kabis-sender.jar" beforeDir="false" afterPath="$PROJECT_DIR$/docker/kabis_benchmark/kabis-sender.jar" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker/kabis_benchmark/service-replica.jar" beforeDir="false" afterPath="$PROJECT_DIR$/docker/kabis_benchmark/service-replica.jar" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker/kafka_benchmark/kafka-receiver.jar" beforeDir="false" afterPath="$PROJECT_DIR$/docker/kafka_benchmark/kafka-receiver.jar" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker/kafka_benchmark/kafka-sender.jar" beforeDir="false" afterPath="$PROJECT_DIR$/docker/kafka_benchmark/kafka-sender.jar" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/kabis/benchmark/KabisSender.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/kabis/benchmark/KabisSender.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/DockerConfigurator/KabisSmall.DockerConfigurator.iml" afterDir="false"/>
+      <change afterPath="$PROJECT_DIR$/KabisSmall.main.iml" afterDir="false"/>
+      <change afterPath="$PROJECT_DIR$/KabisSmall.test.iml" afterDir="false"/>
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false"/>
+      <change beforePath="$PROJECT_DIR$/KabisSmall.iml" beforeDir="false" afterPath="$PROJECT_DIR$/KabisSmall.iml" afterDir="false"/>
+      <change beforePath="$PROJECT_DIR$/KabisSmall.ipr" beforeDir="false" afterPath="$PROJECT_DIR$/KabisSmall.ipr" afterDir="false"/>
+      <change beforePath="$PROJECT_DIR$/KabisSmall.iws" beforeDir="false" afterPath="$PROJECT_DIR$/KabisSmall.iws" afterDir="false"/>
+      <change beforePath="$PROJECT_DIR$/docker/bft_benchmark/bft-receiver.jar" beforeDir="false" afterPath="$PROJECT_DIR$/docker/bft_benchmark/bft-receiver.jar" afterDir="false"/>
+      <change beforePath="$PROJECT_DIR$/docker/bft_benchmark/bft-sender.jar" beforeDir="false" afterPath="$PROJECT_DIR$/docker/bft_benchmark/bft-sender.jar" afterDir="false"/>
+      <change beforePath="$PROJECT_DIR$/docker/bft_benchmark/bft-service-replica.jar" beforeDir="false" afterPath="$PROJECT_DIR$/docker/bft_benchmark/bft-service-replica.jar" afterDir="false"/>
+      <change beforePath="$PROJECT_DIR$/docker/kabis_benchmark/kabis-receiver.jar" beforeDir="false" afterPath="$PROJECT_DIR$/docker/kabis_benchmark/kabis-receiver.jar" afterDir="false"/>
+      <change beforePath="$PROJECT_DIR$/docker/kabis_benchmark/kabis-sender.jar" beforeDir="false" afterPath="$PROJECT_DIR$/docker/kabis_benchmark/kabis-sender.jar" afterDir="false"/>
+      <change beforePath="$PROJECT_DIR$/docker/kabis_benchmark/service-replica.jar" beforeDir="false" afterPath="$PROJECT_DIR$/docker/kabis_benchmark/service-replica.jar" afterDir="false"/>
+      <change beforePath="$PROJECT_DIR$/docker/kafka_benchmark/kafka-receiver.jar" beforeDir="false" afterPath="$PROJECT_DIR$/docker/kafka_benchmark/kafka-receiver.jar" afterDir="false"/>
+      <change beforePath="$PROJECT_DIR$/docker/kafka_benchmark/kafka-sender.jar" beforeDir="false" afterPath="$PROJECT_DIR$/docker/kafka_benchmark/kafka-sender.jar" afterDir="false"/>
+      <change beforePath="$PROJECT_DIR$/src/main/java/kabis/benchmark/KabisSender.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/kabis/benchmark/KabisSender.java" afterDir="false"/>
     </list>
-    <option name="SHOW_DIALOG" value="false" />
-    <option name="HIGHLIGHT_CONFLICTS" value="true" />
-    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
-    <option name="LAST_RESOLUTION" value="IGNORE" />
+    <option name="SHOW_DIALOG" value="false"/>
+    <option name="HIGHLIGHT_CONFLICTS" value="true"/>
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false"/>
+    <option name="LAST_RESOLUTION" value="IGNORE"/>
   </component>
   <component name="CreatePatchCommitExecutor">
-    <option name="PATCH_PATH" value="" />
-    <option name="REVERSE_PATCH" value="false" />
+    <option name="PATCH_PATH" value=""/>
+    <option name="REVERSE_PATCH" value="false"/>
   </component>
   <component name="DebuggerManager">
     <breakpoint_any converted="true">
       <breakpoint>
-        <option name="NOTIFY_CAUGHT" value="true" />
-        <option name="NOTIFY_UNCAUGHT" value="true" />
-        <option name="ENABLED" value="false" />
-        <option name="LOG_ENABLED" value="false" />
-        <option name="LOG_EXPRESSION_ENABLED" value="false" />
-        <option name="SUSPEND_POLICY" value="SuspendAll" />
-        <option name="COUNT_FILTER_ENABLED" value="false" />
-        <option name="COUNT_FILTER" value="0" />
-        <option name="CONDITION_ENABLED" value="false" />
-        <option name="CLASS_FILTERS_ENABLED" value="false" />
-        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
-        <option name="CONDITION" value="" />
-        <option name="LOG_MESSAGE" value="" />
+        <option name="NOTIFY_CAUGHT" value="true"/>
+        <option name="NOTIFY_UNCAUGHT" value="true"/>
+        <option name="ENABLED" value="false"/>
+        <option name="LOG_ENABLED" value="false"/>
+        <option name="LOG_EXPRESSION_ENABLED" value="false"/>
+        <option name="SUSPEND_POLICY" value="SuspendAll"/>
+        <option name="COUNT_FILTER_ENABLED" value="false"/>
+        <option name="COUNT_FILTER" value="0"/>
+        <option name="CONDITION_ENABLED" value="false"/>
+        <option name="CLASS_FILTERS_ENABLED" value="false"/>
+        <option name="INSTANCE_FILTERS_ENABLED" value="false"/>
+        <option name="CONDITION" value=""/>
+        <option name="LOG_MESSAGE" value=""/>
       </breakpoint>
       <breakpoint>
-        <option name="NOTIFY_CAUGHT" value="true" />
-        <option name="NOTIFY_UNCAUGHT" value="true" />
-        <option name="ENABLED" value="false" />
-        <option name="LOG_ENABLED" value="false" />
-        <option name="LOG_EXPRESSION_ENABLED" value="false" />
-        <option name="SUSPEND_POLICY" value="SuspendAll" />
-        <option name="COUNT_FILTER_ENABLED" value="false" />
-        <option name="COUNT_FILTER" value="0" />
-        <option name="CONDITION_ENABLED" value="false" />
-        <option name="CLASS_FILTERS_ENABLED" value="false" />
-        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
-        <option name="CONDITION" value="" />
-        <option name="LOG_MESSAGE" value="" />
+        <option name="NOTIFY_CAUGHT" value="true"/>
+        <option name="NOTIFY_UNCAUGHT" value="true"/>
+        <option name="ENABLED" value="false"/>
+        <option name="LOG_ENABLED" value="false"/>
+        <option name="LOG_EXPRESSION_ENABLED" value="false"/>
+        <option name="SUSPEND_POLICY" value="SuspendAll"/>
+        <option name="COUNT_FILTER_ENABLED" value="false"/>
+        <option name="COUNT_FILTER" value="0"/>
+        <option name="CONDITION_ENABLED" value="false"/>
+        <option name="CLASS_FILTERS_ENABLED" value="false"/>
+        <option name="INSTANCE_FILTERS_ENABLED" value="false"/>
+        <option name="CONDITION" value=""/>
+        <option name="LOG_MESSAGE" value=""/>
       </breakpoint>
     </breakpoint_any>
-    <breakpoint_rules converted="true" />
-    <ui_properties converted="true" />
+    <breakpoint_rules converted="true"/>
+    <ui_properties converted="true"/>
   </component>
   <component name="ExternalProjectsData">
     <projectState path="$PROJECT_DIR$">
-      <ProjectState />
+      <ProjectState/>
     </projectState>
   </component>
   <component name="ExternalProjectsManager">
     <system id="GRADLE">
       <state>
         <task path="$PROJECT_DIR$">
-          <activation />
+          <activation/>
         </task>
         <projects_view>
           <tree_state>
             <expand>
               <path>
-                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
-                <item name="KabisSmall" type="f1a62948:ProjectNode" />
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode"/>
+                <item name="KabisSmall" type="f1a62948:ProjectNode"/>
               </path>
               <path>
-                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
-                <item name="KabisSmall" type="f1a62948:ProjectNode" />
-                <item name="Tasks" type="e4a08cd1:TasksNode" />
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode"/>
+                <item name="KabisSmall" type="f1a62948:ProjectNode"/>
+                <item name="Tasks" type="e4a08cd1:TasksNode"/>
               </path>
               <path>
-                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
-                <item name="KabisSmall" type="f1a62948:ProjectNode" />
-                <item name="Tasks" type="e4a08cd1:TasksNode" />
-                <item name="build" type="c8890929:TasksNode$1" />
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode"/>
+                <item name="KabisSmall" type="f1a62948:ProjectNode"/>
+                <item name="Tasks" type="e4a08cd1:TasksNode"/>
+                <item name="build" type="c8890929:TasksNode$1"/>
               </path>
             </expand>
-            <select />
+            <select/>
           </tree_state>
         </projects_view>
       </state>
     </system>
   </component>
   <component name="MarkdownSettingsMigration">
-    <option name="stateVersion" value="1" />
+    <option name="stateVersion" value="1"/>
   </component>
   <component name="ModuleEditorState">
-    <option name="LAST_EDITED_MODULE_NAME" />
-    <option name="LAST_EDITED_TAB_NAME" />
+    <option name="LAST_EDITED_MODULE_NAME"/>
+    <option name="LAST_EDITED_TAB_NAME"/>
   </component>
-  <component name="ProjectId" id="2MolD5PwTY0TWu8bDbASJLj3Uov" />
+  <component name="ProjectId" id="2MolD5PwTY0TWu8bDbASJLj3Uov"/>
   <component name="ProjectInspectionProfilesVisibleTreeState">
     <entry key="Project Default">
-      <profile-state />
+      <profile-state/>
     </entry>
   </component>
   <component name="ProjectLevelVcsManager">
-    <ConfirmationsSetting value="2" id="Add" />
+    <ConfirmationsSetting value="2" id="Add"/>
   </component>
   <component name="ProjectReloadState">
-    <option name="STATE" value="0" />
+    <option name="STATE" value="0"/>
   </component>
   <component name="ProjectViewState">
-    <option name="hideEmptyMiddlePackages" value="true" />
-    <option name="showLibraryContents" value="true" />
+    <option name="hideEmptyMiddlePackages" value="true"/>
+    <option name="showLibraryContents" value="true"/>
   </component>
   <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/home/flavio/Scrivania/Politecnico/TESI/KabisBft&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  "keyToString": {
+    "ASKED_ADD_EXTERNAL_FILES": "true",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "last_opened_file_path": "/home/flavio/Scrivania/Politecnico/TESI/KabisBft",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "vue.rearranger.settings.migration": "true"
   }
 }</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$" />
+      <recent name="$PROJECT_DIR$"/>
     </key>
   </component>
   <component name="RunManager" selected="Gradle.KabisBft [bftServiceReplicaJar]">
     <configuration default="true" type="Applet" factoryName="Applet">
-      <module name="" />
-      <option name="MAIN_CLASS_NAME" />
-      <option name="HTML_FILE_NAME" />
-      <option name="HTML_USED" value="false" />
-      <option name="WIDTH" value="400" />
-      <option name="HEIGHT" value="300" />
-      <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
-      <option name="VM_PARAMETERS" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" />
+      <module name=""/>
+      <option name="MAIN_CLASS_NAME"/>
+      <option name="HTML_FILE_NAME"/>
+      <option name="HTML_USED" value="false"/>
+      <option name="WIDTH" value="400"/>
+      <option name="HEIGHT" value="300"/>
+      <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy"/>
+      <option name="VM_PARAMETERS"/>
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false"/>
+      <option name="ALTERNATIVE_JRE_PATH"/>
       <method>
-        <option name="BuildArtifacts" enabled="false" />
-        <option name="Make" enabled="true" />
+        <option name="BuildArtifacts" enabled="false"/>
+        <option name="Make" enabled="true"/>
       </method>
     </configuration>
     <configuration name="&lt;template&gt;" type="WebApp" default="true" selected="false">
@@ -169,184 +169,184 @@
       <Port>5050</Port>
     </configuration>
     <configuration default="true" type="Application" factoryName="Application">
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$"/>
       <method v="2">
-        <option name="BuildArtifacts" enabled="false" />
-        <option name="Make" enabled="true" />
+        <option name="BuildArtifacts" enabled="false"/>
+        <option name="Make" enabled="true"/>
       </method>
     </configuration>
     <configuration name="KabisBft [bftReceiverJar]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
-        <option name="executionName" />
-        <option name="externalProjectPath" value="$PROJECT_DIR$" />
-        <option name="externalSystemIdString" value="GRADLE" />
-        <option name="scriptParameters" />
+        <option name="executionName"/>
+        <option name="externalProjectPath" value="$PROJECT_DIR$"/>
+        <option name="externalSystemIdString" value="GRADLE"/>
+        <option name="scriptParameters"/>
         <option name="taskDescriptions">
-          <list />
+          <list/>
         </option>
         <option name="taskNames">
           <list>
-            <option value="bftReceiverJar" />
+            <option value="bftReceiverJar"/>
           </list>
         </option>
-        <option name="vmOptions" />
+        <option name="vmOptions"/>
       </ExternalSystemSettings>
       <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
       <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
       <DebugAllEnabled>false</DebugAllEnabled>
-      <method v="2" />
+      <method v="2"/>
     </configuration>
     <configuration name="KabisBft [bftSenderJar]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
-        <option name="executionName" />
-        <option name="externalProjectPath" value="$PROJECT_DIR$" />
-        <option name="externalSystemIdString" value="GRADLE" />
-        <option name="scriptParameters" />
+        <option name="executionName"/>
+        <option name="externalProjectPath" value="$PROJECT_DIR$"/>
+        <option name="externalSystemIdString" value="GRADLE"/>
+        <option name="scriptParameters"/>
         <option name="taskDescriptions">
-          <list />
+          <list/>
         </option>
         <option name="taskNames">
           <list>
-            <option value="bftSenderJar" />
+            <option value="bftSenderJar"/>
           </list>
         </option>
-        <option name="vmOptions" />
+        <option name="vmOptions"/>
       </ExternalSystemSettings>
       <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
       <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
       <DebugAllEnabled>false</DebugAllEnabled>
-      <method v="2" />
+      <method v="2"/>
     </configuration>
     <configuration name="KabisBft [bftSenderShadowJar]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
-        <option name="executionName" />
-        <option name="externalProjectPath" value="$PROJECT_DIR$" />
-        <option name="externalSystemIdString" value="GRADLE" />
-        <option name="scriptParameters" />
+        <option name="executionName"/>
+        <option name="externalProjectPath" value="$PROJECT_DIR$"/>
+        <option name="externalSystemIdString" value="GRADLE"/>
+        <option name="scriptParameters"/>
         <option name="taskDescriptions">
-          <list />
+          <list/>
         </option>
         <option name="taskNames">
           <list>
-            <option value="bftSenderShadowJar" />
+            <option value="bftSenderShadowJar"/>
           </list>
         </option>
-        <option name="vmOptions" />
+        <option name="vmOptions"/>
       </ExternalSystemSettings>
       <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
       <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
       <DebugAllEnabled>false</DebugAllEnabled>
-      <method v="2" />
+      <method v="2"/>
     </configuration>
     <configuration name="KabisBft [bftServiceReplicaJar]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
-        <option name="executionName" />
-        <option name="externalProjectPath" value="$PROJECT_DIR$" />
-        <option name="externalSystemIdString" value="GRADLE" />
-        <option name="scriptParameters" />
+        <option name="executionName"/>
+        <option name="externalProjectPath" value="$PROJECT_DIR$"/>
+        <option name="externalSystemIdString" value="GRADLE"/>
+        <option name="scriptParameters"/>
         <option name="taskDescriptions">
-          <list />
+          <list/>
         </option>
         <option name="taskNames">
           <list>
-            <option value="bftServiceReplicaJar" />
+            <option value="bftServiceReplicaJar"/>
           </list>
         </option>
-        <option name="vmOptions" />
+        <option name="vmOptions"/>
       </ExternalSystemSettings>
       <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
       <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
       <DebugAllEnabled>false</DebugAllEnabled>
-      <method v="2" />
+      <method v="2"/>
     </configuration>
     <configuration name="KabisBft [bftServiceReplicaShadowJar]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
-        <option name="executionName" />
-        <option name="externalProjectPath" value="$PROJECT_DIR$" />
-        <option name="externalSystemIdString" value="GRADLE" />
-        <option name="scriptParameters" />
+        <option name="executionName"/>
+        <option name="externalProjectPath" value="$PROJECT_DIR$"/>
+        <option name="externalSystemIdString" value="GRADLE"/>
+        <option name="scriptParameters"/>
         <option name="taskDescriptions">
-          <list />
+          <list/>
         </option>
         <option name="taskNames">
           <list>
-            <option value="bftServiceReplicaShadowJar" />
+            <option value="bftServiceReplicaShadowJar"/>
           </list>
         </option>
-        <option name="vmOptions" />
+        <option name="vmOptions"/>
       </ExternalSystemSettings>
       <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
       <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
       <DebugAllEnabled>false</DebugAllEnabled>
-      <method v="2" />
+      <method v="2"/>
     </configuration>
     <configuration default="true" type="JUnit" factoryName="JUnit">
-      <option name="TEST_OBJECT" value="class" />
-      <option name="VM_PARAMETERS" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="TEST_OBJECT" value="class"/>
+      <option name="VM_PARAMETERS"/>
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$"/>
       <option name="TEST_SEARCH_SCOPE">
-        <value defaultName="moduleWithDependencies" />
+        <value defaultName="moduleWithDependencies"/>
       </option>
       <method v="2">
-        <option name="BuildArtifacts" enabled="false" />
-        <option name="Make" enabled="true" />
+        <option name="BuildArtifacts" enabled="false"/>
+        <option name="Make" enabled="true"/>
       </method>
     </configuration>
     <configuration default="true" type="Remote">
-      <option name="USE_SOCKET_TRANSPORT" value="true" />
-      <option name="SERVER_MODE" value="false" />
-      <option name="SHMEM_ADDRESS" value="javadebug" />
-      <option name="HOST" value="localhost" />
-      <option name="PORT" value="5005" />
-      <option name="AUTO_RESTART" value="false" />
+      <option name="USE_SOCKET_TRANSPORT" value="true"/>
+      <option name="SERVER_MODE" value="false"/>
+      <option name="SHMEM_ADDRESS" value="javadebug"/>
+      <option name="HOST" value="localhost"/>
+      <option name="PORT" value="5005"/>
+      <option name="AUTO_RESTART" value="false"/>
       <method v="2">
-        <option name="BuildArtifacts" enabled="false" />
+        <option name="BuildArtifacts" enabled="false"/>
       </method>
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Gradle.KabisBft [bftServiceReplicaJar]" />
-        <item itemvalue="Gradle.KabisBft [bftServiceReplicaShadowJar]" />
-        <item itemvalue="Gradle.KabisBft [bftSenderJar]" />
-        <item itemvalue="Gradle.KabisBft [bftSenderShadowJar]" />
-        <item itemvalue="Gradle.KabisBft [bftReceiverJar]" />
+        <item itemvalue="Gradle.KabisBft [bftServiceReplicaJar]"/>
+        <item itemvalue="Gradle.KabisBft [bftServiceReplicaShadowJar]"/>
+        <item itemvalue="Gradle.KabisBft [bftSenderJar]"/>
+        <item itemvalue="Gradle.KabisBft [bftSenderShadowJar]"/>
+        <item itemvalue="Gradle.KabisBft [bftReceiverJar]"/>
       </list>
     </recent_temporary>
   </component>
-  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true"/>
   <component name="SvnConfiguration" maxAnnotateRevisions="500">
-    <option name="USER" value="" />
-    <option name="PASSWORD" value="" />
-    <option name="LAST_MERGED_REVISION" />
-    <option name="UPDATE_RUN_STATUS" value="false" />
-    <option name="MERGE_DRY_RUN" value="false" />
-    <option name="MERGE_DIFF_USE_ANCESTRY" value="true" />
-    <option name="UPDATE_LOCK_ON_DEMAND" value="false" />
-    <option name="IGNORE_SPACES_IN_MERGE" value="false" />
-    <option name="DETECT_NESTED_COPIES" value="true" />
-    <option name="IGNORE_SPACES_IN_ANNOTATE" value="true" />
-    <option name="SHOW_MERGE_SOURCES_IN_ANNOTATE" value="true" />
+    <option name="USER" value=""/>
+    <option name="PASSWORD" value=""/>
+    <option name="LAST_MERGED_REVISION"/>
+    <option name="UPDATE_RUN_STATUS" value="false"/>
+    <option name="MERGE_DRY_RUN" value="false"/>
+    <option name="MERGE_DIFF_USE_ANCESTRY" value="true"/>
+    <option name="UPDATE_LOCK_ON_DEMAND" value="false"/>
+    <option name="IGNORE_SPACES_IN_MERGE" value="false"/>
+    <option name="DETECT_NESTED_COPIES" value="true"/>
+    <option name="IGNORE_SPACES_IN_ANNOTATE" value="true"/>
+    <option name="SHOW_MERGE_SOURCES_IN_ANNOTATE" value="true"/>
     <myIsUseDefaultProxy>false</myIsUseDefaultProxy>
   </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="fd8a8c28-189a-4e13-baa3-623d6010d22d" name="Changes" comment="" />
+      <changelist id="fd8a8c28-189a-4e13-baa3-623d6010d22d" name="Changes" comment=""/>
       <created>1678442417357</created>
-      <option name="number" value="Default" />
-      <option name="presentableId" value="Default" />
+      <option name="number" value="Default"/>
+      <option name="presentableId" value="Default"/>
       <updated>1678442417357</updated>
-      <workItem from="1678441695462" duration="317000" />
-      <workItem from="1678442025055" duration="8458000" />
-      <workItem from="1678459200087" duration="1231000" />
-      <workItem from="1678722342690" duration="2407000" />
+      <workItem from="1678441695462" duration="317000"/>
+      <workItem from="1678442025055" duration="8458000"/>
+      <workItem from="1678459200087" duration="1231000"/>
+      <workItem from="1678722342690" duration="2407000"/>
     </task>
-    <servers />
+    <servers/>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
-    <option name="version" value="3" />
+    <option name="version" value="3"/>
   </component>
   <component name="VcsManagerConfiguration">
-    <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
+    <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true"/>
+    <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true"/>
   </component>
 </project>
