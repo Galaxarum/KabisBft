@@ -59,7 +59,7 @@ public class KabisSender{
         //Prime kafka infrastructure
         System.out.printf("Sending %d messages to prime the system. [%d/%d] validated topics%n",TOPICS.size(),numValidatedTopics,TOPICS.size());
         measureSendingTime(producer,TOPICS.size(),message);
-        Thread.sleep(3000);
+        Thread.sleep(15000);
         System.out.println("Kafka infrastructure primed");
 
         //Real measure
