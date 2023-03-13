@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module external.linked.project.id="KabisSmall:main" external.linked.project.path="$MODULE_DIR$" external.root.project.path="$MODULE_DIR$" external.system.id="GRADLE" external.system.module.group="org.example" external.system.module.type="sourceSet" external.system.module.version="1.0-SNAPSHOT" type="JAVA_MODULE" version="4">
+  <component name="NewModuleRootManager">
+    <output url="file://$MODULE_DIR$/build/classes/java/main" />
+    <exclude-output />
+    <content url="file://$MODULE_DIR$/src/main">
+      <sourceFolder url="file://$MODULE_DIR$/src/main/java" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/main/resources" type="java-resource" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/BFT-SMaRt.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="library" name="Gradle: org.apache.kafka:kafka-clients:3.2.3" level="project" />
+    <orderEntry type="library" name="Gradle: org.slf4j:slf4j-simple:1.7.32" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: org.slf4j:slf4j-api:1.7.32" level="project" />
+    <orderEntry type="library" name="Gradle: org.bouncycastle:bcpkix-jdk15on:1.68" level="project" />
+    <orderEntry type="library" name="Gradle: org.bouncycastle:bcprov-jdk15on:1.68" level="project" />
+    <orderEntry type="library" name="Gradle: commons-codec:commons-codec:1.15" level="project" />
+    <orderEntry type="library" name="Gradle: io.netty:netty-all:4.1.77.Final" level="project" />
+    <orderEntry type="library" name="Gradle: io.netty:netty-buffer:4.1.77.Final" level="project" />
+    <orderEntry type="library" name="Gradle: io.netty:netty-codec:4.1.77.Final" level="project" />
+    <orderEntry type="library" name="Gradle: io.netty:netty-codec-dns:4.1.77.Final" level="project" />
+    <orderEntry type="library" name="Gradle: io.netty:netty-codec-haproxy:4.1.77.Final" level="project" />
+    <orderEntry type="library" name="Gradle: io.netty:netty-codec-http:4.1.77.Final" level="project" />
+    <orderEntry type="library" name="Gradle: io.netty:netty-codec-http2:4.1.77.Final" level="project" />
+    <orderEntry type="library" name="Gradle: io.netty:netty-codec-memcache:4.1.77.Final" level="project" />
+    <orderEntry type="library" name="Gradle: io.netty:netty-codec-mqtt:4.1.77.Final" level="project" />
+    <orderEntry type="library" name="Gradle: io.netty:netty-codec-redis:4.1.77.Final" level="project" />
+    <orderEntry type="library" name="Gradle: io.netty:netty-codec-smtp:4.1.77.Final" level="project" />
+    <orderEntry type="library" name="Gradle: io.netty:netty-codec-socks:4.1.77.Final" level="project" />
+    <orderEntry type="library" name="Gradle: io.netty:netty-codec-stomp:4.1.77.Final" level="project" />
+    <orderEntry type="library" name="Gradle: io.netty:netty-codec-xml:4.1.77.Final" level="project" />
+    <orderEntry type="library" name="Gradle: io.netty:netty-common:4.1.77.Final" level="project" />
+    <orderEntry type="library" name="Gradle: io.netty:netty-handler:4.1.77.Final" level="project" />
+    <orderEntry type="library" name="Gradle: io.netty:netty-handler-proxy:4.1.77.Final" level="project" />
+    <orderEntry type="library" name="Gradle: io.netty:netty-resolver:4.1.77.Final" level="project" />
+    <orderEntry type="library" name="Gradle: io.netty:netty-resolver-dns:4.1.77.Final" level="project" />
+    <orderEntry type="library" name="Gradle: io.netty:netty-transport:4.1.77.Final" level="project" />
+    <orderEntry type="library" name="Gradle: io.netty:netty-transport-rxtx:4.1.77.Final" level="project" />
+    <orderEntry type="library" name="Gradle: io.netty:netty-transport-sctp:4.1.77.Final" level="project" />
+    <orderEntry type="library" name="Gradle: io.netty:netty-transport-udt:4.1.77.Final" level="project" />
+    <orderEntry type="library" name="Gradle: io.netty:netty-transport-classes-epoll:4.1.77.Final" level="project" />
+    <orderEntry type="library" name="Gradle: io.netty:netty-transport-native-unix-common:4.1.77.Final" level="project" />
+    <orderEntry type="library" name="Gradle: io.netty:netty-transport-classes-kqueue:4.1.77.Final" level="project" />
+    <orderEntry type="library" name="Gradle: io.netty:netty-resolver-dns-classes-macos:4.1.77.Final" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: org.slf4j:slf4j-api:1.7.36" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: com.github.luben:zstd-jni:1.5.2-1" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: org.lz4:lz4-java:1.8.0" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: org.xerial.snappy:snappy-java:1.1.8.4" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: io.netty:netty-transport-native-epoll:linux-aarch_64:4.1.77.Final" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: io.netty:netty-transport-native-epoll:linux-x86_64:4.1.77.Final" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: io.netty:netty-transport-native-kqueue:osx-aarch_64:4.1.77.Final" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: io.netty:netty-transport-native-kqueue:osx-x86_64:4.1.77.Final" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: io.netty:netty-resolver-dns-native-macos:osx-aarch_64:4.1.77.Final" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: io.netty:netty-resolver-dns-native-macos:osx-x86_64:4.1.77.Final" level="project" />
+  </component>
+</module>

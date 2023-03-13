@@ -1,6 +1,7 @@
 # Local environment
 .env
 .DS_store
+**/results
 
 # IntelliJ files
 .idea
