@@ -1,8 +1,12 @@
 PAYLOADS=(0 1 5 10)
 VALIDATED=(0 4 8 12)
 OPS=(100)
+
+rm -rf kabis kafka
+
 mkdir "kabis"
 mkdir "kafka"
+
 for payloadKB in "${PAYLOADS[@]}"; do
   ((payloadB=1024*payloadKB))
   for ops in "${OPS[@]}"; do

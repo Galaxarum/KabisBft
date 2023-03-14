@@ -52,7 +52,7 @@ public class KafkaOnlySender {
 
         //Prime kafka infrastructure
         measureSendingTime(producer,TOPICS.size(),message);
-        Thread.sleep(1000);
+        Thread.sleep(10000);
         System.out.println("Kafka infrastructure primed");
 
         var time = measureSendingTime(producer,numOperations,message);
