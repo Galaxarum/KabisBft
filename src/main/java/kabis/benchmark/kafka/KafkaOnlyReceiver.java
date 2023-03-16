@@ -52,8 +52,9 @@ public class KafkaOnlyReceiver {
         Thread.sleep(10000);
         System.out.println("Kafka infrastructure primed");
 
+        //Real measure
+        System.out.printf("KAFKA %d: Reading %d messages.%n",payload,totalMessages);
         var time = measureTotalConsumeTime(consumer,totalMessages);
-
         BenchmarkResult.storeThroughputToDisk(BenchmarkResult.buildThroughputString(totalMessages,payload,-1,time));
         System.out.println("Experiment result persisted");
         consumer.close();

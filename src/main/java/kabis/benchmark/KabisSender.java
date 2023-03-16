@@ -63,7 +63,7 @@ public class KabisSender{
         System.out.println("Kafka infrastructure primed");
 
         //Real measure
-        System.out.printf("Sending %d messages. [%d/%d] validated topics%n",numOperations,numValidatedTopics,TOPICS.size());
+        System.out.printf("KABIS %d: Sending %d messages. [%d/%d] validated topics%n",payloadSize,numOperations,numValidatedTopics,TOPICS.size());
         var time = measureSendingTime(producer,numOperations,message);
         BenchmarkResult.storeThroughputToDisk(BenchmarkResult.buildThroughputString(numOperations,payloadSize,numValidatedTopics,time));
         System.out.println("Experiment result persisted");

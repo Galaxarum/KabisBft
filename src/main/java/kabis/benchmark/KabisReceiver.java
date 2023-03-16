@@ -51,8 +51,6 @@ public class KabisReceiver{
         properties.load(new FileInputStream("config.properties"));
         properties.setProperty("client.id", String.valueOf(clientId));
 
-        Thread.sleep(10000);
-
         KabisConsumer<Integer,String> consumer = new KabisConsumer<>(properties);
         consumer.subscribe(TOPICS);
         consumer.updateTopology(TOPICS.subList(0,numValidatedTopics));
@@ -61,10 +59,11 @@ public class KabisReceiver{
         var primingMessages = numSenders*TOPICS.size();
         System.out.printf("Reading %d messages to prime the system. [%d/%d] validated topics%n",primingMessages,numValidatedTopics,TOPICS.size());
         measureTotalConsumeTime(consumer,primingMessages);
+        Thread.sleep(10000);
         System.out.println("Kafka infrastructure primed");
 
         //Real measure
-        System.out.printf("Reading %d messages. [%d/%d] validated topics%n",totalMessages,numValidatedTopics,TOPICS.size());
+        System.out.printf("KABIS %d: Reading %d messages. [%d/%d] validated topics%n",payload,totalMessages,numValidatedTopics,TOPICS.size());
         var time = measureTotalConsumeTime(consumer,totalMessages);
         BenchmarkResult.storeThroughputToDisk(BenchmarkResult.buildThroughputString(totalMessages,payload,numValidatedTopics,time));
         System.out.println("Experiment result persisted");

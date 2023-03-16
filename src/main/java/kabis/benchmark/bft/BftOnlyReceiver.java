@@ -46,8 +46,9 @@ public class BftOnlyReceiver {
 
         KabisServiceProxy proxy = new KabisServiceProxy(clientId);
 
+        //Real measure
+        System.out.printf("BFT %d: Reading %d messages.%n",payload,totalMessages);
         var time = measureTotalConsumeTime(proxy,totalMessages);
-
         BenchmarkResult.storeThroughputToDisk(BenchmarkResult.buildThroughputString(totalMessages,payload, Integer.MAX_VALUE, time));
         System.out.println("Experiment result persisted");
         Thread.sleep(1000);

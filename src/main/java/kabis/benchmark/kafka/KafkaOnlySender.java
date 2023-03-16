@@ -55,8 +55,12 @@ public class KafkaOnlySender {
         Thread.sleep(15000);
         System.out.println("Kafka infrastructure primed");
 
+        //Real measure
+        System.out.printf("KAFKA %d: Sending %d messages.%n",payloadSize,numOperations);
         var time = measureSendingTime(producer,numOperations,message);
         BenchmarkResult.storeThroughputToDisk(BenchmarkResult.buildThroughputString(numOperations,payloadSize,0,time));
+        System.out.println("Experiment result persisted");
+        producer.close();
     }
 
 }

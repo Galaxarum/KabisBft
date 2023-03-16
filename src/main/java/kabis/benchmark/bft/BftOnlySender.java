@@ -49,6 +49,8 @@ public class BftOnlySender {
 
         KabisServiceProxy proxy = new KabisServiceProxy(clientId);
 
+        //Real measure
+        System.out.printf("BFT %d: Sending %d messages.%n",payloadSize,numOperations);
         var time = measureSendingTime(proxy,numOperations,message,clientId);
         BenchmarkResult.storeThroughputToDisk(BenchmarkResult.buildThroughputString(numOperations,payloadSize,0,time));
         System.out.println("Experiment result saved");
