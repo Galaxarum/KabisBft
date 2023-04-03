@@ -1,0 +1,72 @@
+version: "3.8"
+
+services:
+  #First kafka replica
+  zookeeper-1-4:
+    image: "bitnami/zookeeper:latest"
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+      - ZOO_SERVER_ID=3
+      - ZOO_SERVERS=0.0.0.0:2888:3888
+
+  kafka_1_4:
+    image: "bitnami/kafka:latest"
+    depends_on:
+      - "zookeeper-1-4"
+    ports:
+      - '29097:29097'
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+      - ALLOW_PLAINTEXT_LISTENER=yes
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper-1-4:2181
+      - KAFKA_BROKER_ID=4
+      - KAFKA_CFG_LISTENERS=LOCAL://:9092,EXTERNAL://0.0.0.0:29097
+      - KAFKA_CFG_ADVERTISED_LISTENERS=LOCAL://kafka_1_4:9092,EXTERNAL://172.20.10.11:29097
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=LOCAL:PLAINTEXT,EXTERNAL:PLAINTEXT
+      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=LOCAL
+
+  #Second kafka replica
+  zookeeper-2-4:
+    image: "bitnami/zookeeper:latest"
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+      - ZOO_SERVER_ID=4
+      - ZOO_SERVERS=0.0.0.0:2888:3888
+
+  kafka_2_4:
+    image: "bitnami/kafka:latest"
+    depends_on:
+      - "zookeeper-2-4"
+    ports:
+      - '29098:29098'
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+      - ALLOW_PLAINTEXT_LISTENER=yes
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper-1-4:2181
+      - KAFKA_BROKER_ID=4
+      - KAFKA_CFG_LISTENERS=LOCAL://:9092,EXTERNAL://0.0.0.0:29098
+      - KAFKA_CFG_ADVERTISED_LISTENERS=LOCAL://kafka_1_4:9092,EXTERNAL://172.20.10.11:29098
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=LOCAL:PLAINTEXT,EXTERNAL:PLAINTEXT
+      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=LOCAL
+
+  #Bft service replicas
+  bft-4:
+    image: "${DOCKERHUB_USERNAME}/kabis-service-replica:latest"
+    environment:
+      - ID=3
+
+  #Clients
+  receiver-1:
+    image: "${DOCKERHUB_USERNAME}/kabis-receiver:latest"
+    depends_on:
+      - "kafka_1_4"
+      - "kafka_2_4"
+      - "bft-4"
+    environment:
+      - ID=1004
+      - NUM_SENDERS=3
+      - OPS_PER_SENDER=$SENDER_OPS
+      - PAYLOAD_SIZE=$PAYLOAD
+      - NUM_VALIDATED=$VALIDATED
+    volumes:
+      - ./results/receiver-1:/usr/kabis/result
