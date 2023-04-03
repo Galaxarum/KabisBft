@@ -3,15 +3,15 @@ version: "3.8"
 services:
   #Bft service replicas
   bft-1:
-    image: "${DOCKERHUB_USERNAME}/bft-service-replica:latest"
+    image: "${DOCKERHUB_USERNAME}/bft-sender-service-replica:latest"
     environment:
       - ID=0
   bft-2:
-    image: "${DOCKERHUB_USERNAME}/bft-service-replica:latest"
+    image: "${DOCKERHUB_USERNAME}/bft-sender-service-replica:latest"
     environment:
       - ID=1
   bft-3:
-    image: "${DOCKERHUB_USERNAME}/bft-service-replica:latest"
+    image: "${DOCKERHUB_USERNAME}/bft-sender-service-replica:latest"
     environment:
       - ID=2
 

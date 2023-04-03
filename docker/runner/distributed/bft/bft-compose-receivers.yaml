@@ -3,7 +3,7 @@ version: "3.8"
 services:
   #Bft service replicas
   bft-4:
-    image: "${DOCKERHUB_USERNAME}/bft-service-replica:latest"
+    image: "${DOCKERHUB_USERNAME}/bft-receiver-service-replica:latest"
     environment:
       - ID=3
 
