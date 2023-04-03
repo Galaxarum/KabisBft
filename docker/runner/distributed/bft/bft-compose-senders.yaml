@@ -4,14 +4,23 @@ services:
   #Bft service replicas
   bft-1:
     image: "${DOCKERHUB_USERNAME}/bft-sender-service-replica:latest"
+    ports:
+      - "11000"
+      - "11001"
     environment:
       - ID=0
   bft-2:
     image: "${DOCKERHUB_USERNAME}/bft-sender-service-replica:latest"
+    ports:
+      - "11010"
+      - "11011"
     environment:
       - ID=1
   bft-3:
     image: "${DOCKERHUB_USERNAME}/bft-sender-service-replica:latest"
+    ports:
+      - "11020"
+      - "11021"
     environment:
       - ID=2
 
@@ -22,6 +31,8 @@ services:
       - "bft-1"
       - "bft-2"
       - "bft-3"
+    ports:
+      - "11100"
     environment:
       - ID=1001
       - OPS_PER_SENDER=$SENDER_OPS
@@ -34,6 +45,8 @@ services:
       - "bft-1"
       - "bft-2"
       - "bft-3"
+    ports:
+      - "11101"
     environment:
       - ID=1002
       - OPS_PER_SENDER=$SENDER_OPS
@@ -46,6 +59,8 @@ services:
       - "bft-1"
       - "bft-2"
       - "bft-3"
+    ports:
+      - "11102"
     environment:
       - ID=1003
       - OPS_PER_SENDER=$SENDER_OPS

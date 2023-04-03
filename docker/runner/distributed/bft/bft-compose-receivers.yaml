@@ -4,6 +4,9 @@ services:
   #Bft service replicas
   bft-4:
     image: "${DOCKERHUB_USERNAME}/bft-receiver-service-replica:latest"
+    ports:
+      - "11030"
+      - "11031"
     environment:
       - ID=3
 
@@ -11,9 +14,9 @@ services:
   receiver-1:
     image: "${DOCKERHUB_USERNAME}/bft-receiver:latest"
     depends_on:
-      - "bft-1"
-      - "bft-2"
-      - "bft-3"
+      - "bft-4"
+    ports:
+      - "11103"
     environment:
       - ID=1004
       - OPS_PER_SENDER=$SENDER_OPS
