@@ -4,6 +4,7 @@ services:
   #Bft service replicas
   bft-4:
     image: "${DOCKERHUB_USERNAME}/bft-receiver-service-replica:latest"
+    network_mode: host
     ports:
       - "172.20.10.11:11030:11030"
       - "172.20.10.11:11031:11031"
@@ -13,6 +14,7 @@ services:
   #Clients
   receiver-1:
     image: "${DOCKERHUB_USERNAME}/bft-receiver:latest"
+    network_mode: host
     depends_on:
       - "bft-4"
     ports:

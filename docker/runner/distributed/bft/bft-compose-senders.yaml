@@ -4,6 +4,7 @@ services:
   #Bft service replicas
   bft-1:
     image: "${DOCKERHUB_USERNAME}/bft-sender-service-replica:latest"
+    network_mode: host
     ports:
       - "172.20.10.14:11000:11000"
       - "172.20.10.14:11001:11001"
@@ -11,6 +12,7 @@ services:
       - ID=0
   bft-2:
     image: "${DOCKERHUB_USERNAME}/bft-sender-service-replica:latest"
+    network_mode: host
     ports:
       - "172.20.10.14:11010:11010"
       - "172.20.10.14:11011:11011"
@@ -18,6 +20,7 @@ services:
       - ID=1
   bft-3:
     image: "${DOCKERHUB_USERNAME}/bft-sender-service-replica:latest"
+    network_mode: host
     ports:
       - "172.20.10.14:11020:11020"
       - "172.20.10.14:11021:11021"
@@ -27,6 +30,7 @@ services:
   #Clients
   sender-1:
     image: "${DOCKERHUB_USERNAME}/bft-sender:latest"
+    network_mode: host
     depends_on:
       - "bft-1"
       - "bft-2"
@@ -41,6 +45,7 @@ services:
       - ./results/sender-1:/usr/kabis/result
   sender-2:
     image: "${DOCKERHUB_USERNAME}/bft-sender:latest"
+    network_mode: host
     depends_on:
       - "bft-1"
       - "bft-2"
@@ -55,6 +60,7 @@ services:
       - ./results/sender-2:/usr/kabis/result
   sender-3:
     image: "${DOCKERHUB_USERNAME}/bft-sender:latest"
+    network_mode: host
     depends_on:
       - "bft-1"
       - "bft-2"
