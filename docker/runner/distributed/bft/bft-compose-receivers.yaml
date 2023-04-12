@@ -6,8 +6,8 @@ services:
     image: "${DOCKERHUB_USERNAME}/bft-receiver-service-replica:latest"
     network_mode: host
     ports:
-      - "172.20.10.11:11030:11030"
-      - "172.20.10.11:11031:11031"
+      - "11030:11030"
+      - "11031:11031"
     environment:
       - ID=3
 
@@ -18,7 +18,7 @@ services:
     depends_on:
       - "bft-4"
     ports:
-      - "172.20.10.11:11103:11103"
+      - "11103:11103"
     environment:
       - ID=1004
       - OPS_PER_SENDER=$SENDER_OPS
