@@ -1,24 +1,27 @@
 version: "3.8"
 
+networks:
+  bft-network:
+    name: bft_benchmarks
+    external: true
+    driver: overlay
+
 services:
   #Bft service replicas
   bft-4:
-    image: "${DOCKERHUB_USERNAME}/bft-receiver-service-replica:latest"
-    network_mode: host
-    ports:
-      - "11030:11030"
-      - "11031:11031"
+    image: "${DOCKERHUB_USERNAME}/bft-service-replica:latest"
+    networks:
+     - bft-network
     environment:
       - ID=3
 
   #Clients
   receiver-1:
     image: "${DOCKERHUB_USERNAME}/bft-receiver:latest"
-    network_mode: host
+    networks:
+      - bft-network
     depends_on:
       - "bft-4"
-    ports:
-      - "11103:11103"
     environment:
       - ID=1004
       - OPS_PER_SENDER=$SENDER_OPS

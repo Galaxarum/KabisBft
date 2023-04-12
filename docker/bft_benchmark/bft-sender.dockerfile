@@ -4,5 +4,5 @@ ENV KABIS_HOME=/usr/kabis
 
 WORKDIR $KABIS_HOME
 ADD $JAR_NAME    $KABIS_HOME/$JAR_NAME
-COPY configs/distributed/senders/bft_config $KABIS_HOME/config
+COPY configs/bft_config $KABIS_HOME/config
 ENTRYPOINT java -jar $JAR_NAME $ID $OPS_PER_SENDER $PAYLOAD_SIZE
