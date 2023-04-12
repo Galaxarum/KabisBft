@@ -1,5 +1,7 @@
 version: "3.8"
 
+
+
 services:
   #First kafka replica
   zookeeper-1-4:
