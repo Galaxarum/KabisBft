@@ -13,7 +13,7 @@ services:
     environment:
       - ALLOW_ANONYMOUS_LOGIN=yes
       - ZOO_SERVER_ID=4
-      - ZOO_SERVERS=zookeeper-1-1:2888:3888,zookeeper-1-2:2888:3888,zookeeper-1-3:2888:3888,0.0.0.0:2888:3888
+      - ZOO_SERVERS=0.0.0.0:2888:3888
 
   kafka_1_4:
     image: "bitnami/kafka:latest"
