@@ -11,11 +11,35 @@ networks:
     driver: overlay
 
 services:
+  #Bft service replicas
+  bft-1:
+    image: "${DOCKERHUB_USERNAME}/kabis-service-replica:latest"
+    networks:
+      - bft-network
+    environment:
+      - ID=0
+  bft-2:
+    image: "${DOCKERHUB_USERNAME}/kabis-service-replica:latest"
+    networks:
+      - bft-network
+    environment:
+      - ID=1
+  bft-3:
+    image: "${DOCKERHUB_USERNAME}/kabis-service-replica:latest"
+    networks:
+      - bft-network
+    environment:
+      - ID=2
+
   #First kafka replica
   zookeeper-1-1:
     image: "bitnami/zookeeper:latest"
     networks:
       - kafka-network
+    depends_on:
+      - "bft-1"
+      - "bft-2"
+      - "bft-3"
     environment:
       - ALLOW_ANONYMOUS_LOGIN=yes
       - ZOO_SERVER_ID=1
@@ -24,6 +48,10 @@ services:
     image: "bitnami/zookeeper:latest"
     networks:
       - kafka-network
+    depends_on:
+      - "bft-1"
+      - "bft-2"
+      - "bft-3"
     environment:
       - ALLOW_ANONYMOUS_LOGIN=yes
       - ZOO_SERVER_ID=2
@@ -32,6 +60,10 @@ services:
     image: "bitnami/zookeeper:latest"
     networks:
       - kafka-network
+    depends_on:
+      - "bft-1"
+      - "bft-2"
+      - "bft-3"
     environment:
       - ALLOW_ANONYMOUS_LOGIN=yes
       - ZOO_SERVER_ID=3
@@ -154,27 +186,6 @@ services:
       - KAFKA_BROKER_ID=3
       - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092
       - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka_2_3:9092
-
-
-  #Bft service replicas
-  bft-1:
-    image: "${DOCKERHUB_USERNAME}/kabis-service-replica:latest"
-    networks:
-      - bft-network
-    environment:
-      - ID=0
-  bft-2:
-    image: "${DOCKERHUB_USERNAME}/kabis-service-replica:latest"
-    networks:
-      - bft-network
-    environment:
-      - ID=1
-  bft-3:
-    image: "${DOCKERHUB_USERNAME}/kabis-service-replica:latest"
-    networks:
-      - bft-network
-    environment:
-      - ID=2
 
   #Clients
   sender-1:
