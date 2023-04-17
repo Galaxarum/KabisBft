@@ -36,10 +36,6 @@ services:
     image: "bitnami/zookeeper:latest"
     networks:
       - kafka-network
-    depends_on:
-      - "bft-1"
-      - "bft-2"
-      - "bft-3"
     environment:
       - ALLOW_ANONYMOUS_LOGIN=yes
       - ZOO_SERVER_ID=1
@@ -48,10 +44,6 @@ services:
     image: "bitnami/zookeeper:latest"
     networks:
       - kafka-network
-    depends_on:
-      - "bft-1"
-      - "bft-2"
-      - "bft-3"
     environment:
       - ALLOW_ANONYMOUS_LOGIN=yes
       - ZOO_SERVER_ID=2
@@ -60,10 +52,6 @@ services:
     image: "bitnami/zookeeper:latest"
     networks:
       - kafka-network
-    depends_on:
-      - "bft-1"
-      - "bft-2"
-      - "bft-3"
     environment:
       - ALLOW_ANONYMOUS_LOGIN=yes
       - ZOO_SERVER_ID=3
