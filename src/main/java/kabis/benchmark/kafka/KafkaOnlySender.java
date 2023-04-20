@@ -1,7 +1,6 @@
 package kabis.benchmark.kafka;
 
 import kabis.benchmark.BenchmarkResult;
-import kabis.benchmark.Controller;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.slf4j.Logger;
@@ -9,8 +8,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.ServerSocket;
 import java.util.Properties;
 import java.util.Random;
 
@@ -55,11 +52,15 @@ public class KafkaOnlySender {
 
         //Prime kafka infrastructure
         measureSendingTime(producer,TOPICS.size(),message);
-        Thread.sleep(1_000);
+        Thread.sleep(15000);
         System.out.println("Kafka infrastructure primed");
 
+        //Real measure
+        System.out.printf("KAFKA %d: Sending %d messages.%n",payloadSize,numOperations);
         var time = measureSendingTime(producer,numOperations,message);
         BenchmarkResult.storeThroughputToDisk(BenchmarkResult.buildThroughputString(numOperations,payloadSize,0,time));
+        System.out.println("Experiment result persisted");
+        producer.close();
     }
 
 }

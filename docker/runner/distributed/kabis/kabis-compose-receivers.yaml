@@ -1,0 +1,87 @@
+version: "3.8"
+
+networks:
+  bft-network:
+    name: bft_benchmarks
+    external: true
+    driver: overlay
+  kafka-network:
+    name: kafka_benchmarks
+    external: true
+    driver: overlay
+
+services:
+  #Bft service replicas
+  bft-4:
+    image: "${DOCKERHUB_USERNAME}/kabis-service-replica:latest"
+    networks:
+      - bft-network
+    environment:
+      - ID=3
+
+  #First kafka replica
+  zookeeper-1-4:
+    image: "bitnami/zookeeper:latest"
+    networks:
+      - kafka-network
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+      - ZOO_SERVER_ID=4
+      - ZOO_SERVERS=0.0.0.0:2888:3888
+
+  kafka_1_4:
+    image: "bitnami/kafka:latest"
+    networks:
+      - kafka-network
+    depends_on:
+      - "zookeeper-1-4"
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+      - ALLOW_PLAINTEXT_LISTENER=yes
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper-1-1:2181,zookeeper-1-2:2181,zookeeper-1-3:2181,zookeeper-1-4:2181
+      - KAFKA_BROKER_ID=4
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka_1_4:9092
+
+  #Second kafka replica
+  zookeeper-2-4:
+    image: "bitnami/zookeeper:latest"
+    networks:
+      - kafka-network
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+      - ZOO_SERVER_ID=4
+      - ZOO_SERVERS=0.0.0.0:2888:3888
+
+  kafka_2_4:
+    image: "bitnami/kafka:latest"
+    networks:
+      - kafka-network
+    depends_on:
+      - "zookeeper-2-4"
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+      - ALLOW_PLAINTEXT_LISTENER=yes
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper-2-1:2181,zookeeper-2-2:2181,zookeeper-2-3:2181,zookeeper-2-4:2181
+      - KAFKA_BROKER_ID=4
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka_2_4:9092
+
+  #Clients
+  receiver-1:
+    image: "${DOCKERHUB_USERNAME}/kabis-receiver:latest"
+    networks:
+      - kafka-network
+      - bft-network
+    depends_on:
+      - "kafka_1_4"
+      - "kafka_2_4"
+      - "bft-4"
+    environment:
+      - ID=1004
+      - NUM_SENDERS=3
+      - OPS_PER_SENDER=$SENDER_OPS
+      - PAYLOAD_SIZE=$PAYLOAD
+      - NUM_VALIDATED=$VALIDATED
+    volumes:
+      - ./results/receiver-1:/usr/kabis/result
