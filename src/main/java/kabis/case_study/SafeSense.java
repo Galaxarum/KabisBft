@@ -5,6 +5,7 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import java.io.FileInputStream;
+import java.nio.charset.StandardCharsets;
 import java.security.Security;
 import java.util.Arrays;
 import java.util.Collections;
@@ -18,16 +19,18 @@ public class SafeSense extends ArtExhibitionProducer {
         super(topic, numberOfTrueAlarms, numberOfFalseAlarms, numberOfUncaughtBreaches);
     }
 
-    protected long sendAndMeasure(KabisProducer<Integer, String> producer, Integer numberOfTrueAlarms, Integer numberOfFalseAlarms, String message) {
+    protected long sendAndMeasure(KabisProducer<Integer, String> producer, Integer numberOfTrueAlarms, Integer numberOfFalseAlarms) {
         long t1 = System.nanoTime();
 
         for (int i = 0; i < numberOfTrueAlarms; i++) {
-            var record = new ProducerRecord<>(getTopic(), parseInt(getTopic()), message + i);
+            String trueAlarmMessage = "[SafeSense] TRUE ALARM";
+            ProducerRecord<Integer, String> record = new ProducerRecord<>(getTopic(), parseInt(getTopic()), trueAlarmMessage);
+            record.headers().add("sender", this.getClass().toString().getBytes(StandardCharsets.UTF_8));
             producer.push(record);
         }
         for (int i = 0; i < numberOfFalseAlarms; i++) {
             String falseAlarmMessage = "- [SafeSense] FALSE ALARM - ";
-            var record = new ProducerRecord<>(getTopic(), parseInt(getTopic()), falseAlarmMessage);
+            ProducerRecord<Integer, String> record = new ProducerRecord<>(getTopic(), parseInt(getTopic()), falseAlarmMessage);
             producer.push(record);
         }
         producer.flush();
@@ -50,22 +53,20 @@ public class SafeSense extends ArtExhibitionProducer {
 
         KabisProducer<Integer, String> safeSenseProducer = new KabisProducer<>(properties);
         safeSenseProducer.updateTopology(Collections.singletonList(getTopic()));
-        System.out.printf("[%s-SafeSense] Kabis Producer created%n", getTopic());
+        System.out.printf("[%s-SafeSense] Kabis Producer created\n", getTopic());
 
-        String message = "[SafeSense] TRUE ALARM - Location: ";
-
-        // Thread.sleep(15000);
-
-        long time = sendAndMeasure(safeSenseProducer, getNumberOfTrueAlarms(), getNumberOfFalseAlarms(), message);
-
+        // Send true alarms
+        System.out.printf("[%s-SafeSense] Sending ALARMS\n", getTopic());
+        long time = sendAndMeasure(safeSenseProducer, getNumberOfTrueAlarms(), getNumberOfFalseAlarms());
         safeSenseProducer.close();
+
         CaseStudyBenchmarkResult.storeThroughputToDisk(Arrays.asList("Number of TRUE ALARMS", "Number of FALSE ALARMS", "Total TIME [ns]"),
                 Arrays.asList(Integer.toString(getNumberOfTrueAlarms()), Integer.toString(getNumberOfFalseAlarms()), Long.toString(time)));
     }
 
     public static void main(String[] args) {
         if (args.length != 4) {
-            System.out.print("--ERROR-- \nUSAGE: SafeSense <topic> <totalNumberOfAlarms> <falseAlarmsPercentage> <alarmsNotTriggeredPercentage>");
+            System.out.print("--ERROR-- \nUSAGE: SafeSense <topic> <numberOfTrueAlarms> <numberOfFalseAlarms> <numberOfUncaughtBreaches>");
             System.exit(0);
         }
 

@@ -38,7 +38,7 @@ public abstract class ArtExhibitionConsumer {
         return numberOfUncaughtBreaches;
     }
 
-    protected long pollAndMeasure(KabisConsumer<Integer, String> consumer, Integer recordsToRead, String message) {
+    protected long pollAndMeasure(KabisConsumer<Integer, String> consumer, Integer recordsToRead) {
         int i = 0;
 
         long t1 = System.nanoTime();

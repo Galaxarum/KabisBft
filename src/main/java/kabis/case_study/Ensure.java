@@ -31,13 +31,12 @@ public class Ensure extends ArtExhibitionConsumer {
         ensureConsumer.updateTopology(Collections.singletonList(getTopic()));
         System.out.printf("[%s-Ensure] Kabis Consumer created/n", getTopic());
 
-        String message = "[Ensure] TRUE ALARM - Location: ";
-
-        long time = pollAndMeasure(ensureConsumer, (getNumberOfTrueAlarms() * 2) + getNumberOfFalseAlarms(), message);
-
+        System.out.printf("[%s-Ensure] Reading alarms\n", getTopic());
+        long time = pollAndMeasure(ensureConsumer, (getNumberOfTrueAlarms() * 2) + getNumberOfFalseAlarms() + getNumberOfUncaughtBreaches());
         ensureConsumer.close();
-        CaseStudyBenchmarkResult.storeThroughputToDisk(Arrays.asList("Number of TRUE ALARMS", "Number of FALSE ALARMS", "Total TIME [ns]"),
-                Arrays.asList(Integer.toString(getNumberOfTrueAlarms()), Integer.toString(getNumberOfFalseAlarms()), Long.toString(time)));
+
+        CaseStudyBenchmarkResult.storeThroughputToDisk(Arrays.asList("Number of TOTAL ALARMS", "Total TIME [ns]"),
+                Arrays.asList(Integer.toString((getNumberOfTrueAlarms() * 2) + getNumberOfFalseAlarms() + getNumberOfUncaughtBreaches()), Long.toString(time)));
     }
 
     public static void main(String[] args) {

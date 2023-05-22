@@ -31,13 +31,12 @@ public class ArtEstate extends ArtExhibitionConsumer {
         artEstateConsumer.updateTopology(Collections.singletonList(getTopic()));
         System.out.printf("[%s-ArtEstate] Kabis Consumer created/n", getTopic());
 
-        String message = "[ArtEstate] TRUE ALARM - Location: ";
-
-        long time = pollAndMeasure(artEstateConsumer, (getNumberOfTrueAlarms() * 2) + getNumberOfFalseAlarms(), message);
-
+        System.out.printf("[%s-ArtEstate] Reading alarms\n", getTopic());
+        long time = pollAndMeasure(artEstateConsumer, (getNumberOfTrueAlarms() * 2) + getNumberOfFalseAlarms() + getNumberOfUncaughtBreaches());
         artEstateConsumer.close();
-        CaseStudyBenchmarkResult.storeThroughputToDisk(Arrays.asList("Number of TRUE ALARMS", "Number of FALSE ALARMS", "Total TIME [ns]"),
-                Arrays.asList(Integer.toString(getNumberOfTrueAlarms()), Integer.toString(getNumberOfFalseAlarms()), Long.toString(time)));
+
+        CaseStudyBenchmarkResult.storeThroughputToDisk(Arrays.asList("Number of TOTAL ALARMS", "Total TIME [ns]"),
+                Arrays.asList(Integer.toString((getNumberOfTrueAlarms() * 2) + getNumberOfFalseAlarms() + getNumberOfUncaughtBreaches()), Long.toString(time)));
     }
 
     public static void main(String[] args) {
