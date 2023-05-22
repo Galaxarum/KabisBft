@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.util.List;
 
 public class CaseStudyBenchmarkResult {
-    public static void storeThroughputToDisk(List<String> columns,List<String> values) {
+    public static void storeThroughputToDisk(List<String> columns, List<String> values) {
         String header = "", results = "";
 
         for (String column : columns) {
@@ -20,7 +20,7 @@ public class CaseStudyBenchmarkResult {
 
         File resultDir = new File("result");
         resultDir.mkdir();
-        File throughputFile = new File(resultDir,"throughput.csv");
+        File throughputFile = new File(resultDir, "throughput.csv");
         boolean existed = throughputFile.exists();
 
         try {

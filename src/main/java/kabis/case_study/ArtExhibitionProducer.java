@@ -10,38 +10,33 @@ public abstract class ArtExhibitionProducer {
      * ID of the Art Exhibition.
      */
     private final String topic;
-    private final Integer totalNumberOfAlarms;
-    /**
-     * Percentage of false alarms triggered.
-     */
-    private final Float falseAlarmsPercentage;
-    /**
-     * Percentage of real breaches not caught by alarms.
-     */
-    private final Float alarmsNotTriggeredPercentage;
+    private final Integer numberOfTrueAlarms;
+    private final Integer numberOfFalseAlarms;
+    private final Integer numberOfUncaughtBreaches;
 
-    public ArtExhibitionProducer(String topic, Integer totalNumberOfAlarms, Float falseAlarmsPercentage, Float alarmsNotTriggeredPercentage) {
+    public ArtExhibitionProducer(String topic, Integer numberOfTrueAlarms, Integer numberOfFalseAlarms, Integer numberOfUncaughtBreaches) {
         this.topic = topic;
-        this.totalNumberOfAlarms = totalNumberOfAlarms;
-        this.falseAlarmsPercentage = falseAlarmsPercentage;
-        this.alarmsNotTriggeredPercentage = alarmsNotTriggeredPercentage;
+        this.numberOfTrueAlarms = numberOfTrueAlarms;
+        this.numberOfFalseAlarms = numberOfFalseAlarms;
+        this.numberOfUncaughtBreaches = numberOfUncaughtBreaches;
     }
 
     public String getTopic() {
         return topic;
     }
 
-    public Integer getTotalNumberOfAlarms() {
-        return totalNumberOfAlarms;
+    public Integer getNumberOfTrueAlarms() {
+        return numberOfTrueAlarms;
     }
 
-    public Float getFalseAlarmsPercentage() {
-        return falseAlarmsPercentage;
+    public Integer getNumberOfFalseAlarms() {
+        return numberOfFalseAlarms;
     }
 
-    public Float getAlarmsNotTriggeredPercentage() {
-        return alarmsNotTriggeredPercentage;
+    public Integer getNumberOfUncaughtBreaches() {
+        return numberOfUncaughtBreaches;
     }
+
 
     protected long sendAndMeasure(KabisProducer<Integer,String> producer, Integer numberOfAlarms, String message){
         long t1 = System.nanoTime();
