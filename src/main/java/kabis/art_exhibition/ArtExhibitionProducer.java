@@ -1,4 +1,4 @@
-package kabis.case_study;
+package kabis.art_exhibition;
 
 import kabis.producer.KabisProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;

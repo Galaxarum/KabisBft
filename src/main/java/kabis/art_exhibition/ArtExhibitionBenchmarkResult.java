@@ -1,11 +1,11 @@
-package kabis.case_study;
+package kabis.art_exhibition;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 
-public class CaseStudyBenchmarkResult {
+public class ArtExhibitionBenchmarkResult {
     public static void storeThroughputToDisk(List<String> columns, List<String> values) {
         String header = "", results = "";
 

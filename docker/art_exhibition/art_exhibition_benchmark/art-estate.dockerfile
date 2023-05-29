@@ -1,0 +1,10 @@
+FROM adoptopenjdk/openjdk11:alpine-jre
+ENV JAR_NAME=art-estate.jar
+ENV ART_ESTATE_HOME=/usr/kabis
+
+WORKDIR $ART_ESTATE_HOME
+ADD $JAR_NAME    $ART_ESTATE_HOME/$JAR_NAME
+ADD consumer.properties $ART_ESTATE_HOME/config.properties
+COPY bft_config $ART_ESTATE_HOME/config
+# TODO: CHECK ENTRYPOINT
+ENTRYPOINT java -jar $JAR_NAME $ID $OPS_PER_SENDER $NUM_SENDERS $NUM_VALIDATED $PAYLOAD_SIZE

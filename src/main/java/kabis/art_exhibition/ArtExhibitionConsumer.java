@@ -1,4 +1,4 @@
-package kabis.case_study;
+package kabis.art_exhibition;
 
 import kabis.consumer.KabisConsumer;
 

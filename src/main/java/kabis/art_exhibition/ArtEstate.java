@@ -1,4 +1,4 @@
-package kabis.case_study;
+package kabis.art_exhibition;
 
 import kabis.consumer.KabisConsumer;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -35,7 +35,7 @@ public class ArtEstate extends ArtExhibitionConsumer {
         long time = pollAndMeasure(artEstateConsumer, (getNumberOfTrueAlarms() * 2) + getNumberOfFalseAlarms() + getNumberOfUncaughtBreaches());
         artEstateConsumer.close();
 
-        CaseStudyBenchmarkResult.storeThroughputToDisk(Arrays.asList("Number of TOTAL ALARMS", "Total TIME [ns]"),
+        ArtExhibitionBenchmarkResult.storeThroughputToDisk(Arrays.asList("Number of TOTAL ALARMS", "Total TIME [ns]"),
                 Arrays.asList(Integer.toString((getNumberOfTrueAlarms() * 2) + getNumberOfFalseAlarms() + getNumberOfUncaughtBreaches()), Long.toString(time)));
     }
 

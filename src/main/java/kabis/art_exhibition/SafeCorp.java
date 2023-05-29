@@ -1,4 +1,4 @@
-package kabis.case_study;
+package kabis.art_exhibition;
 
 import kabis.consumer.KabisConsumer;
 import kabis.producer.KabisProducer;
@@ -84,7 +84,7 @@ public class SafeCorp extends ArtExhibitionProducer {
         safeCorpProducer.close();
 
         // Store results
-        CaseStudyBenchmarkResult.storeThroughputToDisk(Arrays.asList("Number of TRUE ALARMS", "Number of UNCAUGHT BREACHES", "Total TIME [ns]"),
+        ArtExhibitionBenchmarkResult.storeThroughputToDisk(Arrays.asList("Number of TRUE ALARMS", "Number of UNCAUGHT BREACHES", "Total TIME [ns]"),
                 Arrays.asList(Integer.toString(getNumberOfTrueAlarms()), Integer.toString(getNumberOfUncaughtBreaches()), Long.toString(sendingTime + receivingTime)));
     }
 

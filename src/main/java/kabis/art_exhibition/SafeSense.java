@@ -1,4 +1,4 @@
-package kabis.case_study;
+package kabis.art_exhibition;
 
 import kabis.producer.KabisProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -60,7 +60,7 @@ public class SafeSense extends ArtExhibitionProducer {
         long time = sendAndMeasure(safeSenseProducer, getNumberOfTrueAlarms(), getNumberOfFalseAlarms());
         safeSenseProducer.close();
 
-        CaseStudyBenchmarkResult.storeThroughputToDisk(Arrays.asList("Number of TRUE ALARMS", "Number of FALSE ALARMS", "Total TIME [ns]"),
+        ArtExhibitionBenchmarkResult.storeThroughputToDisk(Arrays.asList("Number of TRUE ALARMS", "Number of FALSE ALARMS", "Total TIME [ns]"),
                 Arrays.asList(Integer.toString(getNumberOfTrueAlarms()), Integer.toString(getNumberOfFalseAlarms()), Long.toString(time)));
     }
 
