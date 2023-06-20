@@ -21,8 +21,8 @@ public class SafeCorp extends ArtExhibitionProducer {
 
     private static final Duration POLL_TIMEOUT = Duration.ofSeconds(1);
 
-    public SafeCorp(String topic, Integer numberOfTrueAlarms, Integer numberOfFalseAlarms, Integer numberOfUncaughtBreaches) {
-        super(topic, numberOfTrueAlarms, numberOfFalseAlarms, numberOfUncaughtBreaches);
+    public SafeCorp(Integer artExhibitionID, Integer numberOfTrueAlarms, Integer numberOfFalseAlarms, Integer numberOfUncaughtBreaches) {
+        super(artExhibitionID, numberOfTrueAlarms, numberOfFalseAlarms, numberOfUncaughtBreaches);
     }
 
     protected long pollAndRespondMeasure(KabisConsumer<Integer, String> consumer, KabisProducer<Integer, String> producer, Integer recordsToRead, String message) {
@@ -35,7 +35,7 @@ public class SafeCorp extends ArtExhibitionProducer {
                 if (!Arrays.equals(record.headers().lastHeader("sender").value(), this.getClass().toString().getBytes(StandardCharsets.UTF_8))) {
                     i += 1;
 
-                    ProducerRecord<Integer, String> responseRecord = new ProducerRecord<>(getTopic(), parseInt(getTopic()), message);
+                    ProducerRecord<Integer, String> responseRecord = new ProducerRecord<>(Topics.ART_EXHIBITION.toString(), getArtExhibitionID(), message);
                     producer.push(responseRecord);
                 }
 
@@ -56,29 +56,29 @@ public class SafeCorp extends ArtExhibitionProducer {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        properties.setProperty("client.id", getTopic() + "-SafeCorp");
+        properties.setProperty("client.id", getArtExhibitionID() + "-SafeCorp");
 
         // Thread.sleep(10000);
 
         KabisConsumer<Integer, String> safeCorpConsumer = new KabisConsumer<>(properties);
-        safeCorpConsumer.subscribe(Collections.singletonList(getTopic()));
-        safeCorpConsumer.updateTopology(Collections.singletonList(getTopic()));
-        System.out.printf("[%s-SafeCorp] Kabis Consumer created\n", getTopic());
+        safeCorpConsumer.subscribe(Collections.singletonList(Topics.ART_EXHIBITION.toString()));
+        safeCorpConsumer.updateTopology(Collections.singletonList(Topics.ART_EXHIBITION.toString()));
+        System.out.printf("[%s-SafeCorp] Kabis Consumer created\n", getArtExhibitionID());
 
         KabisProducer<Integer, String> safeCorpProducer = new KabisProducer<>(properties);
-        safeCorpProducer.updateTopology(Collections.singletonList(getTopic()));
-        System.out.printf("[%s-SafeCorp] Kabis Producer created\n", getTopic());
+        safeCorpProducer.updateTopology(Collections.singletonList(Topics.ART_EXHIBITION.toString()));
+        System.out.printf("[%s-SafeCorp] Kabis Producer created\n", getArtExhibitionID());
 
         // Thread.sleep(15000);
 
         // Read messages
-        System.out.printf("[%s-SafeCorp] Reading alarms\n", getTopic());
+        System.out.printf("[%s-SafeCorp] Reading alarms\n", getArtExhibitionID());
         String responseMessage = "[SafeCorp] TRUE ALARM RECEIVED";
         long receivingTime = pollAndRespondMeasure(safeCorpConsumer, safeCorpProducer, getNumberOfTrueAlarms(), responseMessage);
         safeCorpConsumer.close();
 
         // Send uncaught
-        System.out.printf("[%s-SafeCorp] Sending breaches\n", getTopic());
+        System.out.printf("[%s-SafeCorp] Sending breaches\n", getArtExhibitionID());
         String sendMessage = "[SafeCorp] BREACH FOUND";
         long sendingTime = sendAndMeasure(safeCorpProducer, getNumberOfUncaughtBreaches(), sendMessage);
         safeCorpProducer.close();
@@ -90,10 +90,10 @@ public class SafeCorp extends ArtExhibitionProducer {
 
     public static void main(String[] args) {
         if (args.length != 4) {
-            System.out.println("--ERROR-- \nUSAGE: SafeSense <topic> <numberOfTrueAlarms> <numberOfFalseAlarms> <numberOfUncaughtBreaches>");
+            System.out.println("--ERROR-- \nUSAGE: SafeSense <artExhibitionID> <numberOfTrueAlarms> <numberOfFalseAlarms> <numberOfUncaughtBreaches>");
             System.exit(0);
         }
 
-        new SafeCorp(args[0], parseInt(args[1]), parseInt(args[2]), parseInt(args[3])).run();
+        new SafeCorp(parseInt(args[0]), parseInt(args[1]), parseInt(args[2]), parseInt(args[3])).run();
     }
 }

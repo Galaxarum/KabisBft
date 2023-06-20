@@ -3,26 +3,25 @@ package kabis.art_exhibition;
 import kabis.producer.KabisProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 
-import static java.lang.Integer.parseInt;
-
 public abstract class ArtExhibitionProducer {
     /**
-     * ID of the Art Exhibition.
+     * ID of the Art Exhibition
      */
-    private final String topic;
+    private final Integer artExhibitionID;
     private final Integer numberOfTrueAlarms;
     private final Integer numberOfFalseAlarms;
     private final Integer numberOfUncaughtBreaches;
 
-    public ArtExhibitionProducer(String topic, Integer numberOfTrueAlarms, Integer numberOfFalseAlarms, Integer numberOfUncaughtBreaches) {
-        this.topic = topic;
+
+    public ArtExhibitionProducer(Integer artExhibitionID, Integer numberOfTrueAlarms, Integer numberOfFalseAlarms, Integer numberOfUncaughtBreaches) {
+        this.artExhibitionID = artExhibitionID;
         this.numberOfTrueAlarms = numberOfTrueAlarms;
         this.numberOfFalseAlarms = numberOfFalseAlarms;
         this.numberOfUncaughtBreaches = numberOfUncaughtBreaches;
     }
 
-    public String getTopic() {
-        return topic;
+    public Integer getArtExhibitionID() {
+        return artExhibitionID;
     }
 
     public Integer getNumberOfTrueAlarms() {
@@ -41,7 +40,7 @@ public abstract class ArtExhibitionProducer {
         long t1 = System.nanoTime();
 
         for (int i = 0; i < numberOfAlarms; i++) {
-            var record = new ProducerRecord<>(this.topic, parseInt(this.topic), message + i);
+            var record = new ProducerRecord<>(Topics.ART_EXHIBITION.toString(), artExhibitionID, message + i);
             producer.push(record);
         }
         producer.flush();

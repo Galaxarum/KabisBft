@@ -12,8 +12,8 @@ import java.util.Properties;
 import static java.lang.Integer.parseInt;
 
 public class ArtEstate extends ArtExhibitionConsumer {
-    public ArtEstate(String topic, Integer numberOfTrueAlarms, Integer numberOfFalseAlarms, Integer numberOfUncaughtBreaches) {
-        super(topic, numberOfTrueAlarms, numberOfFalseAlarms, numberOfUncaughtBreaches);
+    public ArtEstate(Integer artExhibitionID, Integer numberOfTrueAlarms, Integer numberOfFalseAlarms, Integer numberOfUncaughtBreaches) {
+        super(artExhibitionID, numberOfTrueAlarms, numberOfFalseAlarms, numberOfUncaughtBreaches);
     }
 
     private void run() {
@@ -24,14 +24,14 @@ public class ArtEstate extends ArtExhibitionConsumer {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        properties.setProperty("client.id", getTopic() + "-Ensure");
+        properties.setProperty("client.id", getArtExhibitionID() + "-Ensure");
 
         KabisConsumer<Integer, String> artEstateConsumer = new KabisConsumer<>(properties);
-        artEstateConsumer.subscribe(Collections.singletonList(getTopic()));
-        artEstateConsumer.updateTopology(Collections.singletonList(getTopic()));
-        System.out.printf("[%s-ArtEstate] Kabis Consumer created/n", getTopic());
+        artEstateConsumer.subscribe(Collections.singletonList(Topics.ART_EXHIBITION.toString()));
+        artEstateConsumer.updateTopology(Collections.singletonList(Topics.ART_EXHIBITION.toString()));
+        System.out.printf("[%s-ArtEstate] Kabis Consumer created/n", getArtExhibitionID());
 
-        System.out.printf("[%s-ArtEstate] Reading alarms\n", getTopic());
+        System.out.printf("[%s-ArtEstate] Reading alarms\n", getArtExhibitionID());
         long time = pollAndMeasure(artEstateConsumer, (getNumberOfTrueAlarms() * 2) + getNumberOfFalseAlarms() + getNumberOfUncaughtBreaches());
         artEstateConsumer.close();
 
@@ -41,10 +41,10 @@ public class ArtEstate extends ArtExhibitionConsumer {
 
     public static void main(String[] args) {
         if (args.length != 4) {
-            System.out.print("--ERROR-- \nUSAGE: ArtEstate <topic> <totalNumberOfAlarms> <falseAlarmsPercentage> <alarmsNotTriggeredPercentage>");
+            System.out.print("--ERROR-- \nUSAGE: ArtEstate <artExhibitionID> <totalNumberOfAlarms> <falseAlarmsPercentage> <alarmsNotTriggeredPercentage>");
             System.exit(0);
         }
 
-        new ArtEstate(args[0], parseInt(args[1]), parseInt(args[2]), parseInt(args[3])).run();
+        new ArtEstate(parseInt(args[0]), parseInt(args[1]), parseInt(args[2]), parseInt(args[3])).run();
     }
 }

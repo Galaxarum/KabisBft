@@ -12,8 +12,8 @@ import java.util.Properties;
 import static java.lang.Integer.parseInt;
 
 public class Ensure extends ArtExhibitionConsumer {
-    public Ensure(String topic, Integer numberOfTrueAlarms, Integer numberOfFalseAlarms, Integer numberOfUncaughtBreaches) {
-        super(topic, numberOfTrueAlarms, numberOfFalseAlarms, numberOfUncaughtBreaches);
+    public Ensure(Integer artExhibitionID, Integer numberOfTrueAlarms, Integer numberOfFalseAlarms, Integer numberOfUncaughtBreaches) {
+        super(artExhibitionID, numberOfTrueAlarms, numberOfFalseAlarms, numberOfUncaughtBreaches);
     }
 
     private void run() {
@@ -24,14 +24,14 @@ public class Ensure extends ArtExhibitionConsumer {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        properties.setProperty("client.id", getTopic() + "-Ensure");
+        properties.setProperty("client.id", getArtExhibitionID() + "-Ensure");
 
         KabisConsumer<Integer, String> ensureConsumer = new KabisConsumer<>(properties);
-        ensureConsumer.subscribe(Collections.singletonList(getTopic()));
-        ensureConsumer.updateTopology(Collections.singletonList(getTopic()));
-        System.out.printf("[%s-Ensure] Kabis Consumer created/n", getTopic());
+        ensureConsumer.subscribe(Collections.singletonList(Topics.ART_EXHIBITION.toString()));
+        ensureConsumer.updateTopology(Collections.singletonList(Topics.ART_EXHIBITION.toString()));
+        System.out.printf("[%s-Ensure] Kabis Consumer created/n", getArtExhibitionID());
 
-        System.out.printf("[%s-Ensure] Reading alarms\n", getTopic());
+        System.out.printf("[%s-Ensure] Reading alarms\n", getArtExhibitionID());
         long time = pollAndMeasure(ensureConsumer, (getNumberOfTrueAlarms() * 2) + getNumberOfFalseAlarms() + getNumberOfUncaughtBreaches());
         ensureConsumer.close();
 
@@ -41,10 +41,10 @@ public class Ensure extends ArtExhibitionConsumer {
 
     public static void main(String[] args) {
         if (args.length != 4) {
-            System.out.print("--ERROR-- \nUSAGE: Ensure <topic> <totalNumberOfAlarms> <falseAlarmsPercentage> <alarmsNotTriggeredPercentage>");
+            System.out.print("--ERROR-- \nUSAGE: Ensure <artExhibitionID> <totalNumberOfAlarms> <falseAlarmsPercentage> <alarmsNotTriggeredPercentage>");
             System.exit(0);
         }
 
-        new Ensure(args[0], parseInt(args[1]), parseInt(args[2]), parseInt(args[3])).run();
+        new Ensure(parseInt(args[0]), parseInt(args[1]), parseInt(args[2]), parseInt(args[3])).run();
     }
 }
