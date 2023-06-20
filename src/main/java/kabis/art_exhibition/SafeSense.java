@@ -31,6 +31,7 @@ public class SafeSense extends ArtExhibitionProducer {
         for (int i = 0; i < numberOfFalseAlarms; i++) {
             String falseAlarmMessage = "- [SafeSense] FALSE ALARM - ";
             ProducerRecord<Integer, String> record = new ProducerRecord<>(Topics.ART_EXHIBITION.toString(), getArtExhibitionID(), falseAlarmMessage);
+            record.headers().add("sender", this.getClass().toString().getBytes(StandardCharsets.UTF_8));
             producer.push(record);
         }
         producer.flush();

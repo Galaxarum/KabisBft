@@ -36,6 +36,7 @@ public class SafeCorp extends ArtExhibitionProducer {
                     i += 1;
 
                     ProducerRecord<Integer, String> responseRecord = new ProducerRecord<>(Topics.ART_EXHIBITION.toString(), getArtExhibitionID(), message);
+                    responseRecord.headers().add("sender", this.getClass().toString().getBytes(StandardCharsets.UTF_8));
                     producer.push(responseRecord);
                 }
 
@@ -74,11 +75,11 @@ public class SafeCorp extends ArtExhibitionProducer {
         // Read messages
         System.out.printf("[%s-SafeCorp] Reading alarms\n", getArtExhibitionID());
         String responseMessage = "[SafeCorp] TRUE ALARM RECEIVED";
-        long receivingTime = pollAndRespondMeasure(safeCorpConsumer, safeCorpProducer, getNumberOfTrueAlarms(), responseMessage);
+        long receivingTime = pollAndRespondMeasure(safeCorpConsumer, safeCorpProducer, getNumberOfTrueAlarms() + getNumberOfFalseAlarms(), responseMessage);
         safeCorpConsumer.close();
 
         // Send uncaught
-        System.out.printf("[%s-SafeCorp] Sending breaches\n", getArtExhibitionID());
+        System.out.printf("[%s-SafeCorp] Sending uncaught breaches\n", getArtExhibitionID());
         String sendMessage = "[SafeCorp] BREACH FOUND";
         long sendingTime = sendAndMeasure(safeCorpProducer, getNumberOfUncaughtBreaches(), sendMessage);
         safeCorpProducer.close();

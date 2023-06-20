@@ -36,7 +36,7 @@ public class Ensure extends ArtExhibitionConsumer {
         ensureConsumer.close();
 
         ArtExhibitionBenchmarkResult.storeThroughputToDisk(Arrays.asList("Number of TOTAL ALARMS", "Total TIME [ns]"),
-                Arrays.asList(Integer.toString((getNumberOfTrueAlarms() * 2) + getNumberOfFalseAlarms() + getNumberOfUncaughtBreaches()), Long.toString(time)));
+                Arrays.asList(Integer.toString((getNumberOfTrueAlarms() + getNumberOfFalseAlarms()) * 2 + getNumberOfUncaughtBreaches()), Long.toString(time)));
     }
 
     public static void main(String[] args) {
