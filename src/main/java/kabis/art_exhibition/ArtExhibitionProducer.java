@@ -19,6 +19,13 @@ public abstract class ArtExhibitionProducer {
         this.numberOfUncaughtBreaches = numberOfUncaughtBreaches;
     }
 
+    public ArtExhibitionProducer(Integer numberOfArtExhibitions, Integer numberOfTrueAlarms, Integer numberOfFalseAlarms) {
+        this.numberOfArtExhibitions = numberOfArtExhibitions;
+        this.numberOfTrueAlarms = numberOfTrueAlarms;
+        this.numberOfFalseAlarms = numberOfFalseAlarms;
+        this.numberOfUncaughtBreaches = 0;
+    }
+
     public Integer getNumberOfArtExhibitions() {
         return numberOfArtExhibitions;
     }

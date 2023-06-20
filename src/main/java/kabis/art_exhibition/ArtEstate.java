@@ -12,8 +12,8 @@ import java.util.Properties;
 import static java.lang.Integer.parseInt;
 
 public class ArtEstate extends ArtExhibitionConsumer {
-    public ArtEstate(Integer numberOfArtExhibition, Integer numberOfTrueAlarms, Integer numberOfFalseAlarms, Integer numberOfUncaughtBreaches) {
-        super(numberOfArtExhibition, numberOfTrueAlarms, numberOfFalseAlarms, numberOfUncaughtBreaches);
+    public ArtEstate(Integer numberOfArtExhibitions, Integer numberOfTrueAlarms, Integer numberOfFalseAlarms, Integer numberOfUncaughtBreaches) {
+        super(numberOfArtExhibitions, numberOfTrueAlarms, numberOfFalseAlarms, numberOfUncaughtBreaches);
     }
 
     private void run() {
@@ -42,7 +42,7 @@ public class ArtEstate extends ArtExhibitionConsumer {
 
     public static void main(String[] args) {
         if (args.length != 4) {
-            System.out.print("--ERROR-- \nUSAGE: ArtEstate <numberOfArtExhibition> <totalNumberOfAlarms> <falseAlarmsPercentage> <alarmsNotTriggeredPercentage>");
+            System.out.print("--ERROR-- \nUSAGE: ArtEstate <numberOfArtExhibitions> <totalNumberOfAlarms> <falseAlarmsPercentage> <alarmsNotTriggeredPercentage>");
             System.exit(0);
         }
 

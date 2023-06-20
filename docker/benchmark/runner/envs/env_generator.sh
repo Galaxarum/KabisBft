@@ -14,13 +14,13 @@ for payloadB in "${PAYLOADS[@]}"; do
       echo "SENDER_OPS=$ops">"$file"
       echo "PAYLOAD=$payloadB">>"$file"
       echo "VALIDATED=$validated">>"$file"
-      source ../../../.env
+      source ../../../../.env
       echo "DOCKERHUB_USERNAME=$DOCKERHUB_USERNAME" >>"$file"
     done
     file="kafka/$payloadB.env"
     echo "SENDER_OPS=$ops">"$file"
     echo "PAYLOAD=$payloadB">>"$file"
-    source ../../../.env
+    source ../../../../.env
     echo "DOCKERHUB_USERNAME=$DOCKERHUB_USERNAME" >>"$file"
   done
 done
