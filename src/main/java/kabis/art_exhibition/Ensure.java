@@ -12,8 +12,8 @@ import java.util.Properties;
 import static java.lang.Integer.parseInt;
 
 public class Ensure extends ArtExhibitionConsumer {
-    public Ensure(Integer artExhibitionID, Integer numberOfTrueAlarms, Integer numberOfFalseAlarms, Integer numberOfUncaughtBreaches) {
-        super(artExhibitionID, numberOfTrueAlarms, numberOfFalseAlarms, numberOfUncaughtBreaches);
+    public Ensure(Integer numberOfArtExhibition, Integer numberOfTrueAlarms, Integer numberOfFalseAlarms, Integer numberOfUncaughtBreaches) {
+        super(numberOfArtExhibition, numberOfTrueAlarms, numberOfFalseAlarms, numberOfUncaughtBreaches);
     }
 
     private void run() {
@@ -24,24 +24,25 @@ public class Ensure extends ArtExhibitionConsumer {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        properties.setProperty("client.id", getArtExhibitionID() + "-Ensure");
+        properties.setProperty("client.id", "-Ensure");
 
         KabisConsumer<Integer, String> ensureConsumer = new KabisConsumer<>(properties);
         ensureConsumer.subscribe(Collections.singletonList(Topics.ART_EXHIBITION.toString()));
         ensureConsumer.updateTopology(Collections.singletonList(Topics.ART_EXHIBITION.toString()));
-        System.out.printf("[%s-Ensure] Kabis Consumer created/n", getArtExhibitionID());
+        System.out.printf("[Ensure] Kabis Consumer created/n");
 
-        System.out.printf("[%s-Ensure] Reading alarms\n", getArtExhibitionID());
-        long time = pollAndMeasure(ensureConsumer, (getNumberOfTrueAlarms() * 2) + getNumberOfFalseAlarms() + getNumberOfUncaughtBreaches());
+        System.out.printf("[Ensure] Reading alarms\n");
+        int recordsToRead = ((getNumberOfTrueAlarms() + getNumberOfFalseAlarms()) * 2 + getNumberOfUncaughtBreaches()) * getNumberOfArtExhibitions();
+        long time = pollAndMeasure(ensureConsumer, recordsToRead);
         ensureConsumer.close();
 
         ArtExhibitionBenchmarkResult.storeThroughputToDisk(Arrays.asList("Number of TOTAL ALARMS", "Total TIME [ns]"),
-                Arrays.asList(Integer.toString((getNumberOfTrueAlarms() + getNumberOfFalseAlarms()) * 2 + getNumberOfUncaughtBreaches()), Long.toString(time)));
+                Arrays.asList(Integer.toString(recordsToRead), Long.toString(time)));
     }
 
     public static void main(String[] args) {
         if (args.length != 4) {
-            System.out.print("--ERROR-- \nUSAGE: Ensure <artExhibitionID> <totalNumberOfAlarms> <falseAlarmsPercentage> <alarmsNotTriggeredPercentage>");
+            System.out.print("--ERROR-- \nUSAGE: Ensure <numberOfArtExhibition> <totalNumberOfAlarms> <falseAlarmsPercentage> <alarmsNotTriggeredPercentage>");
             System.exit(0);
         }
 

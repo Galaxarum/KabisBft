@@ -1,29 +1,28 @@
 package kabis.art_exhibition;
 
 import kabis.consumer.KabisConsumer;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.clients.consumer.ConsumerRecords;
 
 import java.time.Duration;
 
 public abstract class ArtExhibitionConsumer {
-    /**
-     * ID of the Art Exhibition.
-     */
-    private final Integer artExhibitionID;
+    private final Integer numberOfArtExhibition;
     private final Integer numberOfTrueAlarms;
     private final Integer numberOfFalseAlarms;
     private final Integer numberOfUncaughtBreaches;
 
     private static final Duration POLL_TIMEOUT = Duration.ofSeconds(1);
 
-    public ArtExhibitionConsumer(Integer artExhibitionID, Integer numberOfTrueAlarms, Integer numberOfFalseAlarms, Integer numberOfUncaughtBreaches) {
-        this.artExhibitionID = artExhibitionID;
+    public ArtExhibitionConsumer(Integer numberOfArtExhibition, Integer numberOfTrueAlarms, Integer numberOfFalseAlarms, Integer numberOfUncaughtBreaches) {
+        this.numberOfArtExhibition = numberOfArtExhibition;
         this.numberOfTrueAlarms = numberOfTrueAlarms;
         this.numberOfFalseAlarms = numberOfFalseAlarms;
         this.numberOfUncaughtBreaches = numberOfUncaughtBreaches;
     }
 
-    public Integer getArtExhibitionID() {
-        return artExhibitionID;
+    public Integer getNumberOfArtExhibitions() {
+        return numberOfArtExhibition;
     }
 
     public Integer getNumberOfTrueAlarms() {
@@ -40,10 +39,14 @@ public abstract class ArtExhibitionConsumer {
 
     protected long pollAndMeasure(KabisConsumer<Integer, String> consumer, Integer recordsToRead) {
         int i = 0;
-
         long t1 = System.nanoTime();
         while (i < recordsToRead) {
-            i += consumer.poll(POLL_TIMEOUT).count();
+            ConsumerRecords<Integer, String> records = consumer.poll(POLL_TIMEOUT);
+            for (ConsumerRecord<Integer, String> record : records) {
+                i += 1;
+                System.out.printf("[" + this.getClass().toString() + "] Received alarm from " + record.key() + "\n");
+            }
+            //i += consumer.poll(POLL_TIMEOUT).count();
         }
         long t2 = System.nanoTime();
 
