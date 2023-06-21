@@ -32,7 +32,10 @@ public class Ensure extends ArtExhibitionConsumer {
         System.out.printf("[Ensure] Kabis Consumer created\n");
 
         System.out.printf("[Ensure] Reading alarms\n");
-        int recordsToRead = ((getNumberOfTrueAlarms() + getNumberOfFalseAlarms()) * 2 + getNumberOfUncaughtBreaches()) * getNumberOfArtExhibitions();
+        int recordsToReadWithSafeCorp = ((getNumberOfTrueAlarms() + getNumberOfFalseAlarms()) * 2 + getNumberOfUncaughtBreaches()) * getNumberOfArtExhibitions();
+        int recordsToReadWithoutSafeCorp = (getNumberOfTrueAlarms() + getNumberOfFalseAlarms()) * getNumberOfArtExhibitions();
+
+        int recordsToRead = recordsToReadWithoutSafeCorp;
         long time = pollAndMeasure(ensureConsumer, recordsToRead);
         ensureConsumer.close();
 

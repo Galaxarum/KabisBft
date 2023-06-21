@@ -32,7 +32,11 @@ public class ArtEstate extends ArtExhibitionConsumer {
         System.out.printf("[ArtEstate] Kabis Consumer created\n");
 
         System.out.printf("[ArtEstate] Reading alarms\n");
-        int recordsToRead = ((getNumberOfTrueAlarms() + getNumberOfFalseAlarms()) * 2 + getNumberOfUncaughtBreaches()) * getNumberOfArtExhibitions();
+
+        int recordsToReadWithSafeCorp = ((getNumberOfTrueAlarms() + getNumberOfFalseAlarms()) * 2 + getNumberOfUncaughtBreaches()) * getNumberOfArtExhibitions();
+        int recordsToReadWithoutSafeCorp = (getNumberOfTrueAlarms() + getNumberOfFalseAlarms()) * getNumberOfArtExhibitions();
+
+        int recordsToRead = recordsToReadWithoutSafeCorp;
         long time = pollAndMeasure(artEstateConsumer, recordsToRead);
         artEstateConsumer.close();
 
