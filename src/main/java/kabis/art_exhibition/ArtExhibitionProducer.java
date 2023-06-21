@@ -6,24 +6,31 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import java.nio.charset.StandardCharsets;
 
 public abstract class ArtExhibitionProducer {
+    private final Integer clientId;
     private final Integer numberOfArtExhibitions;
     private final Integer numberOfTrueAlarms;
     private final Integer numberOfFalseAlarms;
     private final Integer numberOfUncaughtBreaches;
 
 
-    public ArtExhibitionProducer(Integer numberOfArtExhibitions, Integer numberOfTrueAlarms, Integer numberOfFalseAlarms, Integer numberOfUncaughtBreaches) {
+    public ArtExhibitionProducer(Integer clientId, Integer numberOfArtExhibitions, Integer numberOfTrueAlarms, Integer numberOfFalseAlarms, Integer numberOfUncaughtBreaches) {
+        this.clientId = clientId;
         this.numberOfArtExhibitions = numberOfArtExhibitions;
         this.numberOfTrueAlarms = numberOfTrueAlarms;
         this.numberOfFalseAlarms = numberOfFalseAlarms;
         this.numberOfUncaughtBreaches = numberOfUncaughtBreaches;
     }
 
-    public ArtExhibitionProducer(Integer numberOfArtExhibitions, Integer numberOfTrueAlarms, Integer numberOfFalseAlarms) {
+    public ArtExhibitionProducer(Integer clientId, Integer numberOfArtExhibitions, Integer numberOfTrueAlarms, Integer numberOfFalseAlarms) {
+        this.clientId = clientId;
         this.numberOfArtExhibitions = numberOfArtExhibitions;
         this.numberOfTrueAlarms = numberOfTrueAlarms;
         this.numberOfFalseAlarms = numberOfFalseAlarms;
         this.numberOfUncaughtBreaches = 0;
+    }
+
+    public Integer getClientId() {
+        return clientId;
     }
 
     public Integer getNumberOfArtExhibitions() {

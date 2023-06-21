@@ -7,6 +7,7 @@ import org.apache.kafka.clients.consumer.ConsumerRecords;
 import java.time.Duration;
 
 public abstract class ArtExhibitionConsumer {
+    private final Integer clientId;
     private final Integer numberOfArtExhibitions;
     private final Integer numberOfTrueAlarms;
     private final Integer numberOfFalseAlarms;
@@ -14,11 +15,16 @@ public abstract class ArtExhibitionConsumer {
 
     private static final Duration POLL_TIMEOUT = Duration.ofSeconds(1);
 
-    public ArtExhibitionConsumer(Integer numberOfArtExhibitions, Integer numberOfTrueAlarms, Integer numberOfFalseAlarms, Integer numberOfUncaughtBreaches) {
+    public ArtExhibitionConsumer(Integer clientId, Integer numberOfArtExhibitions, Integer numberOfTrueAlarms, Integer numberOfFalseAlarms, Integer numberOfUncaughtBreaches) {
+        this.clientId = clientId;
         this.numberOfArtExhibitions = numberOfArtExhibitions;
         this.numberOfTrueAlarms = numberOfTrueAlarms;
         this.numberOfFalseAlarms = numberOfFalseAlarms;
         this.numberOfUncaughtBreaches = numberOfUncaughtBreaches;
+    }
+
+    public Integer getClientId() {
+        return clientId;
     }
 
     public Integer getNumberOfArtExhibitions() {

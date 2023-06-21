@@ -12,8 +12,8 @@ import java.util.Properties;
 import static java.lang.Integer.parseInt;
 
 public class Ensure extends ArtExhibitionConsumer {
-    public Ensure(Integer numberOfArtExhibitions, Integer numberOfTrueAlarms, Integer numberOfFalseAlarms, Integer numberOfUncaughtBreaches) {
-        super(numberOfArtExhibitions, numberOfTrueAlarms, numberOfFalseAlarms, numberOfUncaughtBreaches);
+    public Ensure(Integer clientId, Integer numberOfArtExhibitions, Integer numberOfTrueAlarms, Integer numberOfFalseAlarms, Integer numberOfUncaughtBreaches) {
+        super(clientId, numberOfArtExhibitions, numberOfTrueAlarms, numberOfFalseAlarms, numberOfUncaughtBreaches);
     }
 
     private void run() {
@@ -24,12 +24,12 @@ public class Ensure extends ArtExhibitionConsumer {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        properties.setProperty("client.id", "-Ensure");
+        properties.setProperty("client.id", String.valueOf(getClientId()));
 
         KabisConsumer<Integer, String> ensureConsumer = new KabisConsumer<>(properties);
         ensureConsumer.subscribe(Collections.singletonList(Topics.ART_EXHIBITION.toString()));
         ensureConsumer.updateTopology(Collections.singletonList(Topics.ART_EXHIBITION.toString()));
-        System.out.printf("[Ensure] Kabis Consumer created/n");
+        System.out.printf("[Ensure] Kabis Consumer created\n");
 
         System.out.printf("[Ensure] Reading alarms\n");
         int recordsToRead = ((getNumberOfTrueAlarms() + getNumberOfFalseAlarms()) * 2 + getNumberOfUncaughtBreaches()) * getNumberOfArtExhibitions();
@@ -41,11 +41,11 @@ public class Ensure extends ArtExhibitionConsumer {
     }
 
     public static void main(String[] args) {
-        if (args.length != 4) {
-            System.out.print("--ERROR-- \nUSAGE: Ensure <numberOfArtExhibitions> <totalNumberOfAlarms> <falseAlarmsPercentage> <alarmsNotTriggeredPercentage>");
+        if (args.length != 5) {
+            System.out.print("--ERROR-- \nUSAGE: Ensure <clientId> <numberOfArtExhibitions> <totalNumberOfAlarms> <falseAlarmsPercentage> <alarmsNotTriggeredPercentage>");
             System.exit(0);
         }
 
-        new Ensure(parseInt(args[0]), parseInt(args[1]), parseInt(args[2]), parseInt(args[3])).run();
+        new Ensure(parseInt(args[0]), parseInt(args[1]), parseInt(args[2]), parseInt(args[3]), parseInt(args[4])).run();
     }
 }

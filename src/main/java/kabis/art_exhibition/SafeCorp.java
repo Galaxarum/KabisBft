@@ -21,8 +21,8 @@ public class SafeCorp extends ArtExhibitionProducer {
 
     private static final Duration POLL_TIMEOUT = Duration.ofSeconds(1);
 
-    public SafeCorp(Integer numberOfArtExhibitions, Integer numberOfTrueAlarms, Integer numberOfFalseAlarms, Integer numberOfUncaughtBreaches) {
-        super(numberOfArtExhibitions, numberOfTrueAlarms, numberOfFalseAlarms, numberOfUncaughtBreaches);
+    public SafeCorp(Integer clientId, Integer numberOfArtExhibitions, Integer numberOfTrueAlarms, Integer numberOfFalseAlarms, Integer numberOfUncaughtBreaches) {
+        super(clientId, numberOfArtExhibitions, numberOfTrueAlarms, numberOfFalseAlarms, numberOfUncaughtBreaches);
     }
 
     protected long pollAndRespondMeasure(KabisConsumer<Integer, String> consumer, KabisProducer<Integer, String> producer, Integer recordsToRead, String message) {
@@ -56,7 +56,7 @@ public class SafeCorp extends ArtExhibitionProducer {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        properties.setProperty("client.id", "-SafeCorp");
+        properties.setProperty("client.id", String.valueOf(getClientId()));
 
         // Thread.sleep(10000);
 
@@ -90,11 +90,11 @@ public class SafeCorp extends ArtExhibitionProducer {
     }
 
     public static void main(String[] args) {
-        if (args.length != 4) {
-            System.out.println("--ERROR-- \nUSAGE: SafeSense <numberOfArtExhibitions> <numberOfTrueAlarms> <numberOfFalseAlarms> <numberOfUncaughtBreaches>");
+        if (args.length != 5) {
+            System.out.println("--ERROR-- \nUSAGE: SafeSense <clientId> <numberOfArtExhibitions> <numberOfTrueAlarms> <numberOfFalseAlarms> <numberOfUncaughtBreaches>");
             System.exit(0);
         }
 
-        new SafeCorp(parseInt(args[0]), parseInt(args[1]), parseInt(args[2]), parseInt(args[3])).run();
+        new SafeCorp(parseInt(args[0]), parseInt(args[1]), parseInt(args[2]), parseInt(args[3]), parseInt(args[4])).run();
     }
 }

@@ -13,8 +13,8 @@ import static java.lang.Integer.parseInt;
 
 public class SafeSense extends ArtExhibitionProducer {
 
-    public SafeSense(Integer numberOfArtExhibitions, Integer numberOfTrueAlarms, Integer numberOfFalseAlarms) {
-        super(numberOfArtExhibitions, numberOfTrueAlarms, numberOfFalseAlarms);
+    public SafeSense(Integer clientId, Integer numberOfArtExhibitions, Integer numberOfTrueAlarms, Integer numberOfFalseAlarms) {
+        super(clientId, numberOfArtExhibitions, numberOfTrueAlarms, numberOfFalseAlarms);
     }
 
     private void run() {
@@ -25,7 +25,7 @@ public class SafeSense extends ArtExhibitionProducer {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        properties.setProperty("client.id", "-SafeSense");
+        properties.setProperty("client.id", String.valueOf(getClientId()));
 
         // Thread.sleep(10000);
 
@@ -51,11 +51,11 @@ public class SafeSense extends ArtExhibitionProducer {
     }
 
     public static void main(String[] args) {
-        if (args.length != 3) {
-            System.out.print("--ERROR-- \nUSAGE: SafeSense <numberOfArtExhibitions> <numberOfTrueAlarms> <numberOfFalseAlarms>");
+        if (args.length != 4) {
+            System.out.print("--ERROR-- \nUSAGE: <clientId> <numberOfArtExhibitions> <numberOfTrueAlarms> <numberOfFalseAlarms>");
             System.exit(0);
         }
 
-        new SafeSense(parseInt(args[0]), parseInt(args[1]), parseInt(args[2])).run();
+        new SafeSense(parseInt(args[0]), parseInt(args[1]), parseInt(args[2]), parseInt(args[3])).run();
     }
 }
