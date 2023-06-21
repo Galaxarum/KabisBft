@@ -1,8 +1,6 @@
 package kabis.art_exhibition;
 
 import kabis.consumer.KabisConsumer;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.apache.kafka.clients.consumer.ConsumerRecords;
 
 import java.time.Duration;
 
@@ -48,12 +46,12 @@ public abstract class ArtExhibitionConsumer {
         long t1 = System.nanoTime();
         System.out.printf("[pollAndMeasure]: recordsToRead:" + recordsToRead + "\n");
         while (i < recordsToRead) {
-            ConsumerRecords<Integer, String> records = consumer.poll(POLL_TIMEOUT);
+            /*ConsumerRecords<Integer, String> records = consumer.poll(POLL_TIMEOUT);
             for (ConsumerRecord<Integer, String> record : records) {
                 i += 1;
                 System.out.printf("[" + this.getClass().toString() + "] Received alarm from " + record.key() + "\n");
-            }
-            //i += consumer.poll(POLL_TIMEOUT).count();
+            }*/
+            i += consumer.poll(POLL_TIMEOUT).count();
         }
         System.out.printf("[pollAndMeasure]: All messages read!\n");
         long t2 = System.nanoTime();
