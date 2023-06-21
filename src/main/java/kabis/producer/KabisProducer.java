@@ -20,9 +20,6 @@ public class KabisProducer<K extends Integer, V extends String> implements Kabis
 
     public KabisProducer(Properties properties) {
         var bootstrapServers = properties.getProperty("bootstrap.servers").split(";");
-
-        System.out.println("[DEBUG-KabisProducer]: " + bootstrapServers.length + " " + bootstrapServers[0]);
-
         this.id = Integer.parseInt(properties.getProperty("client.id"));
         this.kafkaProducers = new ArrayList<>(bootstrapServers.length);
         for (int i = 0; i < bootstrapServers.length; i++) {
