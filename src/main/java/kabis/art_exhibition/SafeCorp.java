@@ -78,15 +78,20 @@ public class SafeCorp extends ArtExhibitionProducer {
         long receivingTime = pollAndRespondMeasure(safeCorpConsumer, safeCorpProducer, recordsToRead, responseMessage);
         safeCorpConsumer.close();
 
+        System.out.printf("[SafeCorp] READING DONE!\n");
+
         // -- SEND UNCAUGHT ALARMS --
         System.out.printf("[SafeCorp] Sending uncaught breaches\n");
         String sendMessage = "[SafeCorp] BREACH FOUND";
         long sendingTime = sendAndMeasure(safeCorpProducer, getNumberOfUncaughtBreaches(), sendMessage);
         safeCorpProducer.close();
 
+        System.out.printf("[SafeCorp] DONE! Producer Closed - Saving experiments\n");
+
         // Store results
         ArtExhibitionBenchmarkResult.storeThroughputToDisk(Arrays.asList("Number of TRUE ALARMS", "Number of UNCAUGHT BREACHES", "Total TIME [ns]"),
                 Arrays.asList(Integer.toString(getNumberOfTrueAlarms()), Integer.toString(getNumberOfUncaughtBreaches()), Long.toString(sendingTime + receivingTime)));
+        System.out.printf("[SafeCorp] Experiments persisted!\n");
     }
 
     public static void main(String[] args) {

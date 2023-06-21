@@ -40,8 +40,11 @@ public class ArtEstate extends ArtExhibitionConsumer {
         long time = pollAndMeasure(artEstateConsumer, recordsToRead);
         artEstateConsumer.close();
 
+        System.out.printf("[ArtEstate] DONE! Consumer Closed - Saving experiments\n");
+
         ArtExhibitionBenchmarkResult.storeThroughputToDisk(Arrays.asList("Number of TOTAL ALARMS", "Total TIME [ns]"),
                 Arrays.asList(Integer.toString(recordsToRead), Long.toString(time)));
+        System.out.printf("[ArtEstate] Experiments persisted!\n");
     }
 
     public static void main(String[] args) {

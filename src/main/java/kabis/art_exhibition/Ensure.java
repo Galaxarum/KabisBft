@@ -39,8 +39,11 @@ public class Ensure extends ArtExhibitionConsumer {
         long time = pollAndMeasure(ensureConsumer, recordsToRead);
         ensureConsumer.close();
 
+        System.out.printf("[Ensure] DONE! Consumer Closed - Saving experiments\n");
+
         ArtExhibitionBenchmarkResult.storeThroughputToDisk(Arrays.asList("Number of TOTAL ALARMS", "Total TIME [ns]"),
                 Arrays.asList(Integer.toString(recordsToRead), Long.toString(time)));
+        System.out.printf("[Ensure] Experiments persisted!\n");
     }
 
     public static void main(String[] args) {

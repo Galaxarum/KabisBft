@@ -47,8 +47,11 @@ public class SafeSense extends ArtExhibitionProducer {
 
         long time = trueAlarmsTime + falseAlarmTime;
 
+        System.out.printf("[SafeSense] DONE! Producer Closed - Saving experiments\n");
+
         ArtExhibitionBenchmarkResult.storeThroughputToDisk(Arrays.asList("Number of TRUE ALARMS", "Number of FALSE ALARMS", "Total TIME [ns]"),
                 Arrays.asList(Integer.toString(getNumberOfTrueAlarms()), Integer.toString(getNumberOfFalseAlarms()), Long.toString(time)));
+        System.out.printf("[SafeSense] Experiments persisted!\n");
     }
 
     public static void main(String[] args) throws InterruptedException {
