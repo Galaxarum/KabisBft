@@ -33,7 +33,7 @@ services:
     environment:
       - ALLOW_ANONYMOUS_LOGIN=yes
       - ZOO_SERVER_ID=1
-      - ZOO_SERVERS=0.0.0.0:2888:3888,zookeeper-1-2:2888:3888,zookeeper-1-3:2888:3888,zookeeper-1-4:2888:3888
+      - ZOO_SERVERS=0.0.0.0:2888:3888,zookeeper-1-2:2888:3888
   zookeeper-1-2:
     image: "bitnami/zookeeper:latest"
     networks:
@@ -41,7 +41,7 @@ services:
     environment:
       - ALLOW_ANONYMOUS_LOGIN=yes
       - ZOO_SERVER_ID=2
-      - ZOO_SERVERS=zookeeper-1-1:2888:3888,0.0.0.0:2888:3888,zookeeper-1-3:2888:3888,zookeeper-1-4:2888:3888
+      - ZOO_SERVERS=zookeeper-1-1:2888:3888,0.0.0.0:2888:3888
 
   kafka_1_1:
     image: "bitnami/kafka:latest"
@@ -82,7 +82,7 @@ services:
     environment:
       - ALLOW_ANONYMOUS_LOGIN=yes
       - ZOO_SERVER_ID=1
-      - ZOO_SERVERS=0.0.0.0:2888:3888,zookeeper-2-2:2888:3888,zookeeper-2-3:2888:3888,zookeeper-2-4:2888:3888
+      - ZOO_SERVERS=0.0.0.0:2888:3888,zookeeper-2-2:2888:3888
   zookeeper-2-2:
     image: "bitnami/zookeeper:latest"
     networks:
@@ -90,7 +90,7 @@ services:
     environment:
       - ALLOW_ANONYMOUS_LOGIN=yes
       - ZOO_SERVER_ID=2
-      - ZOO_SERVERS=zookeeper-2-1:2888:3888,0.0.0.0:2888:3888,zookeeper-2-3:2888:3888,zookeeper-2-4:2888:3888
+      - ZOO_SERVERS=zookeeper-2-1:2888:3888,0.0.0.0:2888:3888
 
   kafka_2_1:
     image: "bitnami/kafka:latest"
@@ -137,7 +137,7 @@ services:
       - "bft-1"
       - "bft-2"
     environment:
-      - CLIENT_ID=3
+      - CLIENT_ID=1
       - NUM_EXHIBITIONS=$NUM_EXHIBITIONS
       - NUM_TRUE_ALARMS=$NUM_TRUE_ALARMS
       - NUM_FALSE_ALARMS=$NUM_FALSE_ALARMS
@@ -156,7 +156,7 @@ services:
       - "bft-1"
       - "bft-2"
     environment:
-      - CLIENT_ID=4
+      - CLIENT_ID=2
       - NUM_EXHIBITIONS=$NUM_EXHIBITIONS
       - NUM_TRUE_ALARMS=$NUM_TRUE_ALARMS
       - NUM_FALSE_ALARMS=$NUM_FALSE_ALARMS
