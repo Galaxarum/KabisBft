@@ -133,6 +133,7 @@ services:
       - "bft-1"
       - "bft-2"
     environment:
+      - CLIENT_ID=3
       - NUM_EXHIBITIONS=$NUM_EXHIBITIONS
       - NUM_TRUE_ALARMS=$NUM_TRUE_ALARMS
       - NUM_FALSE_ALARMS=$NUM_FALSE_ALARMS
@@ -151,6 +152,7 @@ services:
       - "bft-1"
       - "bft-2"
     environment:
+      - CLIENT_ID=4
       - NUM_EXHIBITIONS=$NUM_EXHIBITIONS
       - NUM_TRUE_ALARMS=$NUM_TRUE_ALARMS
       - NUM_FALSE_ALARMS=$NUM_FALSE_ALARMS
