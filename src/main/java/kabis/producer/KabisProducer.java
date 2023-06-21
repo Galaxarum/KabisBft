@@ -11,23 +11,26 @@ import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
-public class KabisProducer<K extends Integer,V extends String> implements KabisProducerI<K,V> {
+public class KabisProducer<K extends Integer, V extends String> implements KabisProducerI<K, V> {
 
     private final Set<String> validatedTopics = new HashSet<>();
-    private final List<KafkaProducer<K,MessageWrapper<V>>> kafkaProducers;
+    private final List<KafkaProducer<K, MessageWrapper<V>>> kafkaProducers;
     private final KabisServiceProxy serviceProxy;
     private final int id;
 
     public KabisProducer(Properties properties) {
         var bootstrapServers = properties.getProperty("bootstrap.servers").split(";");
+
+        System.out.println("[DEBUG-KabisProducer]: " + bootstrapServers.length + " " + bootstrapServers[0]);
+
         this.id = Integer.parseInt(properties.getProperty("client.id"));
         this.kafkaProducers = new ArrayList<>(bootstrapServers.length);
         for (int i = 0; i < bootstrapServers.length; i++) {
             String server = bootstrapServers[i];
-            var id = String.format("%d-producer-%d",this.id,i);
+            var id = String.format("%d-producer-%d", this.id, i);
             var simplerProperties = (Properties) properties.clone();
             simplerProperties.put("bootstrap.servers", server);
-            simplerProperties.put("client.id",id);
+            simplerProperties.put("client.id", id);
             this.kafkaProducers.add(new KafkaProducer<>(simplerProperties));
         }
         this.serviceProxy = new KabisServiceProxy(id);
@@ -35,7 +38,7 @@ public class KabisProducer<K extends Integer,V extends String> implements KabisP
 
     @Override
     public void updateTopology(Collection<String> validatedTopics) {
-        synchronized (this.validatedTopics){
+        synchronized (this.validatedTopics) {
             this.validatedTopics.clear();
             this.validatedTopics.addAll(validatedTopics);
         }
@@ -53,39 +56,38 @@ public class KabisProducer<K extends Integer,V extends String> implements KabisP
     }
 
     @SuppressWarnings("unchecked")
-    private void pushValidated(ProducerRecord<K,V> record){
+    private void pushValidated(ProducerRecord<K, V> record) {
         var value = record.value();
         var key = record.key();
         var wrapper = new MessageWrapper<>(value, id);
         var wrappedRecord = new ProducerRecord<>(record.topic(), record.key(), wrapper);
 
 
-        CompletableFuture<RecordMetadata>[] completableFutures = kafkaProducers.stream().map(prod->{
+        CompletableFuture<RecordMetadata>[] completableFutures = kafkaProducers.stream().map(prod -> {
             CompletableFuture<RecordMetadata> future = new CompletableFuture<>();
-            prod.send(wrappedRecord,((metadata, exception) -> {
-                if(exception==null) future.complete(metadata);
+            prod.send(wrappedRecord, ((metadata, exception) -> {
+                if (exception == null) future.complete(metadata);
                 else future.completeExceptionally(exception);
             }));
             return future;
         }).toArray(CompletableFuture[]::new);
 
         CompletableFuture.anyOf(completableFutures)
-                .thenAccept(res->{
+                .thenAccept(res -> {
                     RecordMetadata metadata = (RecordMetadata) res;
                     var topic = metadata.topic();
                     var partition = metadata.partition();
-                    SecureIdentifier sid = SecureIdentifier.factory(key,value, topic, partition, id);
+                    SecureIdentifier sid = SecureIdentifier.factory(key, value, topic, partition, id);
                     serviceProxy.push(sid);
                 }).join();
         CompletableFuture.allOf(completableFutures).join();
     }
 
 
-
-    private void pushUnvalidated(ProducerRecord<K,V> record){
+    private void pushUnvalidated(ProducerRecord<K, V> record) {
         var value = record.value();
         var wrapper = new MessageWrapper<>(value);
-        var wrappedRecord = new ProducerRecord<>(record.topic(),record.key(), wrapper);
+        var wrappedRecord = new ProducerRecord<>(record.topic(), record.key(), wrapper);
         kafkaProducers.get(0).send(wrappedRecord);
     }
 
@@ -102,6 +104,6 @@ public class KabisProducer<K extends Integer,V extends String> implements KabisP
 
     @Override
     public void close(Duration duration) {
-        kafkaProducers.forEach(p->p.close(duration));
+        kafkaProducers.forEach(p -> p.close(duration));
     }
 }

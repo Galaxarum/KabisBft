@@ -23,7 +23,8 @@ public class SafeSense extends ArtExhibitionProducer {
         try {
             properties.load(new FileInputStream("config.properties"));
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
+            System.exit(1);
         }
         properties.setProperty("client.id", String.valueOf(getClientId()));
 
@@ -34,12 +35,12 @@ public class SafeSense extends ArtExhibitionProducer {
         System.out.printf("[SafeSense] Kabis Producer created\n");
 
         // -- SEND TRUE ALARMS --
-        System.out.printf("[SafeSense] Sending ALARMS\n");
+        System.out.printf("[SafeSense] Sending TRUE ALARMS\n");
         String trueAlarmMessage = "[SafeSense] TRUE ALARM";
         long trueAlarmsTime = sendAndMeasure(safeSenseProducer, getNumberOfTrueAlarms(), trueAlarmMessage);
 
         // -- SEND FALSE ALARMS --
-        System.out.printf("[SafeSense] Sending ALARMS\n");
+        System.out.printf("[SafeSense] Sending FALSE ALARMS\n");
         String falseAlarmMessage = "[SafeSense] FALSE ALARM";
         long falseAlarmTime = sendAndMeasure(safeSenseProducer, getNumberOfFalseAlarms(), falseAlarmMessage);
         safeSenseProducer.close();
