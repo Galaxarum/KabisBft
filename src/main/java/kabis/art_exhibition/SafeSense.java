@@ -17,7 +17,7 @@ public class SafeSense extends ArtExhibitionProducer {
         super(clientId, numberOfArtExhibitions, numberOfTrueAlarms, numberOfFalseAlarms);
     }
 
-    private void run() {
+    private void run() throws InterruptedException {
         Security.addProvider(new BouncyCastleProvider());
         Properties properties = new Properties();
         try {
@@ -28,7 +28,7 @@ public class SafeSense extends ArtExhibitionProducer {
         }
         properties.setProperty("client.id", String.valueOf(getClientId()));
 
-        // Thread.sleep(10000);
+        Thread.sleep(10000);
 
         KabisProducer<Integer, String> safeSenseProducer = new KabisProducer<>(properties);
         safeSenseProducer.updateTopology(Collections.singletonList(Topics.ART_EXHIBITION.toString()));
@@ -51,7 +51,7 @@ public class SafeSense extends ArtExhibitionProducer {
                 Arrays.asList(Integer.toString(getNumberOfTrueAlarms()), Integer.toString(getNumberOfFalseAlarms()), Long.toString(time)));
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
         if (args.length != 4) {
             System.out.print("--ERROR-- \nUSAGE: <clientId> <numberOfArtExhibitions> <numberOfTrueAlarms> <numberOfFalseAlarms>");
             System.exit(0);
