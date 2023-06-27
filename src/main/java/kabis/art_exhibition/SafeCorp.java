@@ -29,14 +29,14 @@ public class SafeCorp extends ArtExhibitionProducer {
         int i = 0;
 
         long t1 = System.nanoTime();
-        System.out.println("[pollAndMeasure]: recordsToRead: " + recordsToRead);
+        System.out.println("[pollAndRespondMeasure]: recordsToRead: " + recordsToRead);
         while (i < recordsToRead) {
             ConsumerRecords<Integer, String> records = consumer.poll(POLL_TIMEOUT);
             for (ConsumerRecord<Integer, String> record : records) {
-                System.out.println("[SafeCorp] Received record " + record.value() + " exhibition: " + record.key() + " with header: " + record.headers().lastHeader("sender"));
+                System.out.println("[pollAndRespondMeasure]: Received record " + record.value() + " exhibition: " + record.key() + " with header: " + record.headers().lastHeader("sender"));
                 if (!Arrays.equals(record.headers().lastHeader("sender").value(), this.getClass().toString().getBytes(StandardCharsets.UTF_8))) {
                     i += 1;
-                    System.out.println("[SafeCorp] Received alarm " + record.value() + "  exhibition: " + record.key());
+                    System.out.println("[pollAndRespondMeasure]: Received alarm " + record.value() + "  exhibition: " + record.key());
                     ProducerRecord<Integer, String> responseRecord = new ProducerRecord<>(Topics.ART_EXHIBITION.toString(), record.key(), message);
                     responseRecord.headers().add("sender", this.getClass().toString().getBytes(StandardCharsets.UTF_8));
                     producer.push(responseRecord);
@@ -46,6 +46,7 @@ public class SafeCorp extends ArtExhibitionProducer {
         }
         producer.flush();
         long t2 = System.nanoTime();
+        System.out.println("[pollAndRespondMeasure]: All messages read!");
 
         return t2 - t1;
     }

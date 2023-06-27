@@ -51,12 +51,12 @@ public abstract class ArtExhibitionConsumer {
             ConsumerRecords<Integer, String> records = consumer.poll(POLL_TIMEOUT);
             for (ConsumerRecord<Integer, String> record : records) {
                 i += 1;
-                System.out.println("Received " + record.value() + " from " + record.key() + " with header: " + record.headers().lastHeader("sender"));
+                System.out.println("[pollAndMeasure]: Received " + record.value() + " from " + record.key() + " with header: " + record.headers().lastHeader("sender"));
             }
             //i += consumer.poll(POLL_TIMEOUT).count();
         }
-        System.out.println("[pollAndMeasure]: All messages read!");
         long t2 = System.nanoTime();
+        System.out.println("[pollAndMeasure]: All messages read!");
 
         return t2 - t1;
     }
