@@ -55,7 +55,7 @@ public abstract class ArtExhibitionProducer {
         for (int artExhibitionID = 0; artExhibitionID < numberOfArtExhibitions; artExhibitionID++) {
             for (int i = 0; i < numberOfAlarms; i++) {
                 System.out.println("Sending to: " + artExhibitionID);
-                var record = new ProducerRecord<>(Topics.ART_EXHIBITION.toString(), artExhibitionID, message + i);
+                ProducerRecord<Integer, String> record = new ProducerRecord<>(Topics.ART_EXHIBITION.toString(), artExhibitionID, message + i);
                 record.headers().add("sender", this.getClass().toString().getBytes(StandardCharsets.UTF_8));
                 producer.push(record);
             }

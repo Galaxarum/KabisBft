@@ -33,7 +33,7 @@ public class SafeCorp extends ArtExhibitionProducer {
         while (i < recordsToRead) {
             ConsumerRecords<Integer, String> records = consumer.poll(POLL_TIMEOUT);
             for (ConsumerRecord<Integer, String> record : records) {
-                System.out.println("[SafeCorp] Received record " + record.value() + " exhibition: " + record.key() + " with header: " + Arrays.toString(record.headers().lastHeader("sender").value()));
+                System.out.println("[SafeCorp] Received record " + record.value() + " exhibition: " + record.key() + " with header: " + record.headers().headers("sender"));
                 if (!Arrays.equals(record.headers().lastHeader("sender").value(), this.getClass().toString().getBytes(StandardCharsets.UTF_8))) {
                     i += 1;
                     System.out.println("[SafeCorp] Received alarm " + record.value() + "  exhibition: " + record.key());
