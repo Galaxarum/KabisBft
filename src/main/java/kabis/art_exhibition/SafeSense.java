@@ -58,10 +58,6 @@ public class SafeSense extends ArtExhibitionProducer {
             System.out.print("--ERROR-- \nUSAGE: <clientId> <numberOfArtExhibitions> <numberOfTrueAlarms> <numberOfFalseAlarms>");
             System.exit(1);
         }
-        // -- RUNNING SAFE-SENSE --
         new SafeSense(parseInt(args[0]), parseInt(args[1]), parseInt(args[2]), parseInt(args[3])).run();
-        // -- CLOSING THE SENDERS AFTER A MINUTE --
-        Thread.sleep(60000);
-        System.exit(0);
     }
 }

@@ -33,11 +33,11 @@ public class SafeCorp extends ArtExhibitionProducer {
             ConsumerRecords<Integer, String> records = consumer.poll(POLL_TIMEOUT);
             for (ConsumerRecord<Integer, String> record : records) {
                 String recordMessage = record.value();
-                System.out.println("[pollAndRespondMeasure]: Received record " + recordMessage + " exhibition: " + record.key());
                 if (!recordMessage.contains("[SafeCorp]")) {
                     i += 1;
-                    System.out.println("[pollAndRespondMeasure]: Received alarm " + recordMessage + "  exhibition: " + record.key());
+                    System.out.println("[pollAndRespondMeasure]: Received " + recordMessage + "  exhibition: " + record.key());
                     ProducerRecord<Integer, String> responseRecord = new ProducerRecord<>(Topics.ART_EXHIBITION.toString(), record.key(), message);
+                    System.out.println("Sending " + responseRecord.value() + " exhibition: " + responseRecord.key());
                     producer.push(responseRecord);
                 }
 
@@ -98,10 +98,6 @@ public class SafeCorp extends ArtExhibitionProducer {
             System.out.println("--ERROR-- \nUSAGE: SafeSense <clientId> <numberOfArtExhibitions> <numberOfTrueAlarms> <numberOfFalseAlarms> <numberOfUncaughtBreaches>");
             System.exit(1);
         }
-        // -- RUNNING SAFE-CORP --
         new SafeCorp(parseInt(args[0]), parseInt(args[1]), parseInt(args[2]), parseInt(args[3]), parseInt(args[4])).run();
-        // -- CLOSING THE SENDERS AFTER A MINUTE --
-        Thread.sleep(60000);
-        System.exit(0);
     }
 }

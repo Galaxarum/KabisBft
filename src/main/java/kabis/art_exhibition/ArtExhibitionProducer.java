@@ -54,7 +54,7 @@ public abstract class ArtExhibitionProducer {
             for (int i = 0; i < numberOfAlarms; i++) {
                 System.out.println("Sending to: " + artExhibitionID);
                 ProducerRecord<Integer, String> record = new ProducerRecord<>(Topics.ART_EXHIBITION.toString(), artExhibitionID, message + i);
-                System.out.println("Sending " + record.value() + " to: " + record.key());
+                System.out.println("Sending " + record.value() + " exhibition: " + record.key());
                 producer.push(record);
             }
         }
