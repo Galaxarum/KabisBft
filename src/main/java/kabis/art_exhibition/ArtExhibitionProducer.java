@@ -3,8 +3,6 @@ package kabis.art_exhibition;
 import kabis.producer.KabisProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 
-import java.nio.charset.StandardCharsets;
-
 public abstract class ArtExhibitionProducer {
     private final Integer clientId;
     private final Integer numberOfArtExhibitions;
@@ -56,8 +54,7 @@ public abstract class ArtExhibitionProducer {
             for (int i = 0; i < numberOfAlarms; i++) {
                 System.out.println("Sending to: " + artExhibitionID);
                 ProducerRecord<Integer, String> record = new ProducerRecord<>(Topics.ART_EXHIBITION.toString(), artExhibitionID, message + i);
-                record.headers().add("1", this.getClass().toString().getBytes(StandardCharsets.UTF_8));
-                System.out.println("Sending " + record.value() + " to: " + record.key() + " with header: " + record.headers().lastHeader("1"));
+                System.out.println("Sending " + record.value() + " to: " + record.key());
                 producer.push(record);
             }
         }

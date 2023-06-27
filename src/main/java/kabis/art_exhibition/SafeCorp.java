@@ -8,7 +8,6 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import java.io.FileInputStream;
-import java.nio.charset.StandardCharsets;
 import java.security.Security;
 import java.time.Duration;
 import java.util.Arrays;
@@ -33,12 +32,12 @@ public class SafeCorp extends ArtExhibitionProducer {
         while (i < recordsToRead) {
             ConsumerRecords<Integer, String> records = consumer.poll(POLL_TIMEOUT);
             for (ConsumerRecord<Integer, String> record : records) {
-                System.out.println("[pollAndRespondMeasure]: Received record " + record.value() + " exhibition: " + record.key() + " with header: " + record.headers().lastHeader("1"));
-                if (!Arrays.equals(record.headers().lastHeader("sender").value(), this.getClass().toString().getBytes(StandardCharsets.UTF_8))) {
+                String recordMessage = record.value();
+                System.out.println("[pollAndRespondMeasure]: Received record " + recordMessage + " exhibition: " + record.key());
+                if (!recordMessage.contains("[SafeCorp]")) {
                     i += 1;
-                    System.out.println("[pollAndRespondMeasure]: Received alarm " + record.value() + "  exhibition: " + record.key());
+                    System.out.println("[pollAndRespondMeasure]: Received alarm " + recordMessage + "  exhibition: " + record.key());
                     ProducerRecord<Integer, String> responseRecord = new ProducerRecord<>(Topics.ART_EXHIBITION.toString(), record.key(), message);
-                    responseRecord.headers().add("1", this.getClass().toString().getBytes(StandardCharsets.UTF_8));
                     producer.push(responseRecord);
                 }
 
