@@ -85,8 +85,8 @@ public class SafeCorp extends ArtExhibitionProducer {
         System.out.println("[SafeCorp] DONE! Producer Closed - Saving experiments");
 
         // Store results
-        ArtExhibitionBenchmarkResult.storeThroughputToDisk(Arrays.asList("Number of TRUE ALARMS", "Number of UNCAUGHT BREACHES", "Total TIME [ns]"),
-                Arrays.asList(Integer.toString(getNumberOfTrueAlarms()), Integer.toString(getNumberOfUncaughtBreaches()), Long.toString(sendingTime + receivingTime)));
+        ArtExhibitionBenchmarkResult.storeThroughputToDisk(Arrays.asList("#EXHIBITIONS", "#TRUE-ALARMS", "#UNCAUGHT-BREACHES", "TOTAL TIME [ns]"),
+                Arrays.asList(Integer.toString(getNumberOfArtExhibitions()), Integer.toString(getNumberOfTrueAlarms()), Integer.toString(getNumberOfUncaughtBreaches()), Long.toString(sendingTime + receivingTime)));
         System.out.println("[SafeCorp] Experiments persisted!");
     }
 

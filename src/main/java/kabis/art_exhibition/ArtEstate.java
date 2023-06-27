@@ -33,17 +33,16 @@ public class ArtEstate extends ArtExhibitionConsumer {
 
         System.out.println("[ArtEstate] Reading alarms");
 
-        int recordsToReadWithSafeCorp = ((getNumberOfTrueAlarms() + getNumberOfFalseAlarms()) * 2 + getNumberOfUncaughtBreaches()) * getNumberOfArtExhibitions();
-        int recordsToReadWithoutSafeCorp = (getNumberOfTrueAlarms() + getNumberOfFalseAlarms()) * getNumberOfArtExhibitions();
+        int recordsToRead = ((getNumberOfTrueAlarms() + getNumberOfFalseAlarms()) * 2 + getNumberOfUncaughtBreaches()) * getNumberOfArtExhibitions();
+        //int recordsToReadWithoutSafeCorp = (getNumberOfTrueAlarms() + getNumberOfFalseAlarms()) * getNumberOfArtExhibitions();
 
-        int recordsToRead = recordsToReadWithoutSafeCorp;
         long time = pollAndMeasure(artEstateConsumer, recordsToRead);
         artEstateConsumer.close();
 
         System.out.println("[ArtEstate] DONE! Consumer Closed - Saving experiments");
 
-        ArtExhibitionBenchmarkResult.storeThroughputToDisk(Arrays.asList("Number of TOTAL ALARMS", "Total TIME [ns]"),
-                Arrays.asList(Integer.toString(recordsToRead), Long.toString(time)));
+        ArtExhibitionBenchmarkResult.storeThroughputToDisk(Arrays.asList("#EXHIBITIONS", "#TOTAL ALARMS", "TOTAL TIME [ns]"),
+                Arrays.asList(Integer.toString(getNumberOfArtExhibitions()), Integer.toString(recordsToRead), Long.toString(time)));
         System.out.println("[ArtEstate] Experiments persisted!");
     }
 

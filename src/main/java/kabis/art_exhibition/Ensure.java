@@ -32,17 +32,16 @@ public class Ensure extends ArtExhibitionConsumer {
         System.out.println("[Ensure] Kabis Consumer created");
 
         System.out.println("[Ensure] Reading alarms");
-        int recordsToReadWithSafeCorp = ((getNumberOfTrueAlarms() + getNumberOfFalseAlarms()) * 2 + getNumberOfUncaughtBreaches()) * getNumberOfArtExhibitions();
-        int recordsToReadWithoutSafeCorp = (getNumberOfTrueAlarms() + getNumberOfFalseAlarms()) * getNumberOfArtExhibitions();
+        int recordsToRead = ((getNumberOfTrueAlarms() + getNumberOfFalseAlarms()) * 2 + getNumberOfUncaughtBreaches()) * getNumberOfArtExhibitions();
+        //int recordsToReadWithoutSafeCorp = (getNumberOfTrueAlarms() + getNumberOfFalseAlarms()) * getNumberOfArtExhibitions();
 
-        int recordsToRead = recordsToReadWithoutSafeCorp;
         long time = pollAndMeasure(ensureConsumer, recordsToRead);
         ensureConsumer.close();
 
         System.out.println("[Ensure] DONE! Consumer Closed - Saving experiments");
 
-        ArtExhibitionBenchmarkResult.storeThroughputToDisk(Arrays.asList("Number of TOTAL ALARMS", "Total TIME [ns]"),
-                Arrays.asList(Integer.toString(recordsToRead), Long.toString(time)));
+        ArtExhibitionBenchmarkResult.storeThroughputToDisk(Arrays.asList("#EXHIBITIONS", "#TOTAL ALARMS", "TOTAL TIME [ns]"),
+                Arrays.asList(Integer.toString(getNumberOfArtExhibitions()), Integer.toString(recordsToRead), Long.toString(time)));
         System.out.println("[Ensure] Experiments persisted!");
     }
 
