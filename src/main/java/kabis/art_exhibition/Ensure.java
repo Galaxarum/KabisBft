@@ -53,6 +53,5 @@ public class Ensure extends ArtExhibitionConsumer {
         }
 
         new Ensure(parseInt(args[0]), parseInt(args[1]), parseInt(args[2]), parseInt(args[3]), parseInt(args[4])).run();
-        System.exit(0);
     }
 }

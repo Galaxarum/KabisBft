@@ -101,6 +101,5 @@ public class SafeCorp extends ArtExhibitionProducer {
         }
 
         new SafeCorp(parseInt(args[0]), parseInt(args[1]), parseInt(args[2]), parseInt(args[3]), parseInt(args[4])).run();
-        System.exit(0);
     }
 }

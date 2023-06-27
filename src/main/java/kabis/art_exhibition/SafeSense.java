@@ -61,6 +61,5 @@ public class SafeSense extends ArtExhibitionProducer {
         }
 
         new SafeSense(parseInt(args[0]), parseInt(args[1]), parseInt(args[2]), parseInt(args[3])).run();
-        System.exit(0);
     }
 }
