@@ -50,9 +50,10 @@ public class ArtEstate extends ArtExhibitionConsumer {
     public static void main(String[] args) {
         if (args.length != 5) {
             System.out.print("--ERROR-- \nUSAGE: ArtEstate <clientId> <numberOfArtExhibitions> <totalNumberOfAlarms> <falseAlarmsPercentage> <alarmsNotTriggeredPercentage>");
-            System.exit(0);
+            System.exit(1);
         }
 
         new ArtEstate(parseInt(args[0]), parseInt(args[1]), parseInt(args[2]), parseInt(args[3]), parseInt(args[4])).run();
+        System.exit(0);
     }
 }

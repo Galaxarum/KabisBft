@@ -57,9 +57,10 @@ public class SafeSense extends ArtExhibitionProducer {
     public static void main(String[] args) throws InterruptedException {
         if (args.length != 4) {
             System.out.print("--ERROR-- \nUSAGE: <clientId> <numberOfArtExhibitions> <numberOfTrueAlarms> <numberOfFalseAlarms>");
-            System.exit(0);
+            System.exit(1);
         }
 
         new SafeSense(parseInt(args[0]), parseInt(args[1]), parseInt(args[2]), parseInt(args[3])).run();
+        System.exit(0);
     }
 }
