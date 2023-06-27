@@ -51,16 +51,16 @@ public abstract class ArtExhibitionProducer {
 
     protected long sendAndMeasure(KabisProducer<Integer, String> producer, Integer numberOfAlarms, String message) {
         long t1 = System.nanoTime();
-        System.out.printf("[sendAndMeasure]: numberOfArtExhibitions: " + numberOfArtExhibitions + " numberOfAlarms:" + numberOfAlarms + "\n");
+        System.out.println("[sendAndMeasure]: numberOfArtExhibitions: " + numberOfArtExhibitions + " numberOfAlarms:" + numberOfAlarms);
         for (int artExhibitionID = 0; artExhibitionID < numberOfArtExhibitions; artExhibitionID++) {
             for (int i = 0; i < numberOfAlarms; i++) {
-                System.out.printf("[" + this.getClass().toString() + "] Sending to: " + artExhibitionID + "\n");
+                System.out.println("Sending to: " + artExhibitionID);
                 var record = new ProducerRecord<>(Topics.ART_EXHIBITION.toString(), artExhibitionID, message + i);
                 record.headers().add("sender", this.getClass().toString().getBytes(StandardCharsets.UTF_8));
                 producer.push(record);
             }
         }
-        System.out.printf("[sendAndMeasure]: All messages sent!\n");
+        System.out.println("[sendAndMeasure]: All messages sent!");
         producer.flush();
         long t2 = System.nanoTime();
 

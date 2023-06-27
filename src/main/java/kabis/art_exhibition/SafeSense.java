@@ -30,26 +30,26 @@ public class SafeSense extends ArtExhibitionProducer {
 
         KabisProducer<Integer, String> safeSenseProducer = new KabisProducer<>(properties);
         safeSenseProducer.updateTopology(Collections.singletonList(Topics.ART_EXHIBITION.toString()));
-        System.out.printf("[SafeSense] Kabis Producer created\n");
+        System.out.println("[SafeSense] Kabis Producer created");
 
         // -- SEND TRUE ALARMS --
-        System.out.printf("[SafeSense] Sending TRUE ALARMS\n");
-        String trueAlarmMessage = "[SafeSense] TRUE ALARM";
+        System.out.println("[SafeSense] Sending TRUE ALARMS");
+        String trueAlarmMessage = "[SafeSense] TRUE ALARM ";
         long trueAlarmsTime = sendAndMeasure(safeSenseProducer, getNumberOfTrueAlarms(), trueAlarmMessage);
 
         // -- SEND FALSE ALARMS --
-        System.out.printf("[SafeSense] Sending FALSE ALARMS\n");
-        String falseAlarmMessage = "[SafeSense] FALSE ALARM";
+        System.out.println("[SafeSense] Sending FALSE ALARMS");
+        String falseAlarmMessage = "[SafeSense] FALSE ALARM ";
         long falseAlarmTime = sendAndMeasure(safeSenseProducer, getNumberOfFalseAlarms(), falseAlarmMessage);
         safeSenseProducer.close();
 
         long time = trueAlarmsTime + falseAlarmTime;
 
-        System.out.printf("[SafeSense] DONE! Producer Closed - Saving experiments\n");
+        System.out.println("[SafeSense] DONE! Producer Closed - Saving experiments");
 
         ArtExhibitionBenchmarkResult.storeThroughputToDisk(Arrays.asList("Number of TRUE ALARMS", "Number of FALSE ALARMS", "Total TIME [ns]"),
                 Arrays.asList(Integer.toString(getNumberOfTrueAlarms()), Integer.toString(getNumberOfFalseAlarms()), Long.toString(time)));
-        System.out.printf("[SafeSense] Experiments persisted!\n");
+        System.out.println("[SafeSense] Experiments persisted!");
     }
 
     public static void main(String[] args) throws InterruptedException {
@@ -58,7 +58,7 @@ public class SafeSense extends ArtExhibitionProducer {
             System.out.print("--ERROR-- \nUSAGE: <clientId> <numberOfArtExhibitions> <numberOfTrueAlarms> <numberOfFalseAlarms>");
             System.exit(1);
         }
-        // -- RUNNING SAFASENSE --
+        // -- RUNNING SAFE-SENSE --
         new SafeSense(parseInt(args[0]), parseInt(args[1]), parseInt(args[2]), parseInt(args[3])).run();
         // -- CLOSING THE SENDERS AFTER A MINUTE --
         Thread.sleep(60000);

@@ -29,9 +29,9 @@ public class Ensure extends ArtExhibitionConsumer {
         KabisConsumer<Integer, String> ensureConsumer = new KabisConsumer<>(properties);
         ensureConsumer.subscribe(Collections.singletonList(Topics.ART_EXHIBITION.toString()));
         ensureConsumer.updateTopology(Collections.singletonList(Topics.ART_EXHIBITION.toString()));
-        System.out.printf("[Ensure] Kabis Consumer created\n");
+        System.out.println("[Ensure] Kabis Consumer created");
 
-        System.out.printf("[Ensure] Reading alarms\n");
+        System.out.println("[Ensure] Reading alarms");
         int recordsToReadWithSafeCorp = ((getNumberOfTrueAlarms() + getNumberOfFalseAlarms()) * 2 + getNumberOfUncaughtBreaches()) * getNumberOfArtExhibitions();
         int recordsToReadWithoutSafeCorp = (getNumberOfTrueAlarms() + getNumberOfFalseAlarms()) * getNumberOfArtExhibitions();
 
@@ -39,11 +39,11 @@ public class Ensure extends ArtExhibitionConsumer {
         long time = pollAndMeasure(ensureConsumer, recordsToRead);
         ensureConsumer.close();
 
-        System.out.printf("[Ensure] DONE! Consumer Closed - Saving experiments\n");
+        System.out.println("[Ensure] DONE! Consumer Closed - Saving experiments");
 
         ArtExhibitionBenchmarkResult.storeThroughputToDisk(Arrays.asList("Number of TOTAL ALARMS", "Total TIME [ns]"),
                 Arrays.asList(Integer.toString(recordsToRead), Long.toString(time)));
-        System.out.printf("[Ensure] Experiments persisted!\n");
+        System.out.println("[Ensure] Experiments persisted!");
     }
 
     public static void main(String[] args) throws InterruptedException {

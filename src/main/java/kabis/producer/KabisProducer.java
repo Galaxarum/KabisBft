@@ -74,7 +74,6 @@ public class KabisProducer<K extends Integer, V extends String> implements Kabis
                     RecordMetadata metadata = (RecordMetadata) res;
                     var topic = metadata.topic();
                     var partition = metadata.partition();
-                    System.out.println("[DEBUG-KabisProducer]: TOPIC=" + topic + ", PARTITION:" + partition + ", KEY:" + key + ", VALUE:" + value);
                     SecureIdentifier sid = SecureIdentifier.factory(key, value, topic, partition, id);
                     serviceProxy.push(sid);
                 }).join();

@@ -46,16 +46,16 @@ public abstract class ArtExhibitionConsumer {
     protected long pollAndMeasure(KabisConsumer<Integer, String> consumer, Integer recordsToRead) {
         int i = 0;
         long t1 = System.nanoTime();
-        System.out.printf("[pollAndMeasure]: recordsToRead:" + recordsToRead + "\n");
+        System.out.println("[pollAndMeasure]: recordsToRead: " + recordsToRead);
         while (i < recordsToRead) {
             ConsumerRecords<Integer, String> records = consumer.poll(POLL_TIMEOUT);
             for (ConsumerRecord<Integer, String> record : records) {
                 i += 1;
-                System.out.printf("[" + this.getClass().toString() + "] Received alarm from " + record.key() + "\n");
+                System.out.println("Received " + record.value() + " from " + record.key());
             }
             //i += consumer.poll(POLL_TIMEOUT).count();
         }
-        System.out.printf("[pollAndMeasure]: All messages read!\n");
+        System.out.println("[pollAndMeasure]: All messages read!");
         long t2 = System.nanoTime();
 
         return t2 - t1;

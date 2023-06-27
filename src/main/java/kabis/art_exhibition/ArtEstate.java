@@ -29,9 +29,9 @@ public class ArtEstate extends ArtExhibitionConsumer {
         KabisConsumer<Integer, String> artEstateConsumer = new KabisConsumer<>(properties);
         artEstateConsumer.subscribe(Collections.singletonList(Topics.ART_EXHIBITION.toString()));
         artEstateConsumer.updateTopology(Collections.singletonList(Topics.ART_EXHIBITION.toString()));
-        System.out.printf("[ArtEstate] Kabis Consumer created\n");
+        System.out.println("[ArtEstate] Kabis Consumer created");
 
-        System.out.printf("[ArtEstate] Reading alarms\n");
+        System.out.println("[ArtEstate] Reading alarms");
 
         int recordsToReadWithSafeCorp = ((getNumberOfTrueAlarms() + getNumberOfFalseAlarms()) * 2 + getNumberOfUncaughtBreaches()) * getNumberOfArtExhibitions();
         int recordsToReadWithoutSafeCorp = (getNumberOfTrueAlarms() + getNumberOfFalseAlarms()) * getNumberOfArtExhibitions();
@@ -40,11 +40,11 @@ public class ArtEstate extends ArtExhibitionConsumer {
         long time = pollAndMeasure(artEstateConsumer, recordsToRead);
         artEstateConsumer.close();
 
-        System.out.printf("[ArtEstate] DONE! Consumer Closed - Saving experiments\n");
+        System.out.println("[ArtEstate] DONE! Consumer Closed - Saving experiments");
 
         ArtExhibitionBenchmarkResult.storeThroughputToDisk(Arrays.asList("Number of TOTAL ALARMS", "Total TIME [ns]"),
                 Arrays.asList(Integer.toString(recordsToRead), Long.toString(time)));
-        System.out.printf("[ArtEstate] Experiments persisted!\n");
+        System.out.println("[ArtEstate] Experiments persisted!");
     }
 
     public static void main(String[] args) throws InterruptedException {

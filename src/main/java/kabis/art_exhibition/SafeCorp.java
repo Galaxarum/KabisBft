@@ -58,40 +58,36 @@ public class SafeCorp extends ArtExhibitionProducer {
         }
         properties.setProperty("client.id", String.valueOf(getClientId()));
 
-        // Thread.sleep(10000);
-
         KabisConsumer<Integer, String> safeCorpConsumer = new KabisConsumer<>(properties);
         safeCorpConsumer.subscribe(Collections.singletonList(Topics.ART_EXHIBITION.toString()));
         safeCorpConsumer.updateTopology(Collections.singletonList(Topics.ART_EXHIBITION.toString()));
-        System.out.printf("[SafeCorp] Kabis Consumer created\n");
+        System.out.println("[SafeCorp] Kabis Consumer created");
 
         KabisProducer<Integer, String> safeCorpProducer = new KabisProducer<>(properties);
         safeCorpProducer.updateTopology(Collections.singletonList(Topics.ART_EXHIBITION.toString()));
-        System.out.printf("[SafeCorp] Kabis Producer created\n");
-
-        // Thread.sleep(15000);
+        System.out.println("[SafeCorp] Kabis Producer created");
 
         // -- READ TRUE AND FALSE ALARMS AND RESPOND --
-        System.out.printf("[SafeCorp] Reading alarms\n");
-        String responseMessage = "[SafeCorp] ALARM RECEIVED";
+        System.out.println("[SafeCorp] Reading alarms");
+        String responseMessage = "[SafeCorp] ALARM RECEIVED ";
         Integer recordsToRead = (getNumberOfTrueAlarms() + getNumberOfFalseAlarms()) * getNumberOfArtExhibitions();
         long receivingTime = pollAndRespondMeasure(safeCorpConsumer, safeCorpProducer, recordsToRead, responseMessage);
         safeCorpConsumer.close();
 
-        System.out.printf("[SafeCorp] READING DONE!\n");
+        System.out.println("[SafeCorp] READING DONE!");
 
         // -- SEND UNCAUGHT ALARMS --
-        System.out.printf("[SafeCorp] Sending uncaught breaches\n");
+        System.out.println("[SafeCorp] Sending uncaught breaches");
         String sendMessage = "[SafeCorp] BREACH FOUND";
         long sendingTime = sendAndMeasure(safeCorpProducer, getNumberOfUncaughtBreaches(), sendMessage);
         safeCorpProducer.close();
 
-        System.out.printf("[SafeCorp] DONE! Producer Closed - Saving experiments\n");
+        System.out.println("[SafeCorp] DONE! Producer Closed - Saving experiments");
 
         // Store results
         ArtExhibitionBenchmarkResult.storeThroughputToDisk(Arrays.asList("Number of TRUE ALARMS", "Number of UNCAUGHT BREACHES", "Total TIME [ns]"),
                 Arrays.asList(Integer.toString(getNumberOfTrueAlarms()), Integer.toString(getNumberOfUncaughtBreaches()), Long.toString(sendingTime + receivingTime)));
-        System.out.printf("[SafeCorp] Experiments persisted!\n");
+        System.out.println("[SafeCorp] Experiments persisted!");
     }
 
     public static void main(String[] args) throws InterruptedException {
@@ -100,7 +96,7 @@ public class SafeCorp extends ArtExhibitionProducer {
             System.out.println("--ERROR-- \nUSAGE: SafeSense <clientId> <numberOfArtExhibitions> <numberOfTrueAlarms> <numberOfFalseAlarms> <numberOfUncaughtBreaches>");
             System.exit(1);
         }
-        // -- RUNNING SAFECORP --
+        // -- RUNNING SAFE-CORP --
         new SafeCorp(parseInt(args[0]), parseInt(args[1]), parseInt(args[2]), parseInt(args[3]), parseInt(args[4])).run();
         // -- CLOSING THE SENDERS AFTER A MINUTE --
         Thread.sleep(60000);
