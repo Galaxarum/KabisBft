@@ -5,6 +5,8 @@ import kabis.producer.KabisProducer;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.common.header.Header;
+import org.apache.kafka.common.header.internals.RecordHeader;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import java.io.FileInputStream;
@@ -13,6 +15,7 @@ import java.security.Security;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Properties;
 
 import static java.lang.Integer.parseInt;
@@ -37,8 +40,9 @@ public class SafeCorp extends ArtExhibitionProducer {
                 if (!Arrays.equals(record.headers().lastHeader("sender").value(), this.getClass().toString().getBytes(StandardCharsets.UTF_8))) {
                     i += 1;
                     System.out.println("[pollAndRespondMeasure]: Received alarm " + record.value() + "  exhibition: " + record.key());
-                    ProducerRecord<Integer, String> responseRecord = new ProducerRecord<>(Topics.ART_EXHIBITION.toString(), record.key(), message);
-                    responseRecord.headers().add("sender", this.getClass().toString().getBytes(StandardCharsets.UTF_8));
+                    List<Header> headers = Arrays.asList(new RecordHeader("sender", this.getClass().toString().getBytes(StandardCharsets.UTF_8)));
+                    ProducerRecord<Integer, String> responseRecord = new ProducerRecord<>(Topics.ART_EXHIBITION.toString(), null, record.key(), message, headers);
+                    //responseRecord.headers().add("sender", this.getClass().toString().getBytes(StandardCharsets.UTF_8));
                     producer.push(responseRecord);
                 }
 

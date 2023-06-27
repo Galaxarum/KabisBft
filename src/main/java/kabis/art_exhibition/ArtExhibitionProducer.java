@@ -2,8 +2,12 @@ package kabis.art_exhibition;
 
 import kabis.producer.KabisProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.common.header.Header;
+import org.apache.kafka.common.header.internals.RecordHeader;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.List;
 
 public abstract class ArtExhibitionProducer {
     private final Integer clientId;
@@ -55,8 +59,9 @@ public abstract class ArtExhibitionProducer {
         for (int artExhibitionID = 0; artExhibitionID < numberOfArtExhibitions; artExhibitionID++) {
             for (int i = 0; i < numberOfAlarms; i++) {
                 System.out.println("Sending to: " + artExhibitionID);
-                ProducerRecord<Integer, String> record = new ProducerRecord<>(Topics.ART_EXHIBITION.toString(), artExhibitionID, message + i);
-                record.headers().add("sender", this.getClass().toString().getBytes(StandardCharsets.UTF_8));
+                List<Header> headers = Arrays.asList(new RecordHeader("sender", this.getClass().toString().getBytes(StandardCharsets.UTF_8)));
+                ProducerRecord<Integer, String> record = new ProducerRecord<>(Topics.ART_EXHIBITION.toString(), null, artExhibitionID, message + i, headers);
+                //record.headers().add("sender", this.getClass().toString().getBytes(StandardCharsets.UTF_8));
                 System.out.println("Sending " + record.value() + " to: " + record.key() + " with header: " + record.headers().lastHeader("sender"));
                 producer.push(record);
             }
