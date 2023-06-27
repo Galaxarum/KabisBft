@@ -57,6 +57,7 @@ public abstract class ArtExhibitionProducer {
                 System.out.println("Sending to: " + artExhibitionID);
                 ProducerRecord<Integer, String> record = new ProducerRecord<>(Topics.ART_EXHIBITION.toString(), artExhibitionID, message + i);
                 record.headers().add("sender", this.getClass().toString().getBytes(StandardCharsets.UTF_8));
+                System.out.println("Sending " + record.value() + " to: " + record.key() + " with header: " + record.headers().lastHeader("sender"));
                 producer.push(record);
             }
         }
