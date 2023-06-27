@@ -29,12 +29,14 @@ public class SafeCorp extends ArtExhibitionProducer {
         int i = 0;
 
         long t1 = System.nanoTime();
+        System.out.println("[pollAndMeasure]: recordsToRead: " + recordsToRead);
         while (i < recordsToRead) {
             ConsumerRecords<Integer, String> records = consumer.poll(POLL_TIMEOUT);
             for (ConsumerRecord<Integer, String> record : records) {
+                System.out.println("[SafeCorp] Received record " + record.value() + " exhibition: " + record.key() + " with header: " + Arrays.toString(record.headers().lastHeader("sender").value()));
                 if (!Arrays.equals(record.headers().lastHeader("sender").value(), this.getClass().toString().getBytes(StandardCharsets.UTF_8))) {
                     i += 1;
-                    System.out.printf("[SafeCorp] Received alarm from " + record.key() + "\n");
+                    System.out.println("[SafeCorp] Received alarm " + record.value() + "  exhibition: " + record.key());
                     ProducerRecord<Integer, String> responseRecord = new ProducerRecord<>(Topics.ART_EXHIBITION.toString(), record.key(), message);
                     responseRecord.headers().add("sender", this.getClass().toString().getBytes(StandardCharsets.UTF_8));
                     producer.push(responseRecord);
