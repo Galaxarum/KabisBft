@@ -51,7 +51,7 @@ public abstract class ArtExhibitionConsumer {
             ConsumerRecords<Integer, String> records = consumer.poll(POLL_TIMEOUT);
             for (ConsumerRecord<Integer, String> record : records) {
                 i += 1;
-                System.out.println("Received " + record.value() + " from " + record.key());
+                System.out.println("Received " + record.value() + " from " + record.key() + " with header: " + record.headers().lastHeader("sender"));
             }
             //i += consumer.poll(POLL_TIMEOUT).count();
         }
