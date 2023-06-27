@@ -94,12 +94,16 @@ public class SafeCorp extends ArtExhibitionProducer {
         System.out.printf("[SafeCorp] Experiments persisted!\n");
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
+        // -- CHECK IF ALL ARGUMENTS ARE PRESENT --
         if (args.length != 5) {
             System.out.println("--ERROR-- \nUSAGE: SafeSense <clientId> <numberOfArtExhibitions> <numberOfTrueAlarms> <numberOfFalseAlarms> <numberOfUncaughtBreaches>");
             System.exit(1);
         }
-
+        // -- RUNNING SAFECORP --
         new SafeCorp(parseInt(args[0]), parseInt(args[1]), parseInt(args[2]), parseInt(args[3]), parseInt(args[4])).run();
+        // -- CLOSING THE SENDERS AFTER A MINUTE --
+        Thread.sleep(60000);
+        System.exit(0);
     }
 }

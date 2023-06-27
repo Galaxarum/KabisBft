@@ -28,8 +28,6 @@ public class SafeSense extends ArtExhibitionProducer {
         }
         properties.setProperty("client.id", String.valueOf(getClientId()));
 
-        Thread.sleep(10000);
-
         KabisProducer<Integer, String> safeSenseProducer = new KabisProducer<>(properties);
         safeSenseProducer.updateTopology(Collections.singletonList(Topics.ART_EXHIBITION.toString()));
         System.out.printf("[SafeSense] Kabis Producer created\n");
@@ -55,11 +53,15 @@ public class SafeSense extends ArtExhibitionProducer {
     }
 
     public static void main(String[] args) throws InterruptedException {
+        // -- CHECK IF ALL ARGUMENTS ARE PRESENT --
         if (args.length != 4) {
             System.out.print("--ERROR-- \nUSAGE: <clientId> <numberOfArtExhibitions> <numberOfTrueAlarms> <numberOfFalseAlarms>");
             System.exit(1);
         }
-
+        // -- RUNNING SAFASENSE --
         new SafeSense(parseInt(args[0]), parseInt(args[1]), parseInt(args[2]), parseInt(args[3])).run();
+        // -- CLOSING THE SENDERS AFTER A MINUTE --
+        Thread.sleep(60000);
+        System.exit(0);
     }
 }

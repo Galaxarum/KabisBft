@@ -46,12 +46,16 @@ public class Ensure extends ArtExhibitionConsumer {
         System.out.printf("[Ensure] Experiments persisted!\n");
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
+        // -- CHECK IF ALL ARGUMENTS ARE PRESENT --
         if (args.length != 5) {
             System.out.print("--ERROR-- \nUSAGE: Ensure <clientId> <numberOfArtExhibitions> <totalNumberOfAlarms> <falseAlarmsPercentage> <alarmsNotTriggeredPercentage>");
             System.exit(1);
         }
-
+        // -- RUNNING ENSURE --
         new Ensure(parseInt(args[0]), parseInt(args[1]), parseInt(args[2]), parseInt(args[3]), parseInt(args[4])).run();
+        // -- CLOSING THE RECEIVERS AFTER A MINUTE --
+        Thread.sleep(60000);
+        System.exit(0);
     }
 }
