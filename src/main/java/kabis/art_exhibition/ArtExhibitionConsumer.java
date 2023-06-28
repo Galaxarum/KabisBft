@@ -13,7 +13,7 @@ public abstract class ArtExhibitionConsumer {
     private final Integer numberOfFalseAlarms;
     private final Integer numberOfUncaughtBreaches;
 
-    private static final Duration POLL_TIMEOUT = Duration.ofSeconds(1);
+    private static final Duration POLL_TIMEOUT = Duration.ofSeconds(45);
 
     public ArtExhibitionConsumer(Integer clientId, Integer numberOfArtExhibitions, Integer numberOfTrueAlarms, Integer numberOfFalseAlarms, Integer numberOfUncaughtBreaches) {
         this.clientId = clientId;
