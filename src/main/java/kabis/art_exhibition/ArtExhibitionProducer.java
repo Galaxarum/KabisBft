@@ -52,15 +52,14 @@ public abstract class ArtExhibitionProducer {
         System.out.println("[sendAndMeasure]: numberOfArtExhibitions: " + numberOfArtExhibitions + " numberOfAlarms:" + numberOfAlarms);
         for (int artExhibitionID = 0; artExhibitionID < numberOfArtExhibitions; artExhibitionID++) {
             for (int i = 0; i < numberOfAlarms; i++) {
-                System.out.println("Sending to: " + artExhibitionID);
                 ProducerRecord<Integer, String> record = new ProducerRecord<>(Topics.ART_EXHIBITION.toString(), artExhibitionID, message + i);
                 System.out.println("Sending " + record.value() + " exhibition: " + record.key());
                 producer.push(record);
             }
         }
+        long t2 = System.nanoTime();
         System.out.println("[sendAndMeasure]: All messages sent!");
         producer.flush();
-        long t2 = System.nanoTime();
 
         return t2 - t1;
     }

@@ -23,6 +23,7 @@ public class ArtEstate extends ArtExhibitionConsumer {
             properties.load(new FileInputStream("config.properties"));
         } catch (Exception e) {
             e.printStackTrace();
+            System.exit(1);
         }
         properties.setProperty("client.id", String.valueOf(getClientId()));
 

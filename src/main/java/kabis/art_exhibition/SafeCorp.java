@@ -4,6 +4,7 @@ import kabis.consumer.KabisConsumer;
 import kabis.producer.KabisProducer;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
+import org.apache.kafka.clients.producer.ProducerRecord;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import java.io.FileInputStream;
@@ -33,9 +34,9 @@ public class SafeCorp extends ArtExhibitionProducer {
                 if (!recordMessage.contains("[SafeCorp]")) {
                     i += 1;
                     System.out.println("[pollAndRespondMeasure]: Received " + recordMessage + " exhibition: " + record.key());
-                    //ProducerRecord<Integer, String> responseRecord = new ProducerRecord<>(Topics.ART_EXHIBITION.toString(), record.key(), message + record.value());
-                    //System.out.println("Sending " + responseRecord.value() + " exhibition: " + responseRecord.key());
-                    //producer.push(responseRecord);
+                    ProducerRecord<Integer, String> responseRecord = new ProducerRecord<>(Topics.ART_EXHIBITION.toString(), record.key(), message + record.value());
+                    System.out.println("Sending " + responseRecord.value() + " exhibition: " + responseRecord.key());
+                    producer.push(responseRecord);
                 }
             }
         }
@@ -53,6 +54,7 @@ public class SafeCorp extends ArtExhibitionProducer {
             properties.load(new FileInputStream("config.properties"));
         } catch (Exception e) {
             e.printStackTrace();
+            System.exit(1);
         }
         properties.setProperty("client.id", String.valueOf(getClientId()));
 
@@ -74,7 +76,7 @@ public class SafeCorp extends ArtExhibitionProducer {
         long receivingTime = pollAndRespondMeasure(safeCorpConsumer, safeCorpProducer, recordsToRead, responseMessage);
         safeCorpConsumer.close();
 
-        System.out.println("[SafeCorp] READING DONE!");
+        System.out.println("[SafeCorp] READING DONE! Consumer Closed");
 
         // -- SEND UNCAUGHT ALARMS --
         System.out.println("[SafeCorp] Sending uncaught breaches");
