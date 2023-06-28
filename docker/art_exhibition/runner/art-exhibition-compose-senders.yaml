@@ -155,4 +155,23 @@ services:
       - NUM_FALSE_ALARMS=$NUM_FALSE_ALARMS
     volumes:
       - ./results/safe-sense:/usr/kabis/result
-  
+  safe-corp:
+    image: "${DOCKERHUB_USERNAME}/safe-corp:latest"
+    networks:
+      - kafka-network
+      - bft-network
+    depends_on:
+      - "kafka_1_1"
+      - "kafka_1_2"
+      - "kafka_2_1"
+      - "kafka_2_2"
+      - "bft-1"
+      - "bft-2"
+    environment:
+      - CLIENT_ID=1002
+      - NUM_EXHIBITIONS=$NUM_EXHIBITIONS
+      - NUM_TRUE_ALARMS=$NUM_TRUE_ALARMS
+      - NUM_FALSE_ALARMS=$NUM_FALSE_ALARMS
+      - NUM_UNCAUGHT_BREACHES=$NUM_UNCAUGHT_BREACHES
+    volumes:
+      - ./results/safe-corp:/usr/kabis/result

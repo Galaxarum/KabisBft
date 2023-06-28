@@ -136,26 +136,6 @@ services:
       - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka_2_4:9092
 
   #Clients
-  safe-corp:
-    image: "${DOCKERHUB_USERNAME}/safe-corp:latest"
-    networks:
-      - kafka-network
-      - bft-network
-    depends_on:
-      - "kafka_1_3"
-      - "kafka_1_4"
-      - "kafka_2_3"
-      - "kafka_2_4"
-      - "bft-3"
-      - "bft-4"
-    environment:
-      - CLIENT_ID=1002
-      - NUM_EXHIBITIONS=$NUM_EXHIBITIONS
-      - NUM_TRUE_ALARMS=$NUM_TRUE_ALARMS
-      - NUM_FALSE_ALARMS=$NUM_FALSE_ALARMS
-      - NUM_UNCAUGHT_BREACHES=$NUM_UNCAUGHT_BREACHES
-    volumes:
-      - ./results/safe-corp:/usr/kabis/result
   art-estate:
     image: "${DOCKERHUB_USERNAME}/art-estate:latest"
     networks:
