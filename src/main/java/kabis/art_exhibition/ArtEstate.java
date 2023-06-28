@@ -32,7 +32,8 @@ public class ArtEstate extends ArtExhibitionConsumer {
         System.out.println("[ArtEstate] Kabis Consumer created");
 
         System.out.println("[ArtEstate] Reading alarms");
-
+        // * getNumberOfArtExhibitions() will be removed when scaling on multiple consumers within the same consumer group,
+        // every consumer will only read its own exhibition
         int recordsToRead = ((getNumberOfTrueAlarms() + getNumberOfFalseAlarms()) * 2 + getNumberOfUncaughtBreaches()) * getNumberOfArtExhibitions();
         //int recordsToReadWithoutSafeCorp = (getNumberOfTrueAlarms() + getNumberOfFalseAlarms()) * getNumberOfArtExhibitions();
 

@@ -68,6 +68,8 @@ public class SafeCorp extends ArtExhibitionProducer {
         // -- READ TRUE AND FALSE ALARMS AND RESPOND --
         System.out.println("[SafeCorp] Reading alarms");
         String responseMessage = "[SafeCorp] ALARM RECEIVED ";
+        // * getNumberOfArtExhibitions() will be removed when scaling on multiple consumers within the same consumer group,
+        // every consumer will only read its own exhibition
         Integer recordsToRead = (getNumberOfTrueAlarms() + getNumberOfFalseAlarms()) * getNumberOfArtExhibitions();
         long receivingTime = pollAndRespondMeasure(safeCorpConsumer, safeCorpProducer, recordsToRead, responseMessage);
         safeCorpConsumer.close();

@@ -32,6 +32,8 @@ public class Ensure extends ArtExhibitionConsumer {
         System.out.println("[Ensure] Kabis Consumer created");
 
         System.out.println("[Ensure] Reading alarms");
+        // * getNumberOfArtExhibitions() will be removed when scaling on multiple consumers within the same consumer group,
+        // every consumer will only read its own exhibition
         int recordsToRead = ((getNumberOfTrueAlarms() + getNumberOfFalseAlarms()) * 2 + getNumberOfUncaughtBreaches()) * getNumberOfArtExhibitions();
         //int recordsToReadWithoutSafeCorp = (getNumberOfTrueAlarms() + getNumberOfFalseAlarms()) * getNumberOfArtExhibitions();
 
