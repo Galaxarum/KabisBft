@@ -17,8 +17,7 @@ import java.util.Properties;
 import static java.lang.Integer.parseInt;
 
 public class SafeCorp extends ArtExhibitionProducer {
-
-    private static final Duration POLL_TIMEOUT = Duration.ofSeconds(1);
+    private static final Duration POLL_TIMEOUT = Duration.ofSeconds(60);
 
     public SafeCorp(Integer clientId, Integer numberOfArtExhibitions, Integer numberOfTrueAlarms, Integer numberOfFalseAlarms, Integer numberOfUncaughtBreaches) {
         super(clientId, numberOfArtExhibitions, numberOfTrueAlarms, numberOfFalseAlarms, numberOfUncaughtBreaches);
@@ -26,7 +25,6 @@ public class SafeCorp extends ArtExhibitionProducer {
 
     protected long pollAndRespondMeasure(KabisConsumer<Integer, String> consumer, KabisProducer<Integer, String> producer, Integer recordsToRead, String message) {
         int i = 0;
-
         long t1 = System.nanoTime();
         System.out.println("[pollAndRespondMeasure]: recordsToRead: " + recordsToRead);
         while (i < recordsToRead) {
@@ -40,7 +38,6 @@ public class SafeCorp extends ArtExhibitionProducer {
                     System.out.println("Sending " + responseRecord.value() + " exhibition: " + responseRecord.key());
                     producer.push(responseRecord);
                 }
-
             }
         }
         producer.flush();
