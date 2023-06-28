@@ -26,14 +26,14 @@ public class SafeCorp extends ArtExhibitionProducer {
     protected long pollAndRespondMeasure(KabisConsumer<Integer, String> consumer, KabisProducer<Integer, String> producer, Integer recordsToRead, String message) {
         int i = 0;
         long t1 = System.nanoTime();
-        System.out.println("[pollAndRespondMeasure]: recordsToRead: " + recordsToRead);
+        System.out.println("[pollAndRespondMeasure]: recordsToRead: " + recordsToRead + " with POLL_TIMEOUT: " + POLL_TIMEOUT);
         while (i < recordsToRead) {
             ConsumerRecords<Integer, String> records = consumer.poll(POLL_TIMEOUT);
             for (ConsumerRecord<Integer, String> record : records) {
                 String recordMessage = record.value();
                 if (!recordMessage.contains("[SafeCorp]")) {
                     i += 1;
-                    System.out.println("[pollAndRespondMeasure]: Received " + recordMessage + "  exhibition: " + record.key());
+                    System.out.println("[pollAndRespondMeasure]: Received " + recordMessage + " exhibition: " + record.key());
                     ProducerRecord<Integer, String> responseRecord = new ProducerRecord<>(Topics.ART_EXHIBITION.toString(), record.key(), message + record.value());
                     System.out.println("Sending " + responseRecord.value() + " exhibition: " + responseRecord.key());
                     producer.push(responseRecord);
@@ -77,7 +77,7 @@ public class SafeCorp extends ArtExhibitionProducer {
 
         // -- SEND UNCAUGHT ALARMS --
         System.out.println("[SafeCorp] Sending uncaught breaches");
-        String sendMessage = "[SafeCorp] BREACH FOUND";
+        String sendMessage = "[SafeCorp] BREACH FOUND ";
         long sendingTime = sendAndMeasure(safeCorpProducer, getNumberOfUncaughtBreaches(), sendMessage);
         safeCorpProducer.close();
 
