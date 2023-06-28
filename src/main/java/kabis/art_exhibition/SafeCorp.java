@@ -34,7 +34,7 @@ public class SafeCorp extends ArtExhibitionProducer {
                 if (!recordMessage.contains("[SafeCorp]")) {
                     i += 1;
                     System.out.println("[pollAndRespondMeasure]: Received " + recordMessage + "  exhibition: " + record.key());
-                    ProducerRecord<Integer, String> responseRecord = new ProducerRecord<>(Topics.ART_EXHIBITION.toString(), record.key(), message);
+                    ProducerRecord<Integer, String> responseRecord = new ProducerRecord<>(Topics.ART_EXHIBITION.toString(), record.key(), message + record.value());
                     System.out.println("Sending " + responseRecord.value() + " exhibition: " + responseRecord.key());
                     producer.push(responseRecord);
                 }
