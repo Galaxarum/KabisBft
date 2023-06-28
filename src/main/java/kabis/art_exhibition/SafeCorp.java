@@ -4,7 +4,6 @@ import kabis.consumer.KabisConsumer;
 import kabis.producer.KabisProducer;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
-import org.apache.kafka.clients.producer.ProducerRecord;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import java.io.FileInputStream;
@@ -34,9 +33,9 @@ public class SafeCorp extends ArtExhibitionProducer {
                 if (!recordMessage.contains("[SafeCorp]")) {
                     i += 1;
                     System.out.println("[pollAndRespondMeasure]: Received " + recordMessage + " exhibition: " + record.key());
-                    ProducerRecord<Integer, String> responseRecord = new ProducerRecord<>(Topics.ART_EXHIBITION.toString(), record.key(), message + record.value());
-                    System.out.println("Sending " + responseRecord.value() + " exhibition: " + responseRecord.key());
-                    producer.push(responseRecord);
+                    //ProducerRecord<Integer, String> responseRecord = new ProducerRecord<>(Topics.ART_EXHIBITION.toString(), record.key(), message + record.value());
+                    //System.out.println("Sending " + responseRecord.value() + " exhibition: " + responseRecord.key());
+                    //producer.push(responseRecord);
                 }
             }
         }
