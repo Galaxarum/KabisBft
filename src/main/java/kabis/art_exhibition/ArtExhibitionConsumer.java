@@ -14,7 +14,7 @@ public abstract class ArtExhibitionConsumer extends ArtExhibitionClient {
     private final Integer numberOfFalseAlarms;
     private final Integer numberOfUncaughtBreaches;
 
-    private static final Duration POLL_TIMEOUT = Duration.ofMinutes(5);
+    private static final Duration POLL_TIMEOUT = Duration.ofHours(24);
 
     protected ArtExhibitionConsumer(Integer clientId, Integer numberOfArtExhibitions, Integer numberOfTrueAlarms, Integer numberOfFalseAlarms, Integer numberOfUncaughtBreaches) {
         this.clientId = clientId;

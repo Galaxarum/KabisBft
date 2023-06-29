@@ -13,7 +13,7 @@ import java.util.Properties;
 import static java.lang.Integer.parseInt;
 
 public class SafeCorp extends ArtExhibitionProducer {
-    private static final Duration POLL_TIMEOUT = Duration.ofMinutes(5);
+    private static final Duration POLL_TIMEOUT = Duration.ofHours(24);
 
     protected SafeCorp(Integer clientId, Integer numberOfArtExhibitions, Integer numberOfTrueAlarms, Integer numberOfFalseAlarms, Integer numberOfUncaughtBreaches) {
         super(clientId, numberOfArtExhibitions, numberOfTrueAlarms, numberOfFalseAlarms, numberOfUncaughtBreaches);
@@ -30,7 +30,7 @@ public class SafeCorp extends ArtExhibitionProducer {
                 if (!recordMessage.contains("[SafeCorp]")) {
                     i += 1;
                     System.out.println("[pollAndRespondMeasure]: Received " + recordMessage + " exhibition: " + record.key());
-                    ProducerRecord<Integer, String> responseRecord = new ProducerRecord<>(Topics.ART_EXHIBITION.toString(), record.key(), message + record.value());
+                    ProducerRecord<Integer, String> responseRecord = new ProducerRecord<>(Topics.ART_EXHIBITION.toString(), record.key(), message + recordMessage);
                     System.out.println("[pollAndRespondMeasure]: Sending " + responseRecord.value() + " exhibition: " + responseRecord.key());
                     producer.push(responseRecord);
                     System.out.println("[pollAndRespondMeasure]: Message sent, waiting for next message");
