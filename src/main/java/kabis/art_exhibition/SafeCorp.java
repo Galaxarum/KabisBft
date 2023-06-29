@@ -98,6 +98,10 @@ public class SafeCorp extends ArtExhibitionProducer {
             System.out.println("--ERROR-- \nUSAGE: SafeSense <clientId> <numberOfArtExhibitions> <numberOfTrueAlarms> <numberOfFalseAlarms> <numberOfUncaughtBreaches>");
             System.exit(1);
         }
+        // -- RUN SAFECORP INSTANCE --
         new SafeCorp(parseInt(args[0]), parseInt(args[1]), parseInt(args[2]), parseInt(args[3]), parseInt(args[4])).run();
+        // -- KILL THE BENCHMARK AFTER A MINUTE AFTER THE run() METHOD --
+        Thread.sleep(60000);
+        System.exit(0);
     }
 }

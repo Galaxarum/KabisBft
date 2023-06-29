@@ -54,6 +54,10 @@ public class ArtEstate extends ArtExhibitionConsumer {
             System.out.print("--ERROR-- \nUSAGE: ArtEstate <clientId> <numberOfArtExhibitions> <totalNumberOfAlarms> <falseAlarmsPercentage> <alarmsNotTriggeredPercentage>");
             System.exit(1);
         }
+        // -- RUN ARTESTATE INSTANCE --
         new ArtEstate(parseInt(args[0]), parseInt(args[1]), parseInt(args[2]), parseInt(args[3]), parseInt(args[4])).run();
+        // -- KILL THE BENCHMARK AFTER A MINUTE AFTER THE run() METHOD --
+        Thread.sleep(60000);
+        System.exit(0);
     }
 }
