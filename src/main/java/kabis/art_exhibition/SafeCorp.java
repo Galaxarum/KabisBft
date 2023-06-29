@@ -17,7 +17,7 @@ import java.util.Properties;
 import static java.lang.Integer.parseInt;
 
 public class SafeCorp extends ArtExhibitionProducer {
-    private static final Duration POLL_TIMEOUT = Duration.ofSeconds(45);
+    private static final Duration POLL_TIMEOUT = Duration.ofMinutes(5);
 
     public SafeCorp(Integer clientId, Integer numberOfArtExhibitions, Integer numberOfTrueAlarms, Integer numberOfFalseAlarms, Integer numberOfUncaughtBreaches) {
         super(clientId, numberOfArtExhibitions, numberOfTrueAlarms, numberOfFalseAlarms, numberOfUncaughtBreaches);
