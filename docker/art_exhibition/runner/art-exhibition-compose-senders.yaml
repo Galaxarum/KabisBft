@@ -149,7 +149,7 @@ services:
       - "bft-1"
       - "bft-2"
     environment:
-      - CLIENT_ID=1001
+      - CLIENT_ID=0
       - NUM_EXHIBITIONS=$NUM_EXHIBITIONS
       - NUM_TRUE_ALARMS=$NUM_TRUE_ALARMS
       - NUM_FALSE_ALARMS=$NUM_FALSE_ALARMS
@@ -168,7 +168,7 @@ services:
       - "bft-1"
       - "bft-2"
     environment:
-      - CLIENT_ID=1002
+      - CLIENT_ID=1
       - NUM_EXHIBITIONS=$NUM_EXHIBITIONS
       - NUM_TRUE_ALARMS=$NUM_TRUE_ALARMS
       - NUM_FALSE_ALARMS=$NUM_FALSE_ALARMS
