@@ -59,37 +59,40 @@ public class SafeCorp extends ArtExhibitionProducer {
         }
         properties.setProperty("client.id", String.valueOf(getClientId()));
 
-        KabisConsumer<Integer, String> safeCorpConsumer = new KabisConsumer<>(properties);
-        safeCorpConsumer.subscribe(Collections.singletonList(Topics.ART_EXHIBITION.toString()));
-        safeCorpConsumer.updateTopology(Collections.singletonList(Topics.ART_EXHIBITION.toString()));
-        System.out.println("[SafeCorp] Kabis Consumer created");
+        //KabisConsumer<Integer, String> safeCorpConsumer = new KabisConsumer<>(properties);
+        //safeCorpConsumer.subscribe(Collections.singletonList(Topics.ART_EXHIBITION.toString()));
+        //safeCorpConsumer.updateTopology(Collections.singletonList(Topics.ART_EXHIBITION.toString()));
+        //System.out.println("[SafeCorp] Kabis Consumer created");
 
         KabisProducer<Integer, String> safeCorpProducer = new KabisProducer<>(properties);
         safeCorpProducer.updateTopology(Collections.singletonList(Topics.ART_EXHIBITION.toString()));
         System.out.println("[SafeCorp] Kabis Producer created");
 
         // -- READ TRUE AND FALSE ALARMS AND RESPOND --
-        System.out.println("[SafeCorp] Reading alarms");
-        String responseMessage = "[SafeCorp] ALARM RECEIVED ";
+        //System.out.println("[SafeCorp] Reading alarms");
+        //String responseMessage = "[SafeCorp] ALARM RECEIVED ";
         // * getNumberOfArtExhibitions() will be removed when scaling on multiple consumers within the same consumer group,
         // every consumer will only read its own exhibition
-        Integer recordsToRead = (getNumberOfTrueAlarms() + getNumberOfFalseAlarms()) * getNumberOfArtExhibitions();
-        long receivingTime = pollAndRespondMeasure(safeCorpConsumer, safeCorpProducer, recordsToRead, responseMessage);
-        safeCorpConsumer.close();
+        //Integer recordsToRead = (getNumberOfTrueAlarms() + getNumberOfFalseAlarms()) * getNumberOfArtExhibitions();
+        //long receivingTime = pollAndRespondMeasure(safeCorpConsumer, safeCorpProducer, recordsToRead, responseMessage);
+        //safeCorpConsumer.close();
 
-        System.out.println("[SafeCorp] READING DONE! Consumer Closed");
+        //System.out.println("[SafeCorp] READING DONE! Consumer Closed");
 
         // -- SEND UNCAUGHT ALARMS --
         System.out.println("[SafeCorp] Sending uncaught breaches");
         String sendMessage = "[SafeCorp] BREACH FOUND ";
         long sendingTime = sendAndMeasure(safeCorpProducer, getNumberOfUncaughtBreaches(), sendMessage);
-        safeCorpProducer.close();
 
+        //long totalTime = sendingTime + receivingTime;
+        // TODO: Remove after tests
+        long totalTime = sendingTime;
+        safeCorpProducer.close();
         System.out.println("[SafeCorp] DONE! Producer Closed - Saving experiments");
 
         // Store results
         ArtExhibitionBenchmarkResult.storeThroughputToDisk(Arrays.asList("#EXHIBITIONS", "#TRUE-ALARMS", "#UNCAUGHT-BREACHES", "TOTAL TIME [ns]"),
-                Arrays.asList(Integer.toString(getNumberOfArtExhibitions()), Integer.toString(getNumberOfTrueAlarms()), Integer.toString(getNumberOfUncaughtBreaches()), Long.toString(sendingTime + receivingTime)));
+                Arrays.asList(Integer.toString(getNumberOfArtExhibitions()), Integer.toString(getNumberOfTrueAlarms()), Integer.toString(getNumberOfUncaughtBreaches()), Long.toString(totalTime)));
         System.out.println("[SafeCorp] Experiments persisted!");
     }
 

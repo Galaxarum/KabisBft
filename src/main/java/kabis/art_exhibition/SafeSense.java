@@ -41,14 +41,13 @@ public class SafeSense extends ArtExhibitionProducer {
         System.out.println("[SafeSense] Sending FALSE ALARMS");
         String falseAlarmMessage = "[SafeSense] FALSE ALARM ";
         long falseAlarmTime = sendAndMeasure(safeSenseProducer, getNumberOfFalseAlarms(), falseAlarmMessage);
+
+        long totalTime = trueAlarmsTime + falseAlarmTime;
         safeSenseProducer.close();
-
-        long time = trueAlarmsTime + falseAlarmTime;
-
         System.out.println("[SafeSense] DONE! Producer Closed - Saving experiments");
 
         ArtExhibitionBenchmarkResult.storeThroughputToDisk(Arrays.asList("#EXHIBITIONS", "#TRUE-ALARMS", "#FALSE-ALARMS", "TOTAL TIME [ns]"),
-                Arrays.asList(Integer.toString(getNumberOfArtExhibitions()), Integer.toString(getNumberOfTrueAlarms()), Integer.toString(getNumberOfFalseAlarms()), Long.toString(time)));
+                Arrays.asList(Integer.toString(getNumberOfArtExhibitions()), Integer.toString(getNumberOfTrueAlarms()), Integer.toString(getNumberOfFalseAlarms()), Long.toString(totalTime)));
         System.out.println("[SafeSense] Experiments persisted!");
     }
 
