@@ -3,7 +3,9 @@ package kabis.art_exhibition;
 import kabis.producer.KabisProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 
-public abstract class ArtExhibitionProducer {
+import java.util.Properties;
+
+public abstract class ArtExhibitionProducer extends ArtExhibitionClient {
     private final Integer clientId;
     private final Integer numberOfArtExhibitions;
     private final Integer numberOfTrueAlarms;
@@ -11,39 +13,39 @@ public abstract class ArtExhibitionProducer {
     private final Integer numberOfUncaughtBreaches;
 
 
-    public ArtExhibitionProducer(Integer clientId, Integer numberOfArtExhibitions, Integer numberOfTrueAlarms, Integer numberOfFalseAlarms, Integer numberOfUncaughtBreaches) {
+    protected ArtExhibitionProducer(Integer clientId, Integer numberOfArtExhibitions, Integer numberOfTrueAlarms, Integer numberOfFalseAlarms, Integer numberOfUncaughtBreaches) {
         this.clientId = clientId;
         this.numberOfArtExhibitions = numberOfArtExhibitions;
         this.numberOfTrueAlarms = numberOfTrueAlarms;
         this.numberOfFalseAlarms = numberOfFalseAlarms;
         this.numberOfUncaughtBreaches = numberOfUncaughtBreaches;
+
+        Properties properties = getProperties();
+        properties.setProperty("client.id", String.valueOf(this.clientId));
+        setProperties(properties);
     }
 
-    public ArtExhibitionProducer(Integer clientId, Integer numberOfArtExhibitions, Integer numberOfTrueAlarms, Integer numberOfFalseAlarms) {
-        this.clientId = clientId;
-        this.numberOfArtExhibitions = numberOfArtExhibitions;
-        this.numberOfTrueAlarms = numberOfTrueAlarms;
-        this.numberOfFalseAlarms = numberOfFalseAlarms;
-        this.numberOfUncaughtBreaches = 0;
+    protected ArtExhibitionProducer(Integer clientId, Integer numberOfArtExhibitions, Integer numberOfTrueAlarms, Integer numberOfFalseAlarms) {
+        this(clientId, numberOfArtExhibitions, numberOfTrueAlarms, numberOfFalseAlarms, 0);
     }
 
-    public Integer getClientId() {
+    protected Integer getClientId() {
         return clientId;
     }
 
-    public Integer getNumberOfArtExhibitions() {
+    protected Integer getNumberOfArtExhibitions() {
         return numberOfArtExhibitions;
     }
 
-    public Integer getNumberOfTrueAlarms() {
+    protected Integer getNumberOfTrueAlarms() {
         return numberOfTrueAlarms;
     }
 
-    public Integer getNumberOfFalseAlarms() {
+    protected Integer getNumberOfFalseAlarms() {
         return numberOfFalseAlarms;
     }
 
-    public Integer getNumberOfUncaughtBreaches() {
+    protected Integer getNumberOfUncaughtBreaches() {
         return numberOfUncaughtBreaches;
     }
 

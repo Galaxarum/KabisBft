@@ -5,8 +5,9 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 
 import java.time.Duration;
+import java.util.Properties;
 
-public abstract class ArtExhibitionConsumer {
+public abstract class ArtExhibitionConsumer extends ArtExhibitionClient {
     private final Integer clientId;
     private final Integer numberOfArtExhibitions;
     private final Integer numberOfTrueAlarms;
@@ -15,31 +16,35 @@ public abstract class ArtExhibitionConsumer {
 
     private static final Duration POLL_TIMEOUT = Duration.ofMinutes(5);
 
-    public ArtExhibitionConsumer(Integer clientId, Integer numberOfArtExhibitions, Integer numberOfTrueAlarms, Integer numberOfFalseAlarms, Integer numberOfUncaughtBreaches) {
+    protected ArtExhibitionConsumer(Integer clientId, Integer numberOfArtExhibitions, Integer numberOfTrueAlarms, Integer numberOfFalseAlarms, Integer numberOfUncaughtBreaches) {
         this.clientId = clientId;
         this.numberOfArtExhibitions = numberOfArtExhibitions;
         this.numberOfTrueAlarms = numberOfTrueAlarms;
         this.numberOfFalseAlarms = numberOfFalseAlarms;
         this.numberOfUncaughtBreaches = numberOfUncaughtBreaches;
+
+        Properties properties = getProperties();
+        properties.setProperty("client.id", String.valueOf(this.clientId));
+        setProperties(properties);
     }
 
-    public Integer getClientId() {
+    protected Integer getClientId() {
         return clientId;
     }
 
-    public Integer getNumberOfArtExhibitions() {
+    protected Integer getNumberOfArtExhibitions() {
         return numberOfArtExhibitions;
     }
 
-    public Integer getNumberOfTrueAlarms() {
+    protected Integer getNumberOfTrueAlarms() {
         return numberOfTrueAlarms;
     }
 
-    public Integer getNumberOfFalseAlarms() {
+    protected Integer getNumberOfFalseAlarms() {
         return numberOfFalseAlarms;
     }
 
-    public Integer getNumberOfUncaughtBreaches() {
+    protected Integer getNumberOfUncaughtBreaches() {
         return numberOfUncaughtBreaches;
     }
 

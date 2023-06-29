@@ -5,13 +5,9 @@ import kabis.producer.KabisProducer;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.producer.ProducerRecord;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
-import java.io.FileInputStream;
-import java.security.Security;
 import java.time.Duration;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Properties;
 
 import static java.lang.Integer.parseInt;
@@ -19,7 +15,7 @@ import static java.lang.Integer.parseInt;
 public class SafeCorp extends ArtExhibitionProducer {
     private static final Duration POLL_TIMEOUT = Duration.ofMinutes(5);
 
-    public SafeCorp(Integer clientId, Integer numberOfArtExhibitions, Integer numberOfTrueAlarms, Integer numberOfFalseAlarms, Integer numberOfUncaughtBreaches) {
+    protected SafeCorp(Integer clientId, Integer numberOfArtExhibitions, Integer numberOfTrueAlarms, Integer numberOfFalseAlarms, Integer numberOfUncaughtBreaches) {
         super(clientId, numberOfArtExhibitions, numberOfTrueAlarms, numberOfFalseAlarms, numberOfUncaughtBreaches);
     }
 
@@ -49,44 +45,34 @@ public class SafeCorp extends ArtExhibitionProducer {
     }
 
     private void run() {
-        Security.addProvider(new BouncyCastleProvider());
-        Properties properties = new Properties();
-        try {
-            properties.load(new FileInputStream("config.properties"));
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.exit(1);
-        }
-        properties.setProperty("client.id", String.valueOf(getClientId()));
+        Properties properties = getProperties();
 
-        //KabisConsumer<Integer, String> safeCorpConsumer = new KabisConsumer<>(properties);
-        //safeCorpConsumer.subscribe(Collections.singletonList(Topics.ART_EXHIBITION.toString()));
-        //safeCorpConsumer.updateTopology(Collections.singletonList(Topics.ART_EXHIBITION.toString()));
-        //System.out.println("[SafeCorp] Kabis Consumer created");
+        KabisConsumer<Integer, String> safeCorpConsumer = new KabisConsumer<>(properties);
+        safeCorpConsumer.subscribe(TOPICS);
+        safeCorpConsumer.updateTopology(TOPICS);
+        System.out.println("[SafeCorp] Kabis Consumer created");
 
         KabisProducer<Integer, String> safeCorpProducer = new KabisProducer<>(properties);
-        safeCorpProducer.updateTopology(Collections.singletonList(Topics.ART_EXHIBITION.toString()));
+        safeCorpProducer.updateTopology(TOPICS);
         System.out.println("[SafeCorp] Kabis Producer created");
 
         // -- READ TRUE AND FALSE ALARMS AND RESPOND --
-        //System.out.println("[SafeCorp] Reading alarms");
-        //String responseMessage = "[SafeCorp] ALARM RECEIVED ";
+        System.out.println("[SafeCorp] Reading alarms");
+        String responseMessage = "[SafeCorp] ALARM RECEIVED ";
         // * getNumberOfArtExhibitions() will be removed when scaling on multiple consumers within the same consumer group,
         // every consumer will only read its own exhibition
-        //Integer recordsToRead = (getNumberOfTrueAlarms() + getNumberOfFalseAlarms()) * getNumberOfArtExhibitions();
-        //long receivingTime = pollAndRespondMeasure(safeCorpConsumer, safeCorpProducer, recordsToRead, responseMessage);
-        //safeCorpConsumer.close();
+        Integer recordsToRead = (getNumberOfTrueAlarms() + getNumberOfFalseAlarms()) * getNumberOfArtExhibitions();
+        long receivingTime = pollAndRespondMeasure(safeCorpConsumer, safeCorpProducer, recordsToRead, responseMessage);
+        safeCorpConsumer.close();
 
-        //System.out.println("[SafeCorp] READING DONE! Consumer Closed");
+        System.out.println("[SafeCorp] READING DONE! Consumer Closed");
 
         // -- SEND UNCAUGHT ALARMS --
         System.out.println("[SafeCorp] Sending uncaught breaches");
         String sendMessage = "[SafeCorp] BREACH FOUND ";
         long sendingTime = sendAndMeasure(safeCorpProducer, getNumberOfUncaughtBreaches(), sendMessage);
 
-        //long totalTime = sendingTime + receivingTime;
-        // TODO: Remove after tests
-        long totalTime = sendingTime;
+        long totalTime = sendingTime + receivingTime;
         safeCorpProducer.close();
         System.out.println("[SafeCorp] DONE! Producer Closed - Saving experiments");
 
@@ -104,7 +90,7 @@ public class SafeCorp extends ArtExhibitionProducer {
         }
         // -- RUN SAFECORP INSTANCE --
         new SafeCorp(parseInt(args[0]), parseInt(args[1]), parseInt(args[2]), parseInt(args[3]), parseInt(args[4])).run();
-        // -- KILL THE BENCHMARK AFTER A MINUTE AFTER THE run() METHOD --
+        // -- KILL THE BENCHMARK AFTER run() --
         Thread.sleep(60000);
         System.exit(0);
     }

@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.util.List;
 
 public class ArtExhibitionBenchmarkResult {
-    public static void storeThroughputToDisk(List<String> columns, List<String> values) {
+    protected static void storeThroughputToDisk(List<String> columns, List<String> values) {
         String header = "", results = "";
 
         for (String column : columns) {

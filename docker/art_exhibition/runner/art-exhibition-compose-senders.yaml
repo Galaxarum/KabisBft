@@ -136,25 +136,25 @@ services:
       - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka_2_2:9092
 
   #Clients
-  #safe-sense:
-  #  image: "${DOCKERHUB_USERNAME}/safe-sense:latest"
-  #  networks:
-  #    - kafka-network
-  #    - bft-network
-  #  depends_on:
-  #    - "kafka_1_1"
-  #    - "kafka_1_2"
-  #    - "kafka_2_1"
-  #    - "kafka_2_2"
-  #    - "bft-1"
-  #    - "bft-2"
-  #  environment:
-  #    - CLIENT_ID=0
-  #    - NUM_EXHIBITIONS=$NUM_EXHIBITIONS
-  #    - NUM_TRUE_ALARMS=$NUM_TRUE_ALARMS
-  #    - NUM_FALSE_ALARMS=$NUM_FALSE_ALARMS
-  #  volumes:
-  #    - ./results/safe-sense:/usr/kabis/result
+  safe-sense:
+    image: "${DOCKERHUB_USERNAME}/safe-sense:latest"
+    networks:
+      - kafka-network
+      - bft-network
+    depends_on:
+      - "kafka_1_1"
+      - "kafka_1_2"
+      - "kafka_2_1"
+      - "kafka_2_2"
+      - "bft-1"
+      - "bft-2"
+    environment:
+      - CLIENT_ID=0
+      - NUM_EXHIBITIONS=$NUM_EXHIBITIONS
+      - NUM_TRUE_ALARMS=$NUM_TRUE_ALARMS
+      - NUM_FALSE_ALARMS=$NUM_FALSE_ALARMS
+    volumes:
+      - ./results/safe-sense:/usr/kabis/result
   safe-corp:
     image: "${DOCKERHUB_USERNAME}/safe-corp:latest"
     networks:

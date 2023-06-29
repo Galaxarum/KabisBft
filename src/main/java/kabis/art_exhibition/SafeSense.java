@@ -1,35 +1,20 @@
 package kabis.art_exhibition;
 
 import kabis.producer.KabisProducer;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
-import java.io.FileInputStream;
-import java.security.Security;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Properties;
 
 import static java.lang.Integer.parseInt;
 
 public class SafeSense extends ArtExhibitionProducer {
 
-    public SafeSense(Integer clientId, Integer numberOfArtExhibitions, Integer numberOfTrueAlarms, Integer numberOfFalseAlarms) {
+    protected SafeSense(Integer clientId, Integer numberOfArtExhibitions, Integer numberOfTrueAlarms, Integer numberOfFalseAlarms) {
         super(clientId, numberOfArtExhibitions, numberOfTrueAlarms, numberOfFalseAlarms);
     }
 
-    private void run() throws InterruptedException {
-        Security.addProvider(new BouncyCastleProvider());
-        Properties properties = new Properties();
-        try {
-            properties.load(new FileInputStream("config.properties"));
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            System.exit(1);
-        }
-        properties.setProperty("client.id", String.valueOf(getClientId()));
-
-        KabisProducer<Integer, String> safeSenseProducer = new KabisProducer<>(properties);
-        safeSenseProducer.updateTopology(Collections.singletonList(Topics.ART_EXHIBITION.toString()));
+    private void run() {
+        KabisProducer<Integer, String> safeSenseProducer = new KabisProducer<>(getProperties());
+        safeSenseProducer.updateTopology(TOPICS);
         System.out.println("[SafeSense] Kabis Producer created");
 
         // -- SEND TRUE ALARMS --
