@@ -8,12 +8,12 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class KabisConsumer<K extends Integer,V extends String> implements KabisConsumerI<K,V>{
+public class KabisConsumer<K extends Integer, V extends String> implements KabisConsumerI<K, V> {
 
     private final Set<String> validatedTopics = new HashSet<>();
     private final KabisServiceProxy serviceProxy;
-    private final KafkaPollingThread<K,V> kafkaPollingThread;
-    private final Validator<K,V> validator;
+    private final KafkaPollingThread<K, V> kafkaPollingThread;
+    private final Validator<K, V> validator;
 
     public KabisConsumer(Properties properties) {
         int clientId = Integer.parseInt(properties.getProperty("client.id"));
@@ -33,18 +33,20 @@ public class KabisConsumer<K extends Integer,V extends String> implements KabisC
     }
 
     @Override
-    public ConsumerRecords<K,V> poll(Duration duration) {
+    public ConsumerRecords<K, V> poll(Duration duration) {
         var sids = serviceProxy.pull();
-        //if(!sids.isEmpty()) System.out.printf("Received %d sids%n", sids.size());
+        if (!sids.isEmpty()) System.out.printf("Received %d sids%n", sids.size());
         var validatedRecords = validator.verify(sids);
-        //if(!validatedRecords.isEmpty()) System.out.printf("Received %d validated records%n", validatedRecords.values().stream().map(List::size).reduce(Integer::sum).orElse(-1));
+        if (!validatedRecords.isEmpty())
+            System.out.printf("Received %d validated records%n", validatedRecords.values().stream().map(List::size).reduce(Integer::sum).orElse(-1));
 
-        var unvalidatedRecords = kafkaPollingThread.pollUnvalidated(validatedTopics,duration);
-        //if(!unvalidatedRecords.isEmpty()) System.out.printf("Received %d unvalidated records%n", unvalidatedRecords.values().stream().map(List::size).reduce(Integer::sum).orElse(-1));
+        var unvalidatedRecords = kafkaPollingThread.pollUnvalidated(validatedTopics, duration);
+        if (!unvalidatedRecords.isEmpty())
+            System.out.printf("Received %d unvalidated records%n", unvalidatedRecords.values().stream().map(List::size).reduce(Integer::sum).orElse(-1));
 
-        var mergedMap = Stream.concat(validatedRecords.entrySet().stream(),unvalidatedRecords.entrySet().stream())
+        var mergedMap = Stream.concat(validatedRecords.entrySet().stream(), unvalidatedRecords.entrySet().stream())
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
-                        (l1,l2)->Stream.concat(l1.stream(),l2.stream()).collect(Collectors.toList())
+                                (l1, l2) -> Stream.concat(l1.stream(), l2.stream()).collect(Collectors.toList())
                         )
                 );
 
@@ -63,7 +65,7 @@ public class KabisConsumer<K extends Integer,V extends String> implements KabisC
 
     @Override
     public void updateTopology(Collection<String> validatedTopics) {
-        synchronized (this.validatedTopics){
+        synchronized (this.validatedTopics) {
             this.validatedTopics.clear();
             this.validatedTopics.addAll(validatedTopics);
         }
