@@ -35,14 +35,17 @@ public class KabisConsumer<K extends Integer, V extends String> implements Kabis
     @Override
     public ConsumerRecords<K, V> poll(Duration duration) {
         var sids = serviceProxy.pull();
-        if (!sids.isEmpty()) System.out.printf("Received %d sids%n", sids.size());
+        System.out.printf("[" + this.getClass().getName() + "] Received %d sids%n", sids.size());
         var validatedRecords = validator.verify(sids);
+        System.out.printf("[" + this.getClass().getName() + "] Received %d validated records%n", validatedRecords.values().stream().map(List::size).reduce(Integer::sum).orElse(-1));
         if (!validatedRecords.isEmpty())
-            System.out.printf("Received %d validated records%n", validatedRecords.values().stream().map(List::size).reduce(Integer::sum).orElse(-1));
+            System.out.println("[" + this.getClass().getName() + "] Validated records: " + validatedRecords.values());
 
         var unvalidatedRecords = kafkaPollingThread.pollUnvalidated(validatedTopics, duration);
+        System.out.printf("[" + this.getClass().getName() + "] Received %d unvalidated records%n", unvalidatedRecords.values().stream().map(List::size).reduce(Integer::sum).orElse(-1));
         if (!unvalidatedRecords.isEmpty())
-            System.out.printf("Received %d unvalidated records%n", unvalidatedRecords.values().stream().map(List::size).reduce(Integer::sum).orElse(-1));
+            System.out.println("[" + this.getClass().getName() + "] Unvalidated records: " + unvalidatedRecords.values());
+
 
         var mergedMap = Stream.concat(validatedRecords.entrySet().stream(), unvalidatedRecords.entrySet().stream())
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
