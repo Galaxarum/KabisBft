@@ -16,21 +16,21 @@ public class KabisProducer<K extends Integer, V extends String> implements Kabis
     private final Set<String> validatedTopics = new HashSet<>();
     private final List<KafkaProducer<K, MessageWrapper<V>>> kafkaProducers;
     private final KabisServiceProxy serviceProxy;
-    private final int id;
+    private final int clientId;
 
     public KabisProducer(Properties properties) {
         var bootstrapServers = properties.getProperty("bootstrap.servers").split(";");
-        this.id = Integer.parseInt(properties.getProperty("client.id"));
+        this.clientId = Integer.parseInt(properties.getProperty("client.clientId"));
         this.kafkaProducers = new ArrayList<>(bootstrapServers.length);
         for (int i = 0; i < bootstrapServers.length; i++) {
             String server = bootstrapServers[i];
-            var id = String.format("%d-producer-%d", this.id, i);
+            var id = String.format("%d-producer-%d", this.clientId, i);
             var simplerProperties = (Properties) properties.clone();
             simplerProperties.put("bootstrap.servers", server);
-            simplerProperties.put("client.id", id);
+            simplerProperties.put("client.clientId", id);
             this.kafkaProducers.add(new KafkaProducer<>(simplerProperties));
         }
-        this.serviceProxy = new KabisServiceProxy(id);
+        this.serviceProxy = new KabisServiceProxy(this.clientId);
     }
 
     @Override
@@ -56,7 +56,7 @@ public class KabisProducer<K extends Integer, V extends String> implements Kabis
     private void pushValidated(ProducerRecord<K, V> record) {
         var value = record.value();
         var key = record.key();
-        var wrapper = new MessageWrapper<>(value, id);
+        var wrapper = new MessageWrapper<>(value, this.clientId);
         var wrappedRecord = new ProducerRecord<>(record.topic(), record.key(), wrapper);
 
 
@@ -74,17 +74,23 @@ public class KabisProducer<K extends Integer, V extends String> implements Kabis
                     RecordMetadata metadata = (RecordMetadata) res;
                     var topic = metadata.topic();
                     var partition = metadata.partition();
-                    SecureIdentifier sid = SecureIdentifier.factory(key, value, topic, partition, id);
+                    SecureIdentifier sid = SecureIdentifier.factory(key, value, topic, partition, this.clientId);
                     serviceProxy.push(sid);
                 }).join();
         CompletableFuture.allOf(completableFutures).join();
     }
 
 
+    /**
+     * Pushes the record to the first Kafka producer.
+     * <br>
+     * The record value is wrapped in a {@link MessageWrapper} and sent to the first Kafka producer.
+     *
+     * @param record the record to push
+     */
     private void pushUnvalidated(ProducerRecord<K, V> record) {
-        var value = record.value();
-        var wrapper = new MessageWrapper<>(value);
-        var wrappedRecord = new ProducerRecord<>(record.topic(), record.key(), wrapper);
+        MessageWrapper<V> wrappedValue = new MessageWrapper<>(record.value());
+        ProducerRecord<K, MessageWrapper<V>> wrappedRecord = new ProducerRecord<>(record.topic(), record.partition(), record.timestamp(), record.key(), wrappedValue, record.headers());
         kafkaProducers.get(0).send(wrappedRecord);
     }
 
@@ -96,7 +102,6 @@ public class KabisProducer<K extends Integer, V extends String> implements Kabis
     @Override
     public void close() {
         kafkaProducers.forEach(KafkaProducer::close);
-
     }
 
     @Override
