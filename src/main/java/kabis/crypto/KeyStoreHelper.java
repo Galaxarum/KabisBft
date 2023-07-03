@@ -11,12 +11,10 @@ public class KeyStoreHelper {
     private static final KeyStoreHelper instance = new KeyStoreHelper();
     private final Map<Integer, KeyPair> keyPairs = new HashMap<>();
 
-    public static KeyStoreHelper getInstance() {
-        return instance;
-    }
-
     private KeyStoreHelper() {
         try {
+            //TODO: Improve validation and error handling, maybe we should throw an exception if the key is not found
+            //TODO: Add support to multiple algorithms
             var files = new File("config/keysECDSA").listFiles();
             for (var file : files) {
                 var idString = file.getName().replaceAll("publickey|privatekey", "");
@@ -34,8 +32,13 @@ public class KeyStoreHelper {
         }
     }
 
+    public static KeyStoreHelper getInstance() {
+        return instance;
+    }
+
     public byte[] signBytes(int signerId, byte[] values) {
         try {
+            //TODO: Add support to multiple algorithms
             Signature sign = Signature.getInstance("SHA256withECDSA");
             sign.initSign(keyPairs.get(signerId).getPrivate());
             sign.update(values);
@@ -51,6 +54,7 @@ public class KeyStoreHelper {
 
     public boolean validateSignature(int signerId, byte[] value, byte[] sign) {
         try {
+            //TODO: Add support to multiple algorithms
             Signature signature = Signature.getInstance("SHA256withECDSA");
             signature.initVerify(keyPairs.get(signerId).getPublic());
             signature.update(value);
