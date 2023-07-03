@@ -18,9 +18,17 @@ public class KabisProducer<K extends Integer, V extends String> implements Kabis
     private final KabisServiceProxy serviceProxy;
     private final int clientId;
 
+    /**
+     * Creates a new KabisProducer.
+     *
+     * @param properties the properties to be used by the Kabis producer
+     */
     public KabisProducer(Properties properties) {
-        var bootstrapServers = properties.getProperty("bootstrap.servers").split(";");
+        //TODO: Improve the regex + check if the properties are valid, otherwise throw an exception
+        String[] bootstrapServers = properties.getProperty("bootstrap.servers").split(";");
         this.clientId = Integer.parseInt(properties.getProperty("client.clientId"));
+        //TODO: Remove this print
+        System.out.println("[" + this.getClass().getName() + "] Properties: " + properties + " Client id: " + this.clientId + " Bootstrap servers: " + Arrays.toString(bootstrapServers));
         this.kafkaProducers = new ArrayList<>(bootstrapServers.length);
         for (int i = 0; i < bootstrapServers.length; i++) {
             String server = bootstrapServers[i];
@@ -33,6 +41,11 @@ public class KabisProducer<K extends Integer, V extends String> implements Kabis
         this.serviceProxy = new KabisServiceProxy(this.clientId);
     }
 
+    /**
+     * Updates the list of validated topics.
+     *
+     * @param validatedTopics the new list of validated topics
+     */
     @Override
     public void updateTopology(Collection<String> validatedTopics) {
         synchronized (this.validatedTopics) {
@@ -41,6 +54,11 @@ public class KabisProducer<K extends Integer, V extends String> implements Kabis
         }
     }
 
+    /**
+     * Pushes a record to the Kafka cluster.
+     *
+     * @param record the record to be pushed
+     */
     @Override
     public void push(ProducerRecord<K, V> record) {
         synchronized (validatedTopics) {
@@ -52,13 +70,21 @@ public class KabisProducer<K extends Integer, V extends String> implements Kabis
         }
     }
 
+    /**
+     * Pushes the record to all Kafka producers.
+     * <br>
+     * The record value is wrapped in a {@link MessageWrapper} and sent to all Kafka producers.
+     * <br>
+     * The {@link KabisServiceProxy} is used to push the {@link SecureIdentifier}.
+     *
+     * @param record the record to push
+     */
     @SuppressWarnings("unchecked")
     private void pushValidated(ProducerRecord<K, V> record) {
-        var value = record.value();
-        var key = record.key();
-        var wrapper = new MessageWrapper<>(value, this.clientId);
-        var wrappedRecord = new ProducerRecord<>(record.topic(), record.key(), wrapper);
-
+        V value = record.value();
+        K key = record.key();
+        MessageWrapper<V> wrappedValue = new MessageWrapper<>(value, this.clientId);
+        ProducerRecord<K, MessageWrapper<V>> wrappedRecord = new ProducerRecord<>(record.topic(), record.partition(), record.timestamp(), record.key(), wrappedValue, record.headers());
 
         CompletableFuture<RecordMetadata>[] completableFutures = kafkaProducers.stream().map(prod -> {
             CompletableFuture<RecordMetadata> future = new CompletableFuture<>();
@@ -72,8 +98,8 @@ public class KabisProducer<K extends Integer, V extends String> implements Kabis
         CompletableFuture.anyOf(completableFutures)
                 .thenAccept(res -> {
                     RecordMetadata metadata = (RecordMetadata) res;
-                    var topic = metadata.topic();
-                    var partition = metadata.partition();
+                    String topic = metadata.topic();
+                    int partition = metadata.partition();
                     SecureIdentifier sid = SecureIdentifier.factory(key, value, topic, partition, this.clientId);
                     serviceProxy.push(sid);
                 }).join();
@@ -94,16 +120,27 @@ public class KabisProducer<K extends Integer, V extends String> implements Kabis
         kafkaProducers.get(0).send(wrappedRecord);
     }
 
+    /**
+     * Flushes all Kafka producers.
+     */
     @Override
     public void flush() {
         kafkaProducers.forEach(KafkaProducer::flush);
     }
 
+    /**
+     * Closes all Kafka producers.
+     */
     @Override
     public void close() {
         kafkaProducers.forEach(KafkaProducer::close);
     }
 
+    /**
+     * Closes all Kafka producers.
+     *
+     * @param duration the duration to wait for the close operation to complete
+     */
     @Override
     public void close(Duration duration) {
         kafkaProducers.forEach(p -> p.close(duration));
