@@ -13,7 +13,7 @@ import java.util.Properties;
 import static java.lang.Integer.parseInt;
 
 public class SafeCorp extends ArtExhibitionProducer {
-    private static final Duration POLL_TIMEOUT = Duration.ofHours(24);
+    private static final Duration POLL_TIMEOUT = Duration.ofSeconds(1);
 
     protected SafeCorp(Integer clientId, Integer numberOfArtExhibitions, Integer numberOfTrueAlarms, Integer numberOfFalseAlarms, Integer numberOfUncaughtBreaches) {
         super(clientId, numberOfArtExhibitions, numberOfTrueAlarms, numberOfFalseAlarms, numberOfUncaughtBreaches);
@@ -78,10 +78,11 @@ public class SafeCorp extends ArtExhibitionProducer {
             ConsumerRecords<Integer, String> records = consumer.poll(POLL_TIMEOUT);
             for (ConsumerRecord<Integer, String> record : records) {
                 String recordMessage = record.value();
-                if (!recordMessage.contains("[SafeCorp]")) {
+                if (!Arrays.equals(record.headers().lastHeader("clientId").value(), String.valueOf(getClientId()).getBytes())) {
                     i += 1;
                     System.out.println("[pollAndRespondMeasure]: Received " + recordMessage + " exhibition: " + record.partition());
                     ProducerRecord<Integer, String> responseRecord = new ProducerRecord<>(Topics.ART_EXHIBITION.toString(), record.partition(), record.key(), message + recordMessage);
+                    responseRecord.headers().add("clientId", String.valueOf(getClientId()).getBytes());
                     System.out.println("[pollAndRespondMeasure]: Sending " + responseRecord.value() + " exhibition: " + responseRecord.partition());
                     producer.push(responseRecord);
                     System.out.println("[pollAndRespondMeasure]: Message sent, waiting for next message");

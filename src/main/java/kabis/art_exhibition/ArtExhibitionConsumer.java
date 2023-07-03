@@ -8,7 +8,7 @@ import java.time.Duration;
 import java.util.Properties;
 
 public abstract class ArtExhibitionConsumer extends ArtExhibitionClient {
-    private static final Duration POLL_TIMEOUT = Duration.ofHours(24);
+    private static final Duration POLL_TIMEOUT = Duration.ofSeconds(1);
     private final Integer clientId;
     private final Integer numberOfArtExhibitions;
     private final Integer numberOfTrueAlarms;
