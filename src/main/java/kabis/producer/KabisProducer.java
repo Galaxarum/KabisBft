@@ -26,7 +26,7 @@ public class KabisProducer<K extends Integer, V extends String> implements Kabis
     public KabisProducer(Properties properties) {
         //TODO: Improve the regex + check if the properties are valid, otherwise throw an exception
         String[] bootstrapServers = properties.getProperty("bootstrap.servers").split(";");
-        this.clientId = Integer.parseInt(properties.getProperty("client.clientId"));
+        this.clientId = Integer.parseInt(properties.getProperty("client.id"));
         //TODO: Remove this print
         System.out.println("[" + this.getClass().getName() + "] Properties: " + properties + " Client id: " + this.clientId + " Bootstrap servers: " + Arrays.toString(bootstrapServers));
         this.kafkaProducers = new ArrayList<>(bootstrapServers.length);

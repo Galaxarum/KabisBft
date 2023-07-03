@@ -23,7 +23,6 @@ public class KabisConsumer<K extends Integer, V extends String> implements Kabis
      * @param properties the properties to be used by the Kabis consumer
      */
     public KabisConsumer(Properties properties) {
-        //TODO: Check if client.id is set in properties, KabisProducer is checking client.client.id which one is wrong?
         //TODO: Check if the properties are valid, otherwise throw an exception
         int clientId = Integer.parseInt(properties.getProperty("client.id"));
         this.serviceProxy = new KabisServiceProxy(clientId);
