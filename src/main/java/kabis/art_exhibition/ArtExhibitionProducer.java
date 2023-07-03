@@ -13,6 +13,10 @@ public abstract class ArtExhibitionProducer extends ArtExhibitionClient {
     private final Integer numberOfUncaughtBreaches;
 
 
+    protected ArtExhibitionProducer(Integer clientId, Integer numberOfArtExhibitions, Integer numberOfTrueAlarms, Integer numberOfFalseAlarms) {
+        this(clientId, numberOfArtExhibitions, numberOfTrueAlarms, numberOfFalseAlarms, 0);
+    }
+
     protected ArtExhibitionProducer(Integer clientId, Integer numberOfArtExhibitions, Integer numberOfTrueAlarms, Integer numberOfFalseAlarms, Integer numberOfUncaughtBreaches) {
         this.clientId = clientId;
         this.numberOfArtExhibitions = numberOfArtExhibitions;
@@ -23,10 +27,6 @@ public abstract class ArtExhibitionProducer extends ArtExhibitionClient {
         Properties properties = getProperties();
         properties.setProperty("client.id", String.valueOf(this.clientId));
         setProperties(properties);
-    }
-
-    protected ArtExhibitionProducer(Integer clientId, Integer numberOfArtExhibitions, Integer numberOfTrueAlarms, Integer numberOfFalseAlarms) {
-        this(clientId, numberOfArtExhibitions, numberOfTrueAlarms, numberOfFalseAlarms, 0);
     }
 
     protected Integer getClientId() {
@@ -54,7 +54,7 @@ public abstract class ArtExhibitionProducer extends ArtExhibitionClient {
         System.out.println("[sendAndMeasure]: numberOfArtExhibitions: " + numberOfArtExhibitions + " numberOfAlarms:" + numberOfAlarms);
         for (int artExhibitionID = 0; artExhibitionID < numberOfArtExhibitions; artExhibitionID++) {
             for (int i = 0; i < numberOfAlarms; i++) {
-                ProducerRecord<Integer, String> record = new ProducerRecord<>(Topics.ART_EXHIBITION.toString(), artExhibitionID, message + i);
+                ProducerRecord<Integer, String> record = new ProducerRecord<>(Topics.ART_EXHIBITION.toString(), artExhibitionID, artExhibitionID, message + i);
                 System.out.println("[sendAndMeasure]: Sending " + record.value() + " exhibition: " + record.key());
                 producer.push(record);
             }

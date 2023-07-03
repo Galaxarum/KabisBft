@@ -19,29 +19,17 @@ public class SafeCorp extends ArtExhibitionProducer {
         super(clientId, numberOfArtExhibitions, numberOfTrueAlarms, numberOfFalseAlarms, numberOfUncaughtBreaches);
     }
 
-    protected long pollAndRespondMeasure(KabisConsumer<Integer, String> consumer, KabisProducer<Integer, String> producer, Integer recordsToRead, String message) {
-        int i = 0;
-        long t1 = System.nanoTime();
-        System.out.println("[pollAndRespondMeasure]: recordsToRead: " + recordsToRead + " with POLL_TIMEOUT: " + POLL_TIMEOUT);
-        while (i < recordsToRead) {
-            ConsumerRecords<Integer, String> records = consumer.poll(POLL_TIMEOUT);
-            for (ConsumerRecord<Integer, String> record : records) {
-                String recordMessage = record.value();
-                if (!recordMessage.contains("[SafeCorp]")) {
-                    i += 1;
-                    System.out.println("[pollAndRespondMeasure]: Received " + recordMessage + " exhibition: " + record.key());
-                    ProducerRecord<Integer, String> responseRecord = new ProducerRecord<>(Topics.ART_EXHIBITION.toString(), record.key(), message + recordMessage);
-                    System.out.println("[pollAndRespondMeasure]: Sending " + responseRecord.value() + " exhibition: " + responseRecord.key());
-                    producer.push(responseRecord);
-                    System.out.println("[pollAndRespondMeasure]: Message sent, waiting for next message");
-                }
-            }
+    public static void main(String[] args) throws InterruptedException {
+        // -- CHECK IF ALL ARGUMENTS ARE PRESENT --
+        if (args.length != 5) {
+            System.out.println("--ERROR-- \nUSAGE: SafeSense <clientId> <numberOfArtExhibitions> <numberOfTrueAlarms> <numberOfFalseAlarms> <numberOfUncaughtBreaches>");
+            System.exit(1);
         }
-        producer.flush();
-        long t2 = System.nanoTime();
-        System.out.println("[pollAndRespondMeasure]: All messages read!");
-
-        return t2 - t1;
+        // -- RUN SAFECORP INSTANCE --
+        new SafeCorp(parseInt(args[0]), parseInt(args[1]), parseInt(args[2]), parseInt(args[3]), parseInt(args[4])).run();
+        // -- KILL THE BENCHMARK AFTER run() --
+        Thread.sleep(60000);
+        System.exit(0);
     }
 
     private void run() {
@@ -82,16 +70,28 @@ public class SafeCorp extends ArtExhibitionProducer {
         System.out.println("[SafeCorp] Experiments persisted!");
     }
 
-    public static void main(String[] args) throws InterruptedException {
-        // -- CHECK IF ALL ARGUMENTS ARE PRESENT --
-        if (args.length != 5) {
-            System.out.println("--ERROR-- \nUSAGE: SafeSense <clientId> <numberOfArtExhibitions> <numberOfTrueAlarms> <numberOfFalseAlarms> <numberOfUncaughtBreaches>");
-            System.exit(1);
+    protected long pollAndRespondMeasure(KabisConsumer<Integer, String> consumer, KabisProducer<Integer, String> producer, Integer recordsToRead, String message) {
+        int i = 0;
+        long t1 = System.nanoTime();
+        System.out.println("[pollAndRespondMeasure]: recordsToRead: " + recordsToRead + " with POLL_TIMEOUT: " + POLL_TIMEOUT);
+        while (i < recordsToRead) {
+            ConsumerRecords<Integer, String> records = consumer.poll(POLL_TIMEOUT);
+            for (ConsumerRecord<Integer, String> record : records) {
+                String recordMessage = record.value();
+                if (!recordMessage.contains("[SafeCorp]")) {
+                    i += 1;
+                    System.out.println("[pollAndRespondMeasure]: Received " + recordMessage + " exhibition: " + record.key());
+                    ProducerRecord<Integer, String> responseRecord = new ProducerRecord<>(Topics.ART_EXHIBITION.toString(), record.partition(), record.key(), message + recordMessage);
+                    System.out.println("[pollAndRespondMeasure]: Sending " + responseRecord.value() + " exhibition: " + responseRecord.key());
+                    producer.push(responseRecord);
+                    System.out.println("[pollAndRespondMeasure]: Message sent, waiting for next message");
+                }
+            }
         }
-        // -- RUN SAFECORP INSTANCE --
-        new SafeCorp(parseInt(args[0]), parseInt(args[1]), parseInt(args[2]), parseInt(args[3]), parseInt(args[4])).run();
-        // -- KILL THE BENCHMARK AFTER run() --
-        Thread.sleep(60000);
-        System.exit(0);
+        producer.flush();
+        long t2 = System.nanoTime();
+        System.out.println("[pollAndRespondMeasure]: All messages read!");
+
+        return t2 - t1;
     }
 }
