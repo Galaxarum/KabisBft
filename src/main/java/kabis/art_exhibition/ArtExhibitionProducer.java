@@ -55,7 +55,7 @@ public abstract class ArtExhibitionProducer extends ArtExhibitionClient {
         for (int artExhibitionID = 0; artExhibitionID < numberOfArtExhibitions; artExhibitionID++) {
             for (int i = 0; i < numberOfAlarms; i++) {
                 ProducerRecord<Integer, String> record = new ProducerRecord<>(Topics.ART_EXHIBITION.toString(), artExhibitionID, artExhibitionID, message + i);
-                System.out.println("[sendAndMeasure]: Sending " + record.value() + " exhibition: " + record.key());
+                System.out.println("[sendAndMeasure]: Sending " + record.value() + " exhibition: " + record.partition());
                 producer.push(record);
             }
         }

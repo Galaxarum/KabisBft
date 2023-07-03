@@ -8,13 +8,12 @@ import java.time.Duration;
 import java.util.Properties;
 
 public abstract class ArtExhibitionConsumer extends ArtExhibitionClient {
+    private static final Duration POLL_TIMEOUT = Duration.ofHours(24);
     private final Integer clientId;
     private final Integer numberOfArtExhibitions;
     private final Integer numberOfTrueAlarms;
     private final Integer numberOfFalseAlarms;
     private final Integer numberOfUncaughtBreaches;
-
-    private static final Duration POLL_TIMEOUT = Duration.ofHours(24);
 
     protected ArtExhibitionConsumer(Integer clientId, Integer numberOfArtExhibitions, Integer numberOfTrueAlarms, Integer numberOfFalseAlarms, Integer numberOfUncaughtBreaches) {
         this.clientId = clientId;
@@ -56,7 +55,7 @@ public abstract class ArtExhibitionConsumer extends ArtExhibitionClient {
             ConsumerRecords<Integer, String> records = consumer.poll(POLL_TIMEOUT);
             for (ConsumerRecord<Integer, String> record : records) {
                 i += 1;
-                System.out.println("[pollAndMeasure]: Received " + record.value() + " from " + record.key());
+                System.out.println("[pollAndMeasure]: Received " + record.value() + " exhibition: " + record.partition());
             }
             //i += consumer.poll(POLL_TIMEOUT).count();
         }
