@@ -30,8 +30,8 @@ public class KabisProducer<K extends Integer, V extends String> implements Kabis
         this.kafkaProducers = new ArrayList<>(bootstrapServers.length);
         for (int i = 0; i < bootstrapServers.length; i++) {
             String server = bootstrapServers[i];
-            var id = String.format("%d-producer-%d", this.clientId, i);
-            var simplerProperties = (Properties) properties.clone();
+            String id = String.format("%d-producer-%d", this.clientId, i);
+            Properties simplerProperties = (Properties) properties.clone();
             simplerProperties.put("bootstrap.servers", server);
             simplerProperties.put("client.id", id);
             this.kafkaProducers.add(new KafkaProducer<>(simplerProperties));

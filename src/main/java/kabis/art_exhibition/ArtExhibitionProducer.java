@@ -29,10 +29,6 @@ public abstract class ArtExhibitionProducer extends ArtExhibitionClient {
         setProperties(properties);
     }
 
-    protected Integer getClientId() {
-        return clientId;
-    }
-
     protected Integer getNumberOfArtExhibitions() {
         return numberOfArtExhibitions;
     }
@@ -55,6 +51,7 @@ public abstract class ArtExhibitionProducer extends ArtExhibitionClient {
         for (int artExhibitionID = 0; artExhibitionID < numberOfArtExhibitions; artExhibitionID++) {
             for (int i = 0; i < numberOfAlarms; i++) {
                 ProducerRecord<Integer, String> record = new ProducerRecord<>(Topics.ART_EXHIBITION.toString(), artExhibitionID, artExhibitionID, message + i);
+                record.headers().add("clientId", String.valueOf(getClientId()).getBytes());
                 System.out.println("[sendAndMeasure]: Sending " + record.value() + " exhibition: " + record.partition());
                 producer.push(record);
             }
@@ -64,5 +61,9 @@ public abstract class ArtExhibitionProducer extends ArtExhibitionClient {
         producer.flush();
 
         return t2 - t1;
+    }
+
+    protected Integer getClientId() {
+        return clientId;
     }
 }
