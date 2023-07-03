@@ -13,6 +13,26 @@ public class KabisServiceProxy {
     private final boolean orderedPulls;
     private int nextPullIndex = 0;
 
+    /**
+     * Creates a new KabisServiceProxy
+     *
+     * @param id The id of the service proxy
+     */
+    public KabisServiceProxy(int id) {
+        this(id, false);
+    }
+
+    /**
+     * Creates a new KabisServiceProxy
+     *
+     * @param id           The id of the service proxy
+     * @param orderedPulls Whether to use ordered pulls
+     */
+    public KabisServiceProxy(int id, boolean orderedPulls) {
+        this.bftServiceProxy = new ServiceProxy(id);
+        this.orderedPulls = orderedPulls;
+    }
+
     public void push(SecureIdentifier sid) {
         try (var bytes = new ByteArrayOutputStream()) {
             bytes.write(OPS.PUSH.ordinal());
@@ -32,6 +52,7 @@ public class KabisServiceProxy {
                     bftServiceProxy.invokeOrdered(request) :
                     bftServiceProxy.invokeUnordered(request);
             if (responseBytes == null || responseBytes.length == 0) {
+                //TODO: Remove this print
                 System.out.println("[KabisServiceProxy] pull method returns responseBytes as null or with length 0");
                 try {
                     Thread.sleep(50);
@@ -45,15 +66,6 @@ public class KabisServiceProxy {
         } catch (IOException e) {
             throw new SerializationException(e);
         }
-    }
-
-    public KabisServiceProxy(int id, boolean orderedPulls) {
-        this.bftServiceProxy = new ServiceProxy(id);
-        this.orderedPulls = orderedPulls;
-    }
-
-    public KabisServiceProxy(int id) {
-        this(id, false);
     }
 
 }

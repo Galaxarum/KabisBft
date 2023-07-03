@@ -27,15 +27,13 @@ public class KabisProducer<K extends Integer, V extends String> implements Kabis
         //TODO: Improve the regex + check if the properties are valid, otherwise throw an exception
         String[] bootstrapServers = properties.getProperty("bootstrap.servers").split(";");
         this.clientId = Integer.parseInt(properties.getProperty("client.id"));
-        //TODO: Remove this print
-        System.out.println("[" + this.getClass().getName() + "] Properties: " + properties + " Client id: " + this.clientId + " Bootstrap servers: " + Arrays.toString(bootstrapServers));
         this.kafkaProducers = new ArrayList<>(bootstrapServers.length);
         for (int i = 0; i < bootstrapServers.length; i++) {
             String server = bootstrapServers[i];
             var id = String.format("%d-producer-%d", this.clientId, i);
             var simplerProperties = (Properties) properties.clone();
             simplerProperties.put("bootstrap.servers", server);
-            simplerProperties.put("client.clientId", id);
+            simplerProperties.put("client.id", id);
             this.kafkaProducers.add(new KafkaProducer<>(simplerProperties));
         }
         this.serviceProxy = new KabisServiceProxy(this.clientId);
@@ -85,6 +83,8 @@ public class KabisProducer<K extends Integer, V extends String> implements Kabis
         K key = record.key();
         MessageWrapper<V> wrappedValue = new MessageWrapper<>(value, this.clientId);
         ProducerRecord<K, MessageWrapper<V>> wrappedRecord = new ProducerRecord<>(record.topic(), record.partition(), record.timestamp(), record.key(), wrappedValue, record.headers());
+        //TODO: Remove this print
+        System.out.println("Pushing validated record: " + wrappedRecord);
 
         CompletableFuture<RecordMetadata>[] completableFutures = kafkaProducers.stream().map(prod -> {
             CompletableFuture<RecordMetadata> future = new CompletableFuture<>();

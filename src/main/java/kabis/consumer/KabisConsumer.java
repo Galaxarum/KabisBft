@@ -61,13 +61,13 @@ public class KabisConsumer<K extends Integer, V extends String> implements Kabis
         System.out.printf("[" + this.getClass().getName() + "] Received %d sids%n", sids.size());
         var validatedRecords = validator.verify(sids);
         System.out.printf("[" + this.getClass().getName() + "] Received %d validated records%n", validatedRecords.values().stream().map(List::size).reduce(Integer::sum).orElse(-1));
-        if (!validatedRecords.isEmpty())
-            System.out.println("[" + this.getClass().getName() + "] Validated records: " + validatedRecords.values());
+        //if (!validatedRecords.isEmpty())
+        //System.out.println("[" + this.getClass().getName() + "] Validated records: " + validatedRecords.values());
 
         var unvalidatedRecords = kafkaPollingThread.pollUnvalidated(validatedTopics, duration);
         System.out.printf("[" + this.getClass().getName() + "] Received %d unvalidated records%n", unvalidatedRecords.values().stream().map(List::size).reduce(Integer::sum).orElse(-1));
-        if (!unvalidatedRecords.isEmpty())
-            System.out.println("[" + this.getClass().getName() + "] Unvalidated records: " + unvalidatedRecords.values());
+        //if (!unvalidatedRecords.isEmpty())
+        //System.out.println("[" + this.getClass().getName() + "] Unvalidated records: " + unvalidatedRecords.values());
 
 
         Map<TopicPartition, List<ConsumerRecord<K, V>>> mergedMap = Stream.concat(validatedRecords.entrySet().stream(), unvalidatedRecords.entrySet().stream())
