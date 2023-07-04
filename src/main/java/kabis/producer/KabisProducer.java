@@ -35,7 +35,9 @@ public class KabisProducer<K extends Integer, V extends String> implements Kabis
             simplerProperties.put("bootstrap.servers", server);
             simplerProperties.put("client.id", id);
             this.kafkaProducers.add(new KafkaProducer<>(simplerProperties));
+
         }
+        System.out.println("[SafeSense] List of kafka producers: " + this.kafkaProducers);
         this.serviceProxy = new KabisServiceProxy(this.clientId);
     }
 
