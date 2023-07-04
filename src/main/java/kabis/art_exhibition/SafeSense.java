@@ -1,15 +1,10 @@
 package kabis.art_exhibition;
 
 import kabis.producer.KabisProducer;
-import org.apache.kafka.clients.admin.AdminClient;
-import org.apache.kafka.clients.admin.CreateTopicsResult;
-import org.apache.kafka.clients.admin.DescribeTopicsResult;
-import org.apache.kafka.clients.admin.NewTopic;
+import org.apache.kafka.clients.admin.*;
+import org.apache.kafka.common.TopicPartition;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 
 import static java.lang.Integer.parseInt;
@@ -61,17 +56,37 @@ public class SafeSense extends ArtExhibitionProducer {
         properties.put("bootstrap.servers", kafkaBroker);
         properties.put("connections.max.idle.ms", 10000);
         properties.put("request.timeout.ms", 5000);
-        properties.put("delete.topic.enable", true);
         try (AdminClient client = AdminClient.create(properties)) {
             System.out.println("[SafeSense] AdminClient created!");
             CreateTopicsResult createTopicsResult = client.createTopics(List.of(
                     new NewTopic(Topics.ART_EXHIBITION.toString(), getNumberOfArtExhibitions(), (short) 1)
             ));
             DescribeTopicsResult checkTopicsResult = client.describeTopics(Collections.singletonList(Topics.ART_EXHIBITION.toString()));
+            // Delete all records
+            DeleteRecordsResult deleteRecordsResult = client.deleteRecords(Map.of(new TopicPartition(Topics.ART_EXHIBITION.toString(), 0), RecordsToDelete.beforeOffset(0L)));
+            CreatePartitionsResult createPartitionsResult = client.createPartitions(Map.of(Topics.ART_EXHIBITION.toString(), NewPartitions.increaseTo(getNumberOfArtExhibitions())));
             try {
-                System.out.println("[SafeSense] Creating topic for " + kafkaBroker + "...");
-                createTopicsResult.all().get();
-                System.out.println("[SafeSense] Topic created successfully for " + kafkaBroker + "!");
+                // Read all topics
+                Map<String, TopicDescription> topicsList = checkTopicsResult.allTopicNames().get();
+                // Check if topic is already present
+                if (topicsList.containsKey(Topics.ART_EXHIBITION.toString())) {
+                    System.out.println("[SafeSense] Topic already present for " + kafkaBroker + "!");
+                    // Delete all records
+                    deleteRecordsResult.all().get();
+                    System.out.println("[SafeSense] Records deleted for " + kafkaBroker + "!");
+                    System.out.println("[SafeSense] Checking number of partitions for " + kafkaBroker + "...");
+                    if (topicsList.get(Topics.ART_EXHIBITION.toString()).partitions().size() != getNumberOfArtExhibitions()) {
+                        System.out.println("[SafeSense] Number of partitions is not correct for " + kafkaBroker + "!");
+                        // Increase number of partitions
+                        createPartitionsResult.all().get();
+                        System.out.println("[SafeSense] Partitions incremented for " + kafkaBroker + " to " + getNumberOfArtExhibitions() + "!");
+                    } else
+                        System.out.println("[SafeSense] Number of partitions is correct for " + kafkaBroker + "!");
+                } else {
+                    System.out.println("[SafeSense] Creating topic for " + kafkaBroker + "...");
+                    createTopicsResult.all().get();
+                    System.out.println("[SafeSense] Topic created successfully for " + kafkaBroker + "!");
+                }
                 System.out.println("[SafeSense] Describe topic for " + kafkaBroker + ": " + checkTopicsResult.allTopicNames().get());
             } catch (InterruptedException | ExecutionException e) {
                 throw new IllegalStateException(e);
