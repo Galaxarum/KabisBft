@@ -135,38 +135,38 @@ services:
       - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092
       - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka_2_2:9092
 
-  #Kafka setup
-  init-kafka:
-    image: "confluentinc/cp-kafka:6.1.1"
-    networks:
-      - kafka-network
-    depends_on:
-      - "kafka_1_1"
-      - "kafka_1_2"
-      - "kafka_2_1"
-      - "kafka_2_2"
-    entrypoint: [ '/bin/sh', '-c' ]
-    command: |
-      "
+      #Kafka setup
+      #init-kafka:
+      #  image: "confluentinc/cp-kafka:6.1.1"
+      #  networks:
+      #    - kafka-network
+      #  depends_on:
+      #    - "kafka_1_1"
+      #    - "kafka_1_2"
+      #    - "kafka_2_1"
+      #    - "kafka_2_2"
+      #  entrypoint: [ '/bin/sh', '-c' ]
+      #  command: |
+      #    "
+      #    # blocks until kafka is reachable
+      #    echo -e 'INIT KAFKA-1'
+      #    kafka-topics --bootstrap-server kafka_1_1:9092 --list
+      #    echo -e 'Creating kafka topics'
+      #    kafka-topics --bootstrap-server kafka_1_1:9092 --create --if-not-exists --topic ART_EXHIBITION --replication-factor 1 --partitions ${NUM_EXHIBITIONS}
+      #
+      #    echo -e 'Successfully created the following topics:'
+      #    kafka-topics --bootstrap-server kafka_1_1:9092 --list
+      
+      
       # blocks until kafka is reachable
-      echo -e 'INIT KAFKA-1'
-      kafka-topics --bootstrap-server kafka_1_1:9092 --list
-      echo -e 'Creating kafka topics'
-      kafka-topics --bootstrap-server kafka_1_1:9092 --create --if-not-exists --topic ART_EXHIBITION --replication-factor 1 --partitions ${NUM_EXHIBITIONS}
-      
-      echo -e 'Successfully created the following topics:'
-      kafka-topics --bootstrap-server kafka_1_1:9092 --list
-      
-      
-      # blocks until kafka is reachable
-      echo -e 'INIT KAFKA-2'
-      kafka-topics --bootstrap-server kafka_2_1:9092 --list
-      echo -e 'Creating kafka topics'
-      kafka-topics --bootstrap-server kafka_2_1:9092 --create --if-not-exists --topic ART_EXHIBITION --replication-factor 1 --partitions ${NUM_EXHIBITIONS}
-      
-      echo -e 'Successfully created the following topics:'
-      kafka-topics --bootstrap-server kafka_2_1:9092 --list
-      "
+      #    echo -e 'INIT KAFKA-2'
+      #    kafka-topics --bootstrap-server kafka_2_1:9092 --list
+      #    echo -e 'Creating kafka topics'
+      #    kafka-topics --bootstrap-server kafka_2_1:9092 --create --if-not-exists --topic ART_EXHIBITION --replication-factor 1 --partitions ${NUM_EXHIBITIONS}
+
+  #    echo -e 'Successfully created the following topics:'
+  #    kafka-topics --bootstrap-server kafka_2_1:9092 --list
+  #    "
 
   #Clients
   safe-sense:

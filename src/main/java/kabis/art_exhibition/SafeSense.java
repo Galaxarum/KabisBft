@@ -1,8 +1,14 @@
 package kabis.art_exhibition;
 
 import kabis.producer.KabisProducer;
+import org.apache.kafka.clients.admin.AdminClient;
+import org.apache.kafka.clients.admin.CreateTopicsResult;
+import org.apache.kafka.clients.admin.NewTopic;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.Properties;
+import java.util.concurrent.ExecutionException;
 
 import static java.lang.Integer.parseInt;
 
@@ -13,6 +19,23 @@ public class SafeSense extends ArtExhibitionProducer {
     }
 
     private void run() {
+        Properties properties = new Properties();
+        properties.put("bootstrap.servers", getProperties().getProperty("bootstrap.servers"));
+        properties.put("connections.max.idle.ms", 10000);
+        properties.put("request.timeout.ms", 5000);
+        try (AdminClient client = AdminClient.create(properties)) {
+            System.out.println("[SafeSense] Creating topic...");
+            CreateTopicsResult result = client.createTopics(List.of(
+                    new NewTopic(Topics.ART_EXHIBITION.toString(), getNumberOfArtExhibitions(), (short) 2)
+            ));
+            try {
+                result.all().get();
+                System.out.println("[SafeSense] Topic created successfully!");
+            } catch (InterruptedException | ExecutionException e) {
+                throw new IllegalStateException(e);
+            }
+        }
+        
         KabisProducer<Integer, String> safeSenseProducer = new KabisProducer<>(getProperties());
         safeSenseProducer.updateTopology(TOPICS);
         System.out.println("[SafeSense] Kabis Producer created");
