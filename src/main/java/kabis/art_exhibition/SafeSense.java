@@ -28,7 +28,7 @@ public class SafeSense extends ArtExhibitionProducer {
         try (AdminClient client = AdminClient.create(properties)) {
             System.out.println("[SafeSense] Creating topic...");
             CreateTopicsResult result = client.createTopics(List.of(
-                    new NewTopic(Topics.ART_EXHIBITION.toString(), getNumberOfArtExhibitions(), (short) 2)
+                    new NewTopic(Topics.ART_EXHIBITION.toString(), getNumberOfArtExhibitions(), (short) 1)
             ));
             DescribeTopicsResult checkTopics = client.describeTopics(Collections.singletonList(Topics.ART_EXHIBITION.toString()));
             try {
