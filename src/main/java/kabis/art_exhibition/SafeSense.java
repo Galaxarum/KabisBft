@@ -1,7 +1,10 @@
 package kabis.art_exhibition;
 
 import kabis.producer.KabisProducer;
-import org.apache.kafka.clients.admin.*;
+import org.apache.kafka.clients.admin.AdminClient;
+import org.apache.kafka.clients.admin.DescribeTopicsResult;
+import org.apache.kafka.clients.admin.NewPartitions;
+import org.apache.kafka.clients.admin.NewTopic;
 
 import java.util.*;
 import java.util.concurrent.ExecutionException;
@@ -59,13 +62,11 @@ public class SafeSense extends ArtExhibitionProducer {
             System.out.println("[SafeSense] AdminClient created!");
             DescribeTopicsResult describeTopicsResult = client.describeTopics(Collections.singletonList(Topics.ART_EXHIBITION.toString()));
             try {
-                // Read all topics
-                Map<String, TopicDescription> topicsList = describeTopicsResult.allTopicNames().get();
                 // Check if topic is already present
-                if (topicsList.containsKey(Topics.ART_EXHIBITION.toString())) {
+                if (describeTopicsResult.allTopicNames().get().containsKey(Topics.ART_EXHIBITION.toString())) {
                     System.out.println("[SafeSense] Topic already present for " + kafkaBroker + "!");
                     System.out.println("[SafeSense] Checking number of partitions for " + kafkaBroker + "...");
-                    if (topicsList.get(Topics.ART_EXHIBITION.toString()).partitions().size() != getNumberOfArtExhibitions()) {
+                    if (describeTopicsResult.allTopicNames().get().get(Topics.ART_EXHIBITION.toString()).partitions().size() != getNumberOfArtExhibitions()) {
                         System.out.println("[SafeSense] Number of partitions is not correct for " + kafkaBroker + "!");
                         // Increase number of partitions
                         client.createPartitions(Map.of(Topics.ART_EXHIBITION.toString(), NewPartitions.increaseTo(getNumberOfArtExhibitions()))).all().get();
