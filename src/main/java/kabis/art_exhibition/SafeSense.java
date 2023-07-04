@@ -1,7 +1,10 @@
 package kabis.art_exhibition;
 
 import kabis.producer.KabisProducer;
-import org.apache.kafka.clients.admin.*;
+import org.apache.kafka.clients.admin.AdminClient;
+import org.apache.kafka.clients.admin.DescribeTopicsResult;
+import org.apache.kafka.clients.admin.NewTopic;
+import org.apache.kafka.clients.admin.TopicDescription;
 
 import java.util.*;
 import java.util.concurrent.ExecutionException;
@@ -56,23 +59,22 @@ public class SafeSense extends ArtExhibitionProducer {
         properties.put("request.timeout.ms", 5000);
         try (AdminClient client = AdminClient.create(properties)) {
             System.out.println("[SafeSense] AdminClient created!");
-            CreateTopicsResult createTopicResult = client.createTopics(List.of(
-                    new NewTopic(Topics.ART_EXHIBITION.toString(), getNumberOfArtExhibitions(), (short) 1)
-            ));
             DescribeTopicsResult checkTopicsResult = client.describeTopics(Collections.singletonList(Topics.ART_EXHIBITION.toString()));
-            DeleteTopicsResult deleteTopicResult = client.deleteTopics(Collections.singletonList(Topics.ART_EXHIBITION.toString()));
             try {
                 Map<String, TopicDescription> topics = checkTopicsResult.allTopicNames().get();
                 System.out.println("[SafeSense] " + kafkaBroker + " TOPICS STATUS: " + topics);
                 if (topics.containsKey(Topics.ART_EXHIBITION.toString())) {
                     System.out.println("[SafeSense] Topic already exists for " + kafkaBroker + "!");
                     System.out.println("[SafeSense] Deleting topic for " + kafkaBroker + "...");
-                    deleteTopicResult.all().get();
+                    client.deleteTopics(Collections.singletonList(Topics.ART_EXHIBITION.toString())).all().get();
                     System.out.println("[SafeSense] Topic deleted successfully successfully for " + kafkaBroker + "!");
+                    System.out.println("[SafeSense] " + kafkaBroker + " TOPICS STATUS AFTER DELETE: " + checkTopicsResult.allTopicNames().get());
                     Thread.sleep(5000);
                 }
                 System.out.println("[SafeSense] Creating topic for " + kafkaBroker + "...");
-                createTopicResult.all().get();
+                client.createTopics(List.of(
+                        new NewTopic(Topics.ART_EXHIBITION.toString(), getNumberOfArtExhibitions(), (short) 1)
+                )).all().get();
                 System.out.println("[SafeSense] Topic created successfully for " + kafkaBroker + "!");
                 System.out.println("[SafeSense] Describe topic for " + kafkaBroker + ": " + checkTopicsResult.allTopicNames().get());
                 Thread.sleep(5000);
