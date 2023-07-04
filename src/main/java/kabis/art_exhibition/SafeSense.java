@@ -1,7 +1,10 @@
 package kabis.art_exhibition;
 
 import kabis.producer.KabisProducer;
-import org.apache.kafka.clients.admin.*;
+import org.apache.kafka.clients.admin.AdminClient;
+import org.apache.kafka.clients.admin.NewPartitions;
+import org.apache.kafka.clients.admin.NewTopic;
+import org.apache.kafka.clients.admin.TopicDescription;
 
 import java.util.*;
 import java.util.concurrent.ExecutionException;
@@ -25,7 +28,7 @@ public class SafeSense extends ArtExhibitionProducer {
 
     private void run() throws InterruptedException {
         createTopic("kafka_1_1:9092,kafka_1_2:9092,kafka_1_3:9092,kafka_1_4:9092,kafka_2_1:9092,kafka_2_2:9092,kafka_2_3:9092,kafka_2_4:9092");
-        Thread.sleep(15000);
+        Thread.sleep(60000);
 
         KabisProducer<Integer, String> safeSenseProducer = new KabisProducer<>(getProperties());
         safeSenseProducer.updateTopology(TOPICS);
@@ -57,10 +60,9 @@ public class SafeSense extends ArtExhibitionProducer {
         properties.put("request.timeout.ms", 5000);
         try (AdminClient client = AdminClient.create(properties)) {
             System.out.println("[SafeSense] AdminClient created!");
-            DescribeTopicsResult checkTopicsResult = client.describeTopics(Collections.singletonList(Topics.ART_EXHIBITION.toString()));
             try {
                 // Read all topics
-                Map<String, TopicDescription> topicsList = checkTopicsResult.allTopicNames().get();
+                Map<String, TopicDescription> topicsList = client.describeTopics(Collections.singletonList(Topics.ART_EXHIBITION.toString())).allTopicNames().get();
                 // Check if topic is already present
                 if (topicsList.containsKey(Topics.ART_EXHIBITION.toString())) {
                     System.out.println("[SafeSense] Topic already present for " + kafkaBroker + "!");
@@ -70,8 +72,10 @@ public class SafeSense extends ArtExhibitionProducer {
                         // Increase number of partitions
                         client.createPartitions(Map.of(Topics.ART_EXHIBITION.toString(), NewPartitions.increaseTo(getNumberOfArtExhibitions()))).all().get();
                         System.out.println("[SafeSense] Partitions incremented for " + kafkaBroker + " to " + getNumberOfArtExhibitions() + "!");
-                    } else
+                    } else {
                         System.out.println("[SafeSense] Number of partitions is correct for " + kafkaBroker + "!");
+                        System.exit(1);
+                    }
                 } else {
                     System.out.println("[SafeSense] Creating topic for " + kafkaBroker + "...");
                     client.createTopics(List.of(
@@ -79,7 +83,7 @@ public class SafeSense extends ArtExhibitionProducer {
                     )).all().get();
                     System.out.println("[SafeSense] Topic created successfully for " + kafkaBroker + "!");
                 }
-                System.out.println("[SafeSense] Describe topic for " + kafkaBroker + ": " + checkTopicsResult.allTopicNames().get());
+                System.out.println("[SafeSense] Describe topic for " + kafkaBroker + ": " + client.describeTopics(Collections.singletonList(Topics.ART_EXHIBITION.toString())).allTopicNames().get());
             } catch (InterruptedException | ExecutionException e) {
                 throw new IllegalStateException(e);
             }

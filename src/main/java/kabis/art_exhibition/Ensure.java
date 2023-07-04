@@ -11,7 +11,8 @@ public class Ensure extends ArtExhibitionConsumer {
         super(clientId, numberOfArtExhibitions, numberOfTrueAlarms, numberOfFalseAlarms, numberOfUncaughtBreaches);
     }
 
-    private void run() {
+    private void run() throws InterruptedException {
+        Thread.sleep(60000);
         KabisConsumer<Integer, String> ensureConsumer = new KabisConsumer<>(getProperties());
         ensureConsumer.subscribe(TOPICS);
         ensureConsumer.updateTopology(TOPICS);

@@ -11,7 +11,8 @@ public class ArtEstate extends ArtExhibitionConsumer {
         super(clientId, numberOfArtExhibitions, numberOfTrueAlarms, numberOfFalseAlarms, numberOfUncaughtBreaches);
     }
 
-    private void run() {
+    private void run() throws InterruptedException {
+        Thread.sleep(60000);
         KabisConsumer<Integer, String> artEstateConsumer = new KabisConsumer<>(getProperties());
         artEstateConsumer.subscribe(TOPICS);
         artEstateConsumer.updateTopology(TOPICS);

@@ -32,7 +32,8 @@ public class SafeCorp extends ArtExhibitionProducer {
         System.exit(0);
     }
 
-    private void run() {
+    private void run() throws InterruptedException {
+        Thread.sleep(60000);
         Properties properties = getProperties();
 
         KabisConsumer<Integer, String> safeCorpConsumer = new KabisConsumer<>(properties);
