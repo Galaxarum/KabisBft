@@ -65,15 +65,12 @@ public class SafeSense extends ArtExhibitionProducer {
             try {
                 Map<String, TopicDescription> topics = checkTopicsResult.allTopicNames().get();
                 System.out.println("[SafeSense] " + kafkaBroker + " TOPICS STATUS: " + topics);
-                if (checkTopicsResult.allTopicNames().get().containsKey(Topics.ART_EXHIBITION.toString())) {
+                while (checkTopicsResult.allTopicNames().get().containsKey(Topics.ART_EXHIBITION.toString())) {
                     System.out.println("[SafeSense] Topic already exists for " + kafkaBroker + "!");
                     System.out.println("[SafeSense] Deleting topic for " + kafkaBroker + "...");
                     client.deleteTopics(Collections.singletonList(Topics.ART_EXHIBITION.toString())).all().get();
                     System.out.println("[SafeSense] Topic deleted successfully for " + kafkaBroker + "!");
                     System.out.println("[SafeSense] " + kafkaBroker + " TOPICS STATUS AFTER DELETE: " + checkTopicsResult.allTopicNames().get());
-                }
-                while (checkTopicsResult.allTopicNames().get().containsKey(Topics.ART_EXHIBITION.toString())) {
-                    System.out.println("[SafeSense] " + kafkaBroker + " TOPIC STILL PRESENT, WAITING FOR DELETION");
                 }
                 System.out.println("[SafeSense] Creating topic for " + kafkaBroker + "...");
                 client.createTopics(List.of(
