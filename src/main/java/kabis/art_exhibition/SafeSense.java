@@ -57,11 +57,7 @@ public class SafeSense extends ArtExhibitionProducer {
         properties.put("request.timeout.ms", 5000);
         try (AdminClient client = AdminClient.create(properties)) {
             System.out.println("[SafeSense] AdminClient created!");
-            CreateTopicsResult createTopicsResult = client.createTopics(List.of(
-                    new NewTopic(Topics.ART_EXHIBITION.toString(), getNumberOfArtExhibitions(), (short) 1)
-            ));
             DescribeTopicsResult checkTopicsResult = client.describeTopics(Collections.singletonList(Topics.ART_EXHIBITION.toString()));
-            CreatePartitionsResult createPartitionsResult = client.createPartitions(Map.of(Topics.ART_EXHIBITION.toString(), NewPartitions.increaseTo(getNumberOfArtExhibitions())));
             try {
                 // Read all topics
                 Map<String, TopicDescription> topicsList = checkTopicsResult.allTopicNames().get();
@@ -72,13 +68,15 @@ public class SafeSense extends ArtExhibitionProducer {
                     if (topicsList.get(Topics.ART_EXHIBITION.toString()).partitions().size() != getNumberOfArtExhibitions()) {
                         System.out.println("[SafeSense] Number of partitions is not correct for " + kafkaBroker + "!");
                         // Increase number of partitions
-                        createPartitionsResult.all().get();
+                        client.createPartitions(Map.of(Topics.ART_EXHIBITION.toString(), NewPartitions.increaseTo(getNumberOfArtExhibitions()))).all().get();
                         System.out.println("[SafeSense] Partitions incremented for " + kafkaBroker + " to " + getNumberOfArtExhibitions() + "!");
                     } else
                         System.out.println("[SafeSense] Number of partitions is correct for " + kafkaBroker + "!");
                 } else {
                     System.out.println("[SafeSense] Creating topic for " + kafkaBroker + "...");
-                    createTopicsResult.all().get();
+                    client.createTopics(List.of(
+                            new NewTopic(Topics.ART_EXHIBITION.toString(), getNumberOfArtExhibitions(), (short) 1)
+                    )).all().get();
                     System.out.println("[SafeSense] Topic created successfully for " + kafkaBroker + "!");
                 }
                 System.out.println("[SafeSense] Describe topic for " + kafkaBroker + ": " + checkTopicsResult.allTopicNames().get());
