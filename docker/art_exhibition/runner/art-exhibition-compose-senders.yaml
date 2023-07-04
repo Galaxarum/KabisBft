@@ -53,6 +53,8 @@ services:
     image: "bitnami/kafka:latest"
     networks:
       - kafka-network
+    ports:
+      - "9092:9092"
     depends_on:
       - "zookeeper-1-1"
       - "zookeeper-1-2"
@@ -108,6 +110,8 @@ services:
     image: "bitnami/kafka:latest"
     networks:
       - kafka-network
+    ports:
+      - "9092:9092"
     depends_on:
       - "zookeeper-2-1"
       - "zookeeper-2-2"
