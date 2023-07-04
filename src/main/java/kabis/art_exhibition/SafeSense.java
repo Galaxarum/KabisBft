@@ -83,6 +83,7 @@ public class SafeSense extends ArtExhibitionProducer {
                     )).all().get();
                     System.out.println("[SafeSense] Topic created successfully for " + kafkaBroker + "!");
                 }
+                Thread.sleep(10000);
                 System.out.println("[SafeSense] Describe topic for " + kafkaBroker + ": " + client.describeTopics(Collections.singletonList(Topics.ART_EXHIBITION.toString())).allTopicNames().get());
             } catch (InterruptedException | ExecutionException e) {
                 throw new IllegalStateException(e);
