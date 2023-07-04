@@ -52,7 +52,7 @@ public abstract class ArtExhibitionProducer extends ArtExhibitionClient {
             for (int i = 0; i < numberOfAlarms; i++) {
                 ProducerRecord<Integer, String> record = new ProducerRecord<>(Topics.ART_EXHIBITION.toString(), artExhibitionID, message + i);
                 record.headers().add("clientId", String.valueOf(getClientId()).getBytes());
-                System.out.println("[sendAndMeasure]: Sending " + record.value() + " exhibition: " + record.partition());
+                System.out.println("[sendAndMeasure]: Sending " + record.value() + " exhibition: " + record.key());
                 producer.push(record);
             }
         }
