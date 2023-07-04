@@ -141,9 +141,7 @@ services:
 
   #Kafka setup
   init-kafka:
-    image: "confluentinc/cp-kafka:6.1.1"
-    networks:
-      - kafka-network
+    image: "bitnami/kafka:latest"
     depends_on:
       - "kafka_1_1"
       - "kafka_1_2"
@@ -154,22 +152,22 @@ services:
       "
       # blocks until kafka is reachable
       echo -e 'INIT KAFKA-1'
-      kafka-topics --bootstrap-server kafka_1_1 --list
+      kafka-topics --bootstrap-server kafka_1_1:9092 --list
       echo -e 'Creating kafka topics'
-      kafka-topics --bootstrap-server kafka_1_1 --create --if-not-exists --topic ART_EXHIBITION --replication-factor 1 --partitions ${NUM_EXHIBITIONS}
+      kafka-topics --bootstrap-server kafka_1_1:9092 --create --if-not-exists --topic ART_EXHIBITION --replication-factor 1 --partitions ${NUM_EXHIBITIONS}
       
       echo -e 'Successfully created the following topics:'
-      kafka-topics --bootstrap-server kafka_1_1 --list
+      kafka-topics --bootstrap-server kafka_1_1:9092 --list
       
       
       # blocks until kafka is reachable
       echo -e 'INIT KAFKA-2'
-      kafka-topics --bootstrap-server kafka_2_1 --list
+      kafka-topics --bootstrap-server kafka_2_1:9092 --list
       echo -e 'Creating kafka topics'
-      kafka-topics --bootstrap-server kafka_2_1 --create --if-not-exists --topic ART_EXHIBITION --replication-factor 1 --partitions ${NUM_EXHIBITIONS}
+      kafka-topics --bootstrap-server kafka_2_1:9092 --create --if-not-exists --topic ART_EXHIBITION --replication-factor 1 --partitions ${NUM_EXHIBITIONS}
       
       echo -e 'Successfully created the following topics:'
-      kafka-topics --bootstrap-server kafka_2_1 --list
+      kafka-topics --bootstrap-server kafka_2_1:9092 --list
       "
 
   #Clients
