@@ -141,7 +141,7 @@ services:
 
   #Kafka setup
   init-kafka:
-    image: "bitnami/kafka:latest"
+    image: "confluentinc/cp-kafka:6.1.1"
     networks:
       - kafka-network
     depends_on:
