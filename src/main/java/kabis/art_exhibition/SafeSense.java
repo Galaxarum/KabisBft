@@ -22,7 +22,7 @@ public class SafeSense extends ArtExhibitionProducer {
 
     private void run() {
         Properties properties = new Properties();
-        properties.put("bootstrap.servers", getProperties().getProperty("bootstrap.servers"));
+        properties.put("bootstrap.servers", "kafka_1_1:9092, kafka_2_1:9092");
         properties.put("connections.max.idle.ms", 10000);
         properties.put("request.timeout.ms", 5000);
         try (AdminClient client = AdminClient.create(properties)) {
