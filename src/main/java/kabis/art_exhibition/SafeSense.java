@@ -1,10 +1,7 @@
 package kabis.art_exhibition;
 
 import kabis.producer.KabisProducer;
-import org.apache.kafka.clients.admin.AdminClient;
-import org.apache.kafka.clients.admin.NewPartitions;
-import org.apache.kafka.clients.admin.NewTopic;
-import org.apache.kafka.clients.admin.TopicDescription;
+import org.apache.kafka.clients.admin.*;
 
 import java.util.*;
 import java.util.concurrent.ExecutionException;
@@ -60,9 +57,10 @@ public class SafeSense extends ArtExhibitionProducer {
         properties.put("request.timeout.ms", 5000);
         try (AdminClient client = AdminClient.create(properties)) {
             System.out.println("[SafeSense] AdminClient created!");
+            DescribeTopicsResult describeTopicsResult = client.describeTopics(Collections.singletonList(Topics.ART_EXHIBITION.toString()));
             try {
                 // Read all topics
-                Map<String, TopicDescription> topicsList = client.describeTopics(Collections.singletonList(Topics.ART_EXHIBITION.toString())).allTopicNames().get();
+                Map<String, TopicDescription> topicsList = describeTopicsResult.allTopicNames().get();
                 // Check if topic is already present
                 if (topicsList.containsKey(Topics.ART_EXHIBITION.toString())) {
                     System.out.println("[SafeSense] Topic already present for " + kafkaBroker + "!");
@@ -84,7 +82,7 @@ public class SafeSense extends ArtExhibitionProducer {
                     System.out.println("[SafeSense] Topic created successfully for " + kafkaBroker + "!");
                 }
                 Thread.sleep(10000);
-                System.out.println("[SafeSense] Describe topic for " + kafkaBroker + ": " + client.describeTopics(Collections.singletonList(Topics.ART_EXHIBITION.toString())).allTopicNames().get());
+                System.out.println("[SafeSense] Describe topic for " + kafkaBroker + ": " + describeTopicsResult.allTopicNames().get());
             } catch (InterruptedException | ExecutionException e) {
                 throw new IllegalStateException(e);
             }
