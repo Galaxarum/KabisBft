@@ -175,7 +175,12 @@ services:
       - kafka-network
       - bft-network
     depends_on:
-      - "init-kafka"
+      - "kafka_1_1"
+      - "kafka_1_2"
+      - "kafka_2_1"
+      - "kafka_2_2"
+      - "bft-1"
+      - "bft-2"
     environment:
       - CLIENT_ID=0
       - NUM_EXHIBITIONS=$NUM_EXHIBITIONS
