@@ -69,11 +69,13 @@ public class SafeSense extends ArtExhibitionProducer {
                     System.out.println("[SafeSense] Deleting topic for " + kafkaBroker + "...");
                     deleteTopicResult.all().get();
                     System.out.println("[SafeSense] Topic deleted successfully successfully for " + kafkaBroker + "!");
+                    Thread.sleep(5000);
                 }
                 System.out.println("[SafeSense] Creating topic for " + kafkaBroker + "...");
                 createTopicResult.all().get();
                 System.out.println("[SafeSense] Topic created successfully for " + kafkaBroker + "!");
                 System.out.println("[SafeSense] Describe topic for " + kafkaBroker + ": " + checkTopicsResult.allTopicNames().get());
+                Thread.sleep(5000);
             } catch (InterruptedException | ExecutionException e) {
                 throw new IllegalStateException(e);
             }
