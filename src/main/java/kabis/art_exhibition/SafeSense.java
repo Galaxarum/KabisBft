@@ -3,8 +3,10 @@ package kabis.art_exhibition;
 import kabis.producer.KabisProducer;
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.CreateTopicsResult;
+import org.apache.kafka.clients.admin.ListTopicsResult;
 import org.apache.kafka.clients.admin.NewTopic;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
@@ -28,14 +30,17 @@ public class SafeSense extends ArtExhibitionProducer {
             CreateTopicsResult result = client.createTopics(List.of(
                     new NewTopic(Topics.ART_EXHIBITION.toString(), getNumberOfArtExhibitions(), (short) 2)
             ));
+            ListTopicsResult checkTopics = client.listTopics();
             try {
                 result.all().get();
                 System.out.println("[SafeSense] Topic created successfully!");
+
+                System.out.println("[SafeSense] LIST OF TOPICS: " + new ArrayList<>(checkTopics.listings().get()));
             } catch (InterruptedException | ExecutionException e) {
                 throw new IllegalStateException(e);
             }
         }
-        
+
         KabisProducer<Integer, String> safeSenseProducer = new KabisProducer<>(getProperties());
         safeSenseProducer.updateTopology(TOPICS);
         System.out.println("[SafeSense] Kabis Producer created");
