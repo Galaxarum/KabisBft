@@ -3,10 +3,7 @@ package kabis.art_exhibition;
 import kabis.producer.KabisProducer;
 import org.apache.kafka.clients.admin.*;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 
 import static java.lang.Integer.parseInt;
@@ -27,8 +24,7 @@ public class SafeSense extends ArtExhibitionProducer {
     }
 
     private void run() {
-        createTopic("kafka_1_1:9092");
-        //createTopic("kafka_2_1:9092");
+        createTopic("kafka_1_1:9092,kafka_2_1:9092");
 
         KabisProducer<Integer, String> safeSenseProducer = new KabisProducer<>(getProperties());
         safeSenseProducer.updateTopology(TOPICS);
@@ -60,22 +56,24 @@ public class SafeSense extends ArtExhibitionProducer {
         properties.put("request.timeout.ms", 5000);
         try (AdminClient client = AdminClient.create(properties)) {
             System.out.println("[SafeSense] AdminClient created!");
-            CreateTopicsResult result = client.createTopics(List.of(
+            CreateTopicsResult createTopicResult = client.createTopics(List.of(
                     new NewTopic(Topics.ART_EXHIBITION.toString(), getNumberOfArtExhibitions(), (short) 1)
             ));
-            DescribeTopicsResult checkTopics = client.describeTopics(Collections.singletonList(Topics.ART_EXHIBITION.toString()));
-            DeleteTopicsResult deleteTopic = client.deleteTopics(Collections.singletonList(Topics.ART_EXHIBITION.toString()));
+            DescribeTopicsResult checkTopicsResult = client.describeTopics(Collections.singletonList(Topics.ART_EXHIBITION.toString()));
+            DeleteTopicsResult deleteTopicResult = client.deleteTopics(Collections.singletonList(Topics.ART_EXHIBITION.toString()));
             try {
-                if (checkTopics.allTopicNames().get().containsKey(Topics.ART_EXHIBITION.toString())) {
+                Map<String, TopicDescription> topics = checkTopicsResult.allTopicNames().get();
+                System.out.println("[SafeSense] " + kafkaBroker + " TOPICS STATUS: " + topics);
+                if (topics.containsKey(Topics.ART_EXHIBITION.toString())) {
                     System.out.println("[SafeSense] Topic already exists for " + kafkaBroker + "!");
                     System.out.println("[SafeSense] Deleting topic for " + kafkaBroker + "...");
-                    deleteTopic.all().get();
+                    deleteTopicResult.all().get();
                     System.out.println("[SafeSense] Topic deleted successfully successfully for " + kafkaBroker + "!");
                 }
                 System.out.println("[SafeSense] Creating topic for " + kafkaBroker + "...");
-                result.all().get();
+                createTopicResult.all().get();
                 System.out.println("[SafeSense] Topic created successfully for " + kafkaBroker + "!");
-                System.out.println("[SafeSense] Describe topic for " + kafkaBroker + ": " + checkTopics.allTopicNames().get());
+                System.out.println("[SafeSense] Describe topic for " + kafkaBroker + ": " + checkTopicsResult.allTopicNames().get());
             } catch (InterruptedException | ExecutionException e) {
                 throw new IllegalStateException(e);
             }
