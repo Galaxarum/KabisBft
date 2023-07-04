@@ -2,7 +2,6 @@ package kabis.art_exhibition;
 
 import kabis.producer.KabisProducer;
 import org.apache.kafka.clients.admin.*;
-import org.apache.kafka.common.TopicPartition;
 
 import java.util.*;
 import java.util.concurrent.ExecutionException;
@@ -62,8 +61,6 @@ public class SafeSense extends ArtExhibitionProducer {
                     new NewTopic(Topics.ART_EXHIBITION.toString(), getNumberOfArtExhibitions(), (short) 1)
             ));
             DescribeTopicsResult checkTopicsResult = client.describeTopics(Collections.singletonList(Topics.ART_EXHIBITION.toString()));
-            // Delete all records
-            DeleteRecordsResult deleteRecordsResult = client.deleteRecords(Map.of(new TopicPartition(Topics.ART_EXHIBITION.toString(), 0), RecordsToDelete.beforeOffset(0L)));
             CreatePartitionsResult createPartitionsResult = client.createPartitions(Map.of(Topics.ART_EXHIBITION.toString(), NewPartitions.increaseTo(getNumberOfArtExhibitions())));
             try {
                 // Read all topics
@@ -71,9 +68,6 @@ public class SafeSense extends ArtExhibitionProducer {
                 // Check if topic is already present
                 if (topicsList.containsKey(Topics.ART_EXHIBITION.toString())) {
                     System.out.println("[SafeSense] Topic already present for " + kafkaBroker + "!");
-                    // Delete all records
-                    deleteRecordsResult.all().get();
-                    System.out.println("[SafeSense] Records deleted for " + kafkaBroker + "!");
                     System.out.println("[SafeSense] Checking number of partitions for " + kafkaBroker + "...");
                     if (topicsList.get(Topics.ART_EXHIBITION.toString()).partitions().size() != getNumberOfArtExhibitions()) {
                         System.out.println("[SafeSense] Number of partitions is not correct for " + kafkaBroker + "!");

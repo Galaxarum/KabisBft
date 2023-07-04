@@ -64,7 +64,6 @@ services:
       - KAFKA_BROKER_ID=3
       - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092
       - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka_1_3:9092
-      - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=false
   kafka_1_4:
     image: "bitnami/kafka:latest"
     networks:
@@ -80,7 +79,6 @@ services:
       - KAFKA_BROKER_ID=4
       - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092
       - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka_1_4:9092
-      - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=false
 
   #Second kafka replica
   zookeeper-2-3:
@@ -121,7 +119,6 @@ services:
       - KAFKA_BROKER_ID=3
       - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092
       - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka_2_3:9092
-      - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=false
   kafka_2_4:
     image: "bitnami/kafka:latest"
     networks:
@@ -137,7 +134,6 @@ services:
       - KAFKA_BROKER_ID=4
       - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092
       - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka_2_4:9092
-      - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=false
 
   #Clients
   art-estate:
