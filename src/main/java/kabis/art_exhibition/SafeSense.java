@@ -24,7 +24,8 @@ public class SafeSense extends ArtExhibitionProducer {
     }
 
     private void run() {
-        createTopic("kafka_1_1:9092,kafka_2_1:9092");
+        createTopic("kafka_1_1:9092,kafka_1_2:9092,kafka_1_3:9092,kafka_1_4:9092");
+        createTopic("kafka_2_1:9092,kafka_2_2:9092,kafka_2_3:9092,kafka_2_4:9092");
 
         KabisProducer<Integer, String> safeSenseProducer = new KabisProducer<>(getProperties());
         safeSenseProducer.updateTopology(TOPICS);
