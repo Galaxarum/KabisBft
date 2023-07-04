@@ -147,21 +147,20 @@ services:
       - "kafka_2_2"
     entrypoint: [ '/bin/sh', '-c' ]
     command: |
-      "
-      # blocks until kafka is reachable
-      echo -e 'INIT KAFKA-1'
+      "# blocks until kafka is reachable
+      echo -e 'INIT first kafka replica with $NUM_EXHIBITIONS partitions'
       kafka-topics --bootstrap-server kafka_1_1:9092 --list
       echo -e 'Creating kafka topics'
-      kafka-topics --bootstrap-server kafka_1_1:9092 --create --if-not-exists --topic ART-EXHIBITION --replication-factor 1 --partitions ${NUM_EXHIBITIONS}
+      kafka-topics --bootstrap-server kafka_1_1:9092 --create --if-not-exists --topic ART-EXHIBITION --replication-factor 1 --partitions $NUM_EXHIBITIONS
       
       echo -e 'Successfully created the following topics:'
       kafka-topics --bootstrap-server kafka_1_1:9092 --list
       
       # blocks until kafka is reachable
-      echo -e 'INIT KAFKA-2'
+      echo -e 'INIT second kafka replica with $NUM_EXHIBITIONS partitions'
       kafka-topics --bootstrap-server kafka_2_1:9092 --list
       echo -e 'Creating kafka topics'
-      kafka-topics --bootstrap-server kafka_2_1:9092 --create --if-not-exists --topic ART-EXHIBITION --replication-factor 1 --partitions ${NUM_EXHIBITIONS}
+      kafka-topics --bootstrap-server kafka_2_1:9092 --create --if-not-exists --topic ART-EXHIBITION --replication-factor 1 --partitions $NUM_EXHIBITIONS
       
       echo -e 'Successfully created the following topics:'
       kafka-topics --bootstrap-server kafka_2_1:9092 --list"
