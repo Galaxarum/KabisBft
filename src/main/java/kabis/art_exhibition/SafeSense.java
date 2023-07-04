@@ -20,26 +20,31 @@ public class SafeSense extends ArtExhibitionProducer {
         super(clientId, numberOfArtExhibitions, numberOfTrueAlarms, numberOfFalseAlarms);
     }
 
-    private void run() {
+    private void createTopic(String kafkaBroker) {
         Properties properties = new Properties();
-        properties.put("bootstrap.servers", "kafka_1_1:9092, kafka_2_1:9092");
+        properties.put("bootstrap.servers", kafkaBroker);
         properties.put("connections.max.idle.ms", 10000);
         properties.put("request.timeout.ms", 5000);
         try (AdminClient client = AdminClient.create(properties)) {
-            System.out.println("[SafeSense] Creating topic...");
+            System.out.println("[SafeSense] Creating topic for " + kafkaBroker + "...");
             CreateTopicsResult result = client.createTopics(List.of(
                     new NewTopic(Topics.ART_EXHIBITION.toString(), getNumberOfArtExhibitions(), (short) 1)
             ));
             DescribeTopicsResult checkTopics = client.describeTopics(Collections.singletonList(Topics.ART_EXHIBITION.toString()));
             try {
                 result.all().get();
-                System.out.println("[SafeSense] Topic created successfully!");
+                System.out.println("[SafeSense] Topic created successfully for " + kafkaBroker + "!");
 
-                System.out.println("[SafeSense] Describe topic: " + checkTopics.allTopicNames().get());
+                System.out.println("[SafeSense] Describe topic for " + kafkaBroker + ": " + checkTopics.allTopicNames().get());
             } catch (InterruptedException | ExecutionException e) {
                 throw new IllegalStateException(e);
             }
         }
+    }
+
+    private void run() {
+        createTopic("kafka_1_1:9092");
+        createTopic("kafka_2_1:9092");
 
         KabisProducer<Integer, String> safeSenseProducer = new KabisProducer<>(getProperties());
         safeSenseProducer.updateTopology(TOPICS);
