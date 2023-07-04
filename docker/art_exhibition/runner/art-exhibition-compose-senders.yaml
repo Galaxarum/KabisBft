@@ -64,6 +64,7 @@ services:
       - KAFKA_BROKER_ID=1
       - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092
       - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka_1_1:9092
+      - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=false
   kafka_1_2:
     image: "bitnami/kafka:latest"
     networks:
@@ -79,6 +80,7 @@ services:
       - KAFKA_BROKER_ID=2
       - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092
       - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka_1_2:9092
+      - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=false
 
   #Second kafka replica
   zookeeper-2-1:
@@ -119,6 +121,7 @@ services:
       - KAFKA_BROKER_ID=1
       - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092
       - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka_2_1:9092
+      - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=false
   kafka_2_2:
     image: "bitnami/kafka:latest"
     networks:
@@ -134,6 +137,7 @@ services:
       - KAFKA_BROKER_ID=2
       - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092
       - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka_2_2:9092
+      - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=false
 
       #Kafka setup
       #init-kafka:
@@ -156,7 +160,6 @@ services:
       #
       #    echo -e 'Successfully created the following topics:'
       #    kafka-topics --bootstrap-server kafka_1_1:9092 --list
-      
       
       # blocks until kafka is reachable
       #    echo -e 'INIT KAFKA-2'
