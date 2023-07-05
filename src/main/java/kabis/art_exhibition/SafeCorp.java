@@ -80,7 +80,7 @@ public class SafeCorp extends ArtExhibitionProducer {
             ConsumerRecords<Integer, String> records = consumer.poll(POLL_TIMEOUT);
             for (ConsumerRecord<Integer, String> record : records) {
                 String recordMessage = record.value();
-                if (!Arrays.equals(record.headers().lastHeader("clientId").value(), String.valueOf(getClientId()).getBytes())) {
+                if (!recordMessage.contains("[SafeCorp]")) {
                     i += 1;
                     System.out.println("[pollAndRespondMeasure]: Received " + recordMessage + " exhibition: " + record.partition());
                     ProducerRecord<Integer, String> responseRecord = new ProducerRecord<>(Topics.ART_EXHIBITION.toString(), record.partition(), record.key(), message + recordMessage);

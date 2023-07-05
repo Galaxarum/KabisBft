@@ -33,13 +33,15 @@ public class Validator<K extends Integer, V extends String> {
     public Map<TopicPartition, List<ConsumerRecord<K, V>>> verify(List<SecureIdentifier> sids) {
         Map<TopicPartition, List<ConsumerRecord<K, V>>> mapTopicPartitionValidatedRecords = new HashMap<>();
         for (SecureIdentifier sid : sids) {
-            //TODO: Remove prints
             List<ConsumerRecord<K, V>> topicPartitionValidatedRecords = mapTopicPartitionValidatedRecords.computeIfAbsent(sid.getTopicPartition(), tp -> new LinkedList<>());
+            //TODO: Remove this print
             System.out.println("[VALIDATOR] SID TP: " + sid.getTopicPartition() + " SID SENDER ID: " + sid.getSenderId());
             List<ConsumerRecord<K, MessageWrapper<V>>> recordsFromDifferentReplicas = kafkaPollingThread.poll(sid.getTopicPartition(), sid.getSenderId(), KAFKA_POLL_TIMEOUT);
 
             for (ConsumerRecord<K, MessageWrapper<V>> record : recordsFromDifferentReplicas) {
                 if (sid.checkProof(record)) {
+                    //TODO: Remove this print
+                    System.out.println("[VALIDATOR] SID VALIDATED");
                     MessageWrapper<V> wrapper = record.value();
                     //TODO: Add timestamp to the constructor, has of now it is reset to the current time
                     ConsumerRecord<K, V> deserializedRecord = new ConsumerRecord<>(record.topic(), record.partition(), record.offset(), record.key(), wrapper.getValue());

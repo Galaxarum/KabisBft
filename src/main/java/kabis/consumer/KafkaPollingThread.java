@@ -71,11 +71,11 @@ public class KafkaPollingThread<K, V> {
     private void pullKafka(int replicaIndex, Duration timeout) {
         ConsumerRecords<K, MessageWrapper<V>> records = this.consumers.get(replicaIndex).poll(timeout);
         Cache<K, V> cache = this.cacheReplicas.get(replicaIndex);
-        //TODO: Remove this print
-        System.out.println("Pulled " + records.count() + " records from replica " + replicaIndex);
         for (ConsumerRecord<K, MessageWrapper<V>> record : records) {
             TopicPartition tp = new TopicPartition(record.topic(), record.partition());
             CacheKey key = new CacheKey(tp, record.value().getSenderId());
+            //TODO: Remove this print
+            System.out.println("[PullKafka] Pulled " + record.value() + " from partition " + record.partition() + " from replica " + replicaIndex);
             cache.offer(key, record);
         }
     }
