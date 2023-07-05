@@ -25,11 +25,11 @@ public class KabisProducer<K extends Integer, V extends String> implements Kabis
      */
     public KabisProducer(Properties properties) {
         //TODO: Improve the regex + check if the properties are valid, otherwise throw an exception
-        String[] bootstrapServers = properties.getProperty("bootstrap.servers").split(";");
+        String[] serversReplicas = properties.getProperty("bootstrap.servers").split(";");
         this.clientId = Integer.parseInt(properties.getProperty("client.id"));
-        this.kafkaProducers = new ArrayList<>(bootstrapServers.length);
-        for (int i = 0; i < bootstrapServers.length; i++) {
-            String servers = bootstrapServers[i];
+        this.kafkaProducers = new ArrayList<>(serversReplicas.length);
+        for (int i = 0; i < serversReplicas.length; i++) {
+            String servers = serversReplicas[i];
             String id = String.format("%d-producer-%d", this.clientId, i);
             Properties simplerProperties = (Properties) properties.clone();
             simplerProperties.put("bootstrap.servers", servers);

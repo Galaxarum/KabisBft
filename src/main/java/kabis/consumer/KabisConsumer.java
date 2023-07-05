@@ -62,7 +62,7 @@ public class KabisConsumer<K extends Integer, V extends String> implements Kabis
     public ConsumerRecords<K, V> poll(Duration duration) {
         //TODO: Remove all the prints
         List<SecureIdentifier> sids = serviceProxy.pull();
-        //System.out.printf("[" + this.getClass().getName() + "] Received %d sids%n", sids.size());
+        System.out.printf("[" + this.getClass().getName() + "] Received %d sids%n", sids.size());
         counter += sids.size();
         System.out.println("[" + this.getClass().getName() + "] Total SIDS until now: " + counter);
 

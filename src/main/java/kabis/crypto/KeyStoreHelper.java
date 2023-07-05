@@ -7,23 +7,37 @@ import java.security.*;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Singleton Helper class to manage the key store.
+ */
 public class KeyStoreHelper {
     private static final KeyStoreHelper instance = new KeyStoreHelper();
+    /**
+     * The key pairs of the signers.
+     * The key is the id of the signer.
+     * The value is the KeyPair of the signer.
+     */
     private final Map<Integer, KeyPair> keyPairs = new HashMap<>();
 
+    /**
+     * Creates a new KeyStoreHelper.
+     * Loads the key pairs from the config/keysECDSA folder.
+     */
     private KeyStoreHelper() {
         try {
-            //TODO: Improve validation and error handling, maybe we should throw an exception if the key is not found
             //TODO: Add support to multiple algorithms
-            var files = new File("config/keysECDSA").listFiles();
-            for (var file : files) {
-                var idString = file.getName().replaceAll("publickey|privatekey", "");
-                var id = Integer.parseInt(idString);
+            String pathName = "config/keysECDSA";
+            File[] files = new File(pathName).listFiles();
+            if (files == null || files.length == 0)
+                throw new RuntimeException("Error loading keys - Files not found in " + pathName);
+            for (File file : files) {
+                String idString = file.getName().replaceAll("publickey|privatekey", "");
+                int id = Integer.parseInt(idString);
                 if (keyPairs.containsKey(id)) continue;
-                var keyLoader = new ECDSAKeyLoader(id, "config", true, "ECDSA");
-                var priK = keyLoader.loadPrivateKey();
-                var pubK = keyLoader.loadPublicKey();
-                var kp = new KeyPair(pubK, priK);
+                ECDSAKeyLoader keyLoader = new ECDSAKeyLoader(id, "config", true, "ECDSA");
+                PrivateKey priK = keyLoader.loadPrivateKey();
+                PublicKey pubK = keyLoader.loadPublicKey();
+                KeyPair kp = new KeyPair(pubK, priK);
                 keyPairs.put(id, kp);
                 System.out.println("Adding keypair for id " + id);
             }
@@ -36,6 +50,13 @@ public class KeyStoreHelper {
         return instance;
     }
 
+    /**
+     * Signs a value using the private key of the signer.
+     *
+     * @param signerId the id of the signer
+     * @param values   the value to be signed
+     * @return the signature of the value
+     */
     public byte[] signBytes(int signerId, byte[] values) {
         try {
             //TODO: Add support to multiple algorithms
@@ -52,6 +73,14 @@ public class KeyStoreHelper {
         }
     }
 
+    /**
+     * Verifies the signature of a value, using the public key of the signer.
+     *
+     * @param signerId the id of the signer
+     * @param value    the value to be verified
+     * @param sign     the signature of the value
+     * @return true if the signature is valid, false otherwise
+     */
     public boolean validateSignature(int signerId, byte[] value, byte[] sign) {
         try {
             //TODO: Add support to multiple algorithms
