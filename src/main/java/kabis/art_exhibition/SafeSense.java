@@ -18,12 +18,12 @@ public class SafeSense extends ArtExhibitionProducer {
             System.out.print("--ERROR-- \nUSAGE: <clientId> <numberOfArtExhibitions> <numberOfTrueAlarms> <numberOfFalseAlarms>");
             System.exit(1);
         }
+        // -- PRIMING KAFKA, CREATING TOPICS --
+        Thread.sleep(30000);
         new SafeSense(parseInt(args[0]), parseInt(args[1]), parseInt(args[2]), parseInt(args[3])).run();
     }
 
-    private void run() throws InterruptedException {
-        Thread.sleep(60000);
-
+    private void run() {
         KabisProducer<Integer, String> safeSenseProducer = new KabisProducer<>(getProperties());
         safeSenseProducer.updateTopology(TOPICS);
         System.out.println("[SafeSense] Kabis Producer created");

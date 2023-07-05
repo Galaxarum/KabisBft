@@ -11,8 +11,22 @@ public class Ensure extends ArtExhibitionConsumer {
         super(clientId, numberOfArtExhibitions, numberOfTrueAlarms, numberOfFalseAlarms, numberOfUncaughtBreaches);
     }
 
-    private void run() throws InterruptedException {
+    public static void main(String[] args) throws InterruptedException {
+        // -- CHECK IF ALL ARGUMENTS ARE PRESENT --
+        if (args.length != 5) {
+            System.out.print("--ERROR-- \nUSAGE: Ensure <clientId> <numberOfArtExhibitions> <totalNumberOfAlarms> <falseAlarmsPercentage> <alarmsNotTriggeredPercentage>");
+            System.exit(1);
+        }
+        // -- PRIMING KAFKA, CREATING TOPICS --
+        Thread.sleep(30000);
+        // -- RUN ENSURE INSTANCE --
+        new Ensure(parseInt(args[0]), parseInt(args[1]), parseInt(args[2]), parseInt(args[3]), parseInt(args[4])).run();
+        // -- KILL THE BENCHMARK AFTER run() --
         Thread.sleep(60000);
+        System.exit(0);
+    }
+
+    private void run() {
         KabisConsumer<Integer, String> ensureConsumer = new KabisConsumer<>(getProperties());
         ensureConsumer.subscribe(TOPICS);
         ensureConsumer.updateTopology(TOPICS);
@@ -29,18 +43,5 @@ public class Ensure extends ArtExhibitionConsumer {
         ArtExhibitionBenchmarkResult.storeThroughputToDisk(Arrays.asList("#EXHIBITIONS", "#TOTAL ALARMS", "TOTAL TIME [ns]"),
                 Arrays.asList(Integer.toString(getNumberOfArtExhibitions()), Integer.toString(recordsToRead), Long.toString(time)));
         System.out.println("[Ensure] Experiments persisted!");
-    }
-
-    public static void main(String[] args) throws InterruptedException {
-        // -- CHECK IF ALL ARGUMENTS ARE PRESENT --
-        if (args.length != 5) {
-            System.out.print("--ERROR-- \nUSAGE: Ensure <clientId> <numberOfArtExhibitions> <totalNumberOfAlarms> <falseAlarmsPercentage> <alarmsNotTriggeredPercentage>");
-            System.exit(1);
-        }
-        // -- RUN ENSURE INSTANCE --
-        new Ensure(parseInt(args[0]), parseInt(args[1]), parseInt(args[2]), parseInt(args[3]), parseInt(args[4])).run();
-        // -- KILL THE BENCHMARK AFTER run() --
-        Thread.sleep(60000);
-        System.exit(0);
     }
 }

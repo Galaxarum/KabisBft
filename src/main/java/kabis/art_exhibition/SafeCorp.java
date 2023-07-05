@@ -25,6 +25,8 @@ public class SafeCorp extends ArtExhibitionProducer {
             System.out.println("--ERROR-- \nUSAGE: SafeSense <clientId> <numberOfArtExhibitions> <numberOfTrueAlarms> <numberOfFalseAlarms> <numberOfUncaughtBreaches>");
             System.exit(1);
         }
+        // -- PRIMING KAFKA, CREATING TOPICS --
+        Thread.sleep(30000);
         // -- RUN SAFECORP INSTANCE --
         new SafeCorp(parseInt(args[0]), parseInt(args[1]), parseInt(args[2]), parseInt(args[3]), parseInt(args[4])).run();
         // -- KILL THE BENCHMARK AFTER run() --
@@ -32,8 +34,7 @@ public class SafeCorp extends ArtExhibitionProducer {
         System.exit(0);
     }
 
-    private void run() throws InterruptedException {
-        Thread.sleep(60000);
+    private void run() {
         Properties properties = getProperties();
 
         KabisConsumer<Integer, String> safeCorpConsumer = new KabisConsumer<>(properties);
