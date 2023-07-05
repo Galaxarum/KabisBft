@@ -11,8 +11,14 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class KafkaPollingThread<K, V> {
+    /**
+     * List of Kafka consumers, one for each Kafka replica.
+     */
     private final List<KafkaConsumer<K, MessageWrapper<V>>> consumers;
-    private final List<Cache<K, V>> caches;
+    /**
+     * List of caches, one for each Kafka replica.
+     */
+    private final List<Cache<K, V>> cacheReplicas;
 
     /**
      * Creates a new KafkaPollingThread.
@@ -21,17 +27,17 @@ public class KafkaPollingThread<K, V> {
      */
     public KafkaPollingThread(Properties properties) {
         //TODO: Check if the properties are valid, otherwise throw an exception
-        String[] bootstrapServers = properties.getProperty("bootstrap.servers").split(";");
-        ArrayList<KafkaConsumer<K, MessageWrapper<V>>> consumers = new ArrayList<>(bootstrapServers.length);
-        this.caches = new ArrayList<>(bootstrapServers.length);
-        for (int i = 0; i < bootstrapServers.length; i++) {
-            String servers = bootstrapServers[i];
+        String[] serversReplicas = properties.getProperty("bootstrap.servers").split(";");
+        ArrayList<KafkaConsumer<K, MessageWrapper<V>>> consumers = new ArrayList<>(serversReplicas.length);
+        this.cacheReplicas = new ArrayList<>(serversReplicas.length);
+        for (int i = 0; i < serversReplicas.length; i++) {
+            String servers = serversReplicas[i];
             String id = String.format("%s-consumer-%d", properties.getProperty("client.id"), i);
             Properties simplerProperties = (Properties) properties.clone();
             simplerProperties.put("bootstrap.servers", servers);
             simplerProperties.put("client.id", id);
             consumers.add(new KafkaConsumer<>(simplerProperties));
-            caches.add(new Cache<>());
+            this.cacheReplicas.add(new Cache<>());
         }
         this.consumers = Collections.unmodifiableList(consumers);
     }
@@ -46,9 +52,9 @@ public class KafkaPollingThread<K, V> {
      */
     public synchronized List<ConsumerRecord<K, MessageWrapper<V>>> poll(TopicPartition tp, int producerId, Duration timeout) {
         CacheKey cacheKey = new CacheKey(tp, producerId);
-        ArrayList<ConsumerRecord<K, MessageWrapper<V>>> res = new ArrayList<>(this.caches.size());
-        for (int replicaIndex = 0; replicaIndex < this.caches.size(); replicaIndex++) {
-            Cache<K, V> cache = this.caches.get(replicaIndex);
+        ArrayList<ConsumerRecord<K, MessageWrapper<V>>> res = new ArrayList<>(this.cacheReplicas.size());
+        for (int replicaIndex = 0; replicaIndex < this.cacheReplicas.size(); replicaIndex++) {
+            Cache<K, V> cache = this.cacheReplicas.get(replicaIndex);
             while (!cache.hasAny(cacheKey)) {
                 pullKafka(replicaIndex, timeout);
             }
@@ -64,7 +70,7 @@ public class KafkaPollingThread<K, V> {
      */
     private void pullKafka(int replicaIndex, Duration timeout) {
         ConsumerRecords<K, MessageWrapper<V>> records = this.consumers.get(replicaIndex).poll(timeout);
-        Cache<K, V> cache = this.caches.get(replicaIndex);
+        Cache<K, V> cache = this.cacheReplicas.get(replicaIndex);
         for (ConsumerRecord<K, MessageWrapper<V>> record : records) {
             TopicPartition tp = new TopicPartition(record.topic(), record.partition());
             CacheKey key = new CacheKey(tp, record.value().getSenderId());
@@ -74,7 +80,7 @@ public class KafkaPollingThread<K, V> {
 
     public synchronized Map<TopicPartition, List<ConsumerRecord<K, V>>> pollUnvalidated(Collection<String> excludedTopics, Duration timeout) {
         pullKafka(0, timeout);
-        Cache<K, V> cache = this.caches.get(0);
+        Cache<K, V> cache = this.cacheReplicas.get(0);
 
         Set<CacheKey> validTPs = cache.getKeys();
         validTPs.removeIf(k -> excludedTopics.contains(k.topicPartition.topic()));
@@ -90,7 +96,6 @@ public class KafkaPollingThread<K, V> {
                     .collect(Collectors.toList()));
         }
         return map;
-
     }
 
     public void subscribe(Collection<String> topics) {

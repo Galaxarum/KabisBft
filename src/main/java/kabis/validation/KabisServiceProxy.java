@@ -44,7 +44,6 @@ public class KabisServiceProxy {
     }
 
     public List<SecureIdentifier> pull() {
-        System.out.println("[KabisServiceProxy] Pulling from index " + nextPullIndex + "...");
         try (var bytes = new ByteArrayOutputStream()) {
             bytes.write(OPS.PULL.ordinal());
             bytes.writeBytes(ByteBuffer.allocate(Integer.BYTES).putInt(nextPullIndex).array());
