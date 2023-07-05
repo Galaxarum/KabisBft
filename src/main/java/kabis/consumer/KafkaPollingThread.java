@@ -36,6 +36,14 @@ public class KafkaPollingThread<K, V> {
         this.consumers = Collections.unmodifiableList(consumers);
     }
 
+    /**
+     * Polls for records from each Kafka replica, and returns a list of records from each replica.
+     *
+     * @param tp         The topic partition to poll from
+     * @param producerId The producer id to poll from
+     * @param timeout    The maximum time to block (must not be greater than Long.MAX_VALUE milliseconds)
+     * @return the records from each replica
+     */
     public synchronized List<ConsumerRecord<K, MessageWrapper<V>>> poll(TopicPartition tp, int producerId, Duration timeout) {
         CacheKey cacheKey = new CacheKey(tp, producerId);
         ArrayList<ConsumerRecord<K, MessageWrapper<V>>> res = new ArrayList<>(this.caches.size());
@@ -50,8 +58,7 @@ public class KafkaPollingThread<K, V> {
     }
 
     /**
-     * Polls for records.
-     * <p>
+     * Polls for records and stores them in the cache.
      *
      * @param timeout The maximum time to block (must not be greater than Long.MAX_VALUE milliseconds)
      */

@@ -31,23 +31,24 @@ public class Validator<K extends Integer, V extends String> {
      * @return a map of TopicPartitions to lists of ConsumerRecords
      */
     public Map<TopicPartition, List<ConsumerRecord<K, V>>> verify(List<SecureIdentifier> sids) {
-        Map<TopicPartition, List<ConsumerRecord<K, V>>> map = new HashMap<>();
+        Map<TopicPartition, List<ConsumerRecord<K, V>>> mapTopicPartitionValidatedRecords = new HashMap<>();
         for (SecureIdentifier sid : sids) {
-            List<ConsumerRecord<K, V>> list = map.computeIfAbsent(sid.topicPartition(), tp -> new LinkedList<>());
+            // TODO: Remove prints
+            List<ConsumerRecord<K, V>> topicPartitionValidatedRecords = mapTopicPartitionValidatedRecords.computeIfAbsent(sid.topicPartition(), tp -> new LinkedList<>());
             System.out.println("[VALIDATOR] SID TP: " + sid.topicPartition() + " SID SENDER ID: " + sid.senderId());
-            List<ConsumerRecord<K, MessageWrapper<V>>> elems = kafkaPollingThread.poll(sid.topicPartition(), sid.senderId(), KAFKA_POLL_TIMEOUT);
-            System.out.println("[VALIDATOR] ELEMS SIZE: " + elems.size());
-            for (ConsumerRecord<K, MessageWrapper<V>> record : elems) {
+            List<ConsumerRecord<K, MessageWrapper<V>>> recordsFromDifferentReplicas = kafkaPollingThread.poll(sid.topicPartition(), sid.senderId(), KAFKA_POLL_TIMEOUT);
+
+            for (ConsumerRecord<K, MessageWrapper<V>> record : recordsFromDifferentReplicas) {
                 if (sid.checkProof(record)) {
                     MessageWrapper<V> wrapper = record.value();
                     // TODO: Add timestamp to the constructor, has of now it is reset to the current time
                     ConsumerRecord<K, V> deserializedRecord = new ConsumerRecord<>(record.topic(), record.partition(), record.offset(), record.key(), wrapper.getValue());
                     record.headers().forEach(h -> deserializedRecord.headers().add(h));
-                    list.add(deserializedRecord);
+                    topicPartitionValidatedRecords.add(deserializedRecord);
                     break;
                 }
             }
         }
-        return map;
+        return mapTopicPartitionValidatedRecords;
     }
 }
