@@ -60,13 +60,11 @@ public class KabisConsumer<K extends Integer, V extends String> implements Kabis
         //TODO: Remove all the prints
         List<SecureIdentifier> sids = serviceProxy.pull();
         System.out.printf("[" + this.getClass().getName() + "] Received %d sids%n", sids.size());
-        if (!sids.isEmpty())
-            System.out.println("[" + this.getClass().getName() + "] SIDS: " + sids);
 
         Map<TopicPartition, List<ConsumerRecord<K, V>>> validatedRecords = validator.verify(sids);
         System.out.printf("[" + this.getClass().getName() + "] Received %d validated records%n", validatedRecords.values().stream().map(List::size).reduce(Integer::sum).orElse(-1));
-        if (!validatedRecords.isEmpty())
-            System.out.println("[" + this.getClass().getName() + "] Validated records: " + validatedRecords.values());
+        //if (!validatedRecords.isEmpty())
+        //System.out.println("[" + this.getClass().getName() + "] Validated records: " + validatedRecords.values());
         Map<TopicPartition, List<ConsumerRecord<K, V>>> unvalidatedRecords = kafkaPollingThread.pollUnvalidated(validatedTopics, duration);
 
         Map<TopicPartition, List<ConsumerRecord<K, V>>> mergedMap = Stream.concat(validatedRecords.entrySet().stream(), unvalidatedRecords.entrySet().stream())
