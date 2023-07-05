@@ -52,8 +52,6 @@ public class KabisServiceProxy {
                     bftServiceProxy.invokeOrdered(request) :
                     bftServiceProxy.invokeUnordered(request);
             if (responseBytes == null || responseBytes.length == 0) {
-                //TODO: Remove this print
-                System.out.println("[KabisServiceProxy] pull method returns responseBytes as null or with length 0");
                 try {
                     Thread.sleep(50);
                 } catch (InterruptedException ignored) {

@@ -20,6 +20,7 @@ public class KafkaPollingThread<K, V> {
      * @param properties the properties to be used by the KafkaPollingThread
      */
     public KafkaPollingThread(Properties properties) {
+        //TODO: Check if the properties are valid, otherwise throw an exception
         String[] bootstrapServers = properties.getProperty("bootstrap.servers").split(";");
         ArrayList<KafkaConsumer<K, MessageWrapper<V>>> consumers = new ArrayList<>(bootstrapServers.length);
         this.caches = new ArrayList<>(bootstrapServers.length);
@@ -37,9 +38,9 @@ public class KafkaPollingThread<K, V> {
 
     public synchronized List<ConsumerRecord<K, MessageWrapper<V>>> poll(TopicPartition tp, int producerId, Duration timeout) {
         CacheKey cacheKey = new CacheKey(tp, producerId);
-        ArrayList<ConsumerRecord<K, MessageWrapper<V>>> res = new ArrayList<>(caches.size());
-        for (int replicaIndex = 0; replicaIndex < caches.size(); replicaIndex++) {
-            Cache<K, V> cache = caches.get(replicaIndex);
+        ArrayList<ConsumerRecord<K, MessageWrapper<V>>> res = new ArrayList<>(this.caches.size());
+        for (int replicaIndex = 0; replicaIndex < this.caches.size(); replicaIndex++) {
+            Cache<K, V> cache = this.caches.get(replicaIndex);
             while (!cache.hasAny(cacheKey)) {
                 pullKafka(replicaIndex, timeout);
             }
@@ -48,10 +49,16 @@ public class KafkaPollingThread<K, V> {
         return res;
     }
 
+    /**
+     * Polls for records.
+     * <p>
+     *
+     * @param timeout The maximum time to block (must not be greater than Long.MAX_VALUE milliseconds)
+     */
     private void pullKafka(int replicaIndex, Duration timeout) {
-        ConsumerRecords<K, MessageWrapper<V>> records = consumers.get(replicaIndex).poll(timeout);
-        Cache<K, V> cache = caches.get(replicaIndex);
-        for (var record : records) {
+        ConsumerRecords<K, MessageWrapper<V>> records = this.consumers.get(replicaIndex).poll(timeout);
+        Cache<K, V> cache = this.caches.get(replicaIndex);
+        for (ConsumerRecord<K, MessageWrapper<V>> record : records) {
             TopicPartition tp = new TopicPartition(record.topic(), record.partition());
             CacheKey key = new CacheKey(tp, record.value().getSenderId());
             cache.offer(key, record);
@@ -60,7 +67,7 @@ public class KafkaPollingThread<K, V> {
 
     public synchronized Map<TopicPartition, List<ConsumerRecord<K, V>>> pollUnvalidated(Collection<String> excludedTopics, Duration timeout) {
         pullKafka(0, timeout);
-        Cache<K, V> cache = caches.get(0);
+        Cache<K, V> cache = this.caches.get(0);
 
         Set<CacheKey> validTPs = cache.getKeys();
         validTPs.removeIf(k -> excludedTopics.contains(k.topicPartition.topic()));
@@ -80,43 +87,61 @@ public class KafkaPollingThread<K, V> {
     }
 
     public void subscribe(Collection<String> topics) {
-        consumers.forEach(c -> c.subscribe(topics));
+        this.consumers.forEach(c -> c.subscribe(topics));
     }
 
     public void unsubscribe() {
-        consumers.forEach(KafkaConsumer::unsubscribe);
+        this.consumers.forEach(KafkaConsumer::unsubscribe);
     }
 
     public void close() {
-        consumers.forEach(KafkaConsumer::close);
+        this.consumers.forEach(KafkaConsumer::close);
     }
 
     public void close(Duration duration) {
-        consumers.forEach(c -> c.close(duration));
+        this.consumers.forEach(c -> c.close(duration));
     }
 }
 
 class Cache<K, V> {
     private final Map<CacheKey, Queue<ConsumerRecord<K, MessageWrapper<V>>>> data = new HashMap<>();
 
+    /**
+     * Adds the given value to the queue of the given key.
+     *
+     * @param key   the key to add the value to
+     * @param value the value to add
+     */
     public synchronized void offer(CacheKey key, ConsumerRecord<K, MessageWrapper<V>> value) {
         if (!data.containsKey(key)) data.put(key, new LinkedList<>());
-        Queue<ConsumerRecord<K, MessageWrapper<V>>> queue = data.get(key);
+        Queue<ConsumerRecord<K, MessageWrapper<V>>> queue = this.data.get(key);
         queue.offer(value);
     }
 
+    /**
+     * Returns true if there is at least one element in the queue of the given key.
+     *
+     * @param key the key to check
+     * @return true if there is at least one element in the queue of the given key
+     */
     public synchronized boolean hasAny(CacheKey key) {
-        return data.containsKey(key) && !data.get(key).isEmpty();
+        return this.data.containsKey(key) && !data.get(key).isEmpty();
     }
 
+    /**
+     * Returns the first element of the queue of the given key.
+     *
+     * @param key the key to check
+     * @return the first element of the queue of the given key
+     */
     public synchronized ConsumerRecord<K, MessageWrapper<V>> poll(CacheKey key) {
-        return data.get(key).poll();
+        return this.data.get(key).poll();
     }
 
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        data.entrySet().stream()
+        this.data.entrySet().stream()
                 .sorted((e1, e2) -> CacheKey.compare(e1.getKey(), e2.getKey()))
                 .map(e -> Map.entry(e.getKey(), e.getValue().stream().map(ConsumerRecord::key).collect(Collectors.toList())))
                 .forEach(sb::append);
@@ -124,9 +149,15 @@ class Cache<K, V> {
     }
 
     public synchronized Set<CacheKey> getKeys() {
-        return new HashSet<>(data.keySet());
+        return new HashSet<>(this.data.keySet());
     }
 
+    /**
+     * Clears the queue of the given key and returns all the elements.
+     *
+     * @param key the key to check
+     * @return all the elements of the queue of the given key
+     */
     public synchronized List<ConsumerRecord<K, MessageWrapper<V>>> drain(CacheKey key) {
         Queue<ConsumerRecord<K, MessageWrapper<V>>> queue = data.get(key);
         ArrayList<ConsumerRecord<K, MessageWrapper<V>>> res = new ArrayList<>(queue);

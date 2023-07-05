@@ -32,9 +32,11 @@ public class Validator<K extends Integer, V extends String> {
      */
     public Map<TopicPartition, List<ConsumerRecord<K, V>>> verify(List<SecureIdentifier> sids) {
         Map<TopicPartition, List<ConsumerRecord<K, V>>> map = new HashMap<>();
-        for (var sid : sids) {
+        for (SecureIdentifier sid : sids) {
             List<ConsumerRecord<K, V>> list = map.computeIfAbsent(sid.topicPartition(), tp -> new LinkedList<>());
+            System.out.println("[VALIDATOR] SID TP: " + sid.topicPartition() + " SID SENDER ID: " + sid.senderId());
             List<ConsumerRecord<K, MessageWrapper<V>>> elems = kafkaPollingThread.poll(sid.topicPartition(), sid.senderId(), KAFKA_POLL_TIMEOUT);
+            System.out.println("[VALIDATOR] ELEMS SIZE: " + elems.size());
             for (ConsumerRecord<K, MessageWrapper<V>> record : elems) {
                 if (sid.checkProof(record)) {
                     MessageWrapper<V> wrapper = record.value();

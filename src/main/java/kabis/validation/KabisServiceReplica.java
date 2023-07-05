@@ -7,15 +7,14 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.security.Security;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-
-import static kabis.validation.KabisServiceReplica.deserializeSidList;
-import static kabis.validation.KabisServiceReplica.serializeSidList;
 
 public class KabisServiceReplica extends DefaultSingleRecoverable {
 
@@ -35,10 +34,10 @@ public class KabisServiceReplica extends DefaultSingleRecoverable {
 
     @Override
     public byte[] appExecuteOrdered(byte[] bytes, MessageContext messageContext) {
-        try (var cmd = new ByteArrayInputStream(bytes)){
+        try (var cmd = new ByteArrayInputStream(bytes)) {
             var opOrdinal = cmd.read();
             var op = OPS.values()[opOrdinal];
-            switch (op){
+            switch (op) {
                 case PUSH:
                     push(cmd.readAllBytes());
                     return new byte[0];
@@ -46,7 +45,7 @@ public class KabisServiceReplica extends DefaultSingleRecoverable {
                     var index = ByteBuffer.wrap(cmd.readNBytes(Integer.BYTES)).getInt();
                     return pull(index);
                 default:
-                    throw new IllegalArgumentException(String.format("Illegal ordered operation requested: %s",op));
+                    throw new IllegalArgumentException(String.format("Illegal ordered operation requested: %s", op));
             }
         } catch (IOException e) {
             throw new SerializationException(e);
@@ -55,7 +54,7 @@ public class KabisServiceReplica extends DefaultSingleRecoverable {
 
     @Override
     public byte[] appExecuteUnordered(byte[] bytes, MessageContext messageContext) {
-        try (var cmd = new ByteArrayInputStream(bytes)){
+        try (var cmd = new ByteArrayInputStream(bytes)) {
             var opOrdinal = cmd.read();
             if (opOrdinal == OPS.PULL.ordinal()) {
                 var index = ByteBuffer.wrap(cmd.readNBytes(Integer.BYTES)).getInt();
@@ -67,8 +66,8 @@ public class KabisServiceReplica extends DefaultSingleRecoverable {
         }
     }
 
-    public KabisServiceReplica(int id){
-        new bftsmart.tom.ServiceReplica(id,this,this);
+    public KabisServiceReplica(int id) {
+        new bftsmart.tom.ServiceReplica(id, this, this);
     }
 
     public static void main(String[] args) {
@@ -81,15 +80,15 @@ public class KabisServiceReplica extends DefaultSingleRecoverable {
         new KabisServiceReplica(processId);
     }
 
-    private void push(byte[] serializedSid){
+    private void push(byte[] serializedSid) {
         var sid = SecureIdentifier.deserialize(serializedSid);
         synchronized (log) {
             log.add(sid);
         }
     }
 
-    private byte[] pull(int index){
-        if(index>log.size()) return new byte[0];
+    private byte[] pull(int index) {
+        if (index > log.size()) return new byte[0];
         List<SecureIdentifier> logPortion;
         synchronized (log) {
             logPortion = new ArrayList<>(log.subList(index, log.size()));
@@ -97,9 +96,9 @@ public class KabisServiceReplica extends DefaultSingleRecoverable {
         return serializeSidList(logPortion);
     }
 
-    public static byte[] serializeSidList(List<SecureIdentifier> subLog){
-        try(var bytes = new ByteArrayOutputStream()) {
-            for (var sid: subLog){
+    public static byte[] serializeSidList(List<SecureIdentifier> subLog) {
+        try (var bytes = new ByteArrayOutputStream()) {
+            for (var sid : subLog) {
                 var serialized = sid.serialize();
                 bytes.writeBytes(ByteBuffer.allocate(Integer.BYTES).putInt(serialized.length).array());
                 bytes.writeBytes(serialized);
@@ -110,12 +109,12 @@ public class KabisServiceReplica extends DefaultSingleRecoverable {
         }
     }
 
-    public static List<SecureIdentifier> deserializeSidList(byte[] serialized){
-        try (var bytes = new ByteArrayInputStream(serialized)){
+    public static List<SecureIdentifier> deserializeSidList(byte[] serialized) {
+        try (ByteArrayInputStream bytes = new ByteArrayInputStream(serialized)) {
             List<SecureIdentifier> res = new LinkedList<>();
-            while (bytes.available()>0){
-                var len = ByteBuffer.wrap(bytes.readNBytes(Integer.BYTES)).getInt();
-                var serializedSid = bytes.readNBytes(len);
+            while (bytes.available() > 0) {
+                int len = ByteBuffer.wrap(bytes.readNBytes(Integer.BYTES)).getInt();
+                byte[] serializedSid = bytes.readNBytes(len);
                 res.add(SecureIdentifier.deserialize(serializedSid));
             }
             return res;
