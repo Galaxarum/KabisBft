@@ -2,6 +2,7 @@ package kabis.consumer;
 
 import kabis.storage.MessageWrapper;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.TopicPartition;
 
@@ -13,15 +14,20 @@ public class KafkaPollingThread<K, V> {
     private final List<KafkaConsumer<K, MessageWrapper<V>>> consumers;
     private final List<Cache<K, V>> caches;
 
+    /**
+     * Creates a new KafkaPollingThread.
+     *
+     * @param properties the properties to be used by the KafkaPollingThread
+     */
     public KafkaPollingThread(Properties properties) {
-        var bootstrapServers = properties.getProperty("bootstrap.servers").split(";");
-        var consumers = new ArrayList<KafkaConsumer<K, MessageWrapper<V>>>(bootstrapServers.length);
+        String[] bootstrapServers = properties.getProperty("bootstrap.servers").split(";");
+        ArrayList<KafkaConsumer<K, MessageWrapper<V>>> consumers = new ArrayList<>(bootstrapServers.length);
         this.caches = new ArrayList<>(bootstrapServers.length);
         for (int i = 0; i < bootstrapServers.length; i++) {
-            String server = bootstrapServers[i];
-            var id = String.format("%s-consumer-%d", properties.getProperty("client.id"), i);
-            var simplerProperties = (Properties) properties.clone();
-            simplerProperties.put("bootstrap.servers", server);
+            String servers = bootstrapServers[i];
+            String id = String.format("%s-consumer-%d", properties.getProperty("client.id"), i);
+            Properties simplerProperties = (Properties) properties.clone();
+            simplerProperties.put("bootstrap.servers", servers);
             simplerProperties.put("client.id", id);
             consumers.add(new KafkaConsumer<>(simplerProperties));
             caches.add(new Cache<>());
@@ -30,10 +36,10 @@ public class KafkaPollingThread<K, V> {
     }
 
     public synchronized List<ConsumerRecord<K, MessageWrapper<V>>> poll(TopicPartition tp, int producerId, Duration timeout) {
-        var cacheKey = new CacheKey(tp, producerId);
-        var res = new ArrayList<ConsumerRecord<K, MessageWrapper<V>>>(caches.size());
+        CacheKey cacheKey = new CacheKey(tp, producerId);
+        ArrayList<ConsumerRecord<K, MessageWrapper<V>>> res = new ArrayList<>(caches.size());
         for (int replicaIndex = 0; replicaIndex < caches.size(); replicaIndex++) {
-            var cache = caches.get(replicaIndex);
+            Cache<K, V> cache = caches.get(replicaIndex);
             while (!cache.hasAny(cacheKey)) {
                 pullKafka(replicaIndex, timeout);
             }
@@ -43,27 +49,27 @@ public class KafkaPollingThread<K, V> {
     }
 
     private void pullKafka(int replicaIndex, Duration timeout) {
-        var records = consumers.get(replicaIndex).poll(timeout);
-        var cache = caches.get(replicaIndex);
+        ConsumerRecords<K, MessageWrapper<V>> records = consumers.get(replicaIndex).poll(timeout);
+        Cache<K, V> cache = caches.get(replicaIndex);
         for (var record : records) {
-            var tp = new TopicPartition(record.topic(), record.partition());
-            var key = new CacheKey(tp, record.value().getSenderId());
+            TopicPartition tp = new TopicPartition(record.topic(), record.partition());
+            CacheKey key = new CacheKey(tp, record.value().getSenderId());
             cache.offer(key, record);
         }
     }
 
     public synchronized Map<TopicPartition, List<ConsumerRecord<K, V>>> pollUnvalidated(Collection<String> excludedTopics, Duration timeout) {
         pullKafka(0, timeout);
-        var cache = caches.get(0);
+        Cache<K, V> cache = caches.get(0);
 
-        var validTPs = cache.getKeys();
+        Set<CacheKey> validTPs = cache.getKeys();
         validTPs.removeIf(k -> excludedTopics.contains(k.topicPartition.topic()));
         if (validTPs.isEmpty()) return Map.of();
 
-        var map = new HashMap<TopicPartition, List<ConsumerRecord<K, V>>>();
-        for (var tp : validTPs) {
-            var queue = cache.drain(tp);
-            var list = map.computeIfAbsent(tp.topicPartition, ignored -> new LinkedList<>());
+        HashMap<TopicPartition, List<ConsumerRecord<K, V>>> map = new HashMap<>();
+        for (CacheKey tp : validTPs) {
+            List<ConsumerRecord<K, MessageWrapper<V>>> queue = cache.drain(tp);
+            List<ConsumerRecord<K, V>> list = map.computeIfAbsent(tp.topicPartition, ignored -> new LinkedList<>());
             //TODO: new ConsumerRecord<> is not adding the headers and timestamp
             list.addAll(queue.stream()
                     .map(cr -> new ConsumerRecord<>(cr.topic(), cr.partition(), cr.offset(), cr.key(), cr.value().getValue()))
@@ -95,7 +101,7 @@ class Cache<K, V> {
 
     public synchronized void offer(CacheKey key, ConsumerRecord<K, MessageWrapper<V>> value) {
         if (!data.containsKey(key)) data.put(key, new LinkedList<>());
-        var queue = data.get(key);
+        Queue<ConsumerRecord<K, MessageWrapper<V>>> queue = data.get(key);
         queue.offer(value);
     }
 
@@ -122,8 +128,8 @@ class Cache<K, V> {
     }
 
     public synchronized List<ConsumerRecord<K, MessageWrapper<V>>> drain(CacheKey key) {
-        var queue = data.get(key);
-        var res = new ArrayList<>(queue);
+        Queue<ConsumerRecord<K, MessageWrapper<V>>> queue = data.get(key);
+        ArrayList<ConsumerRecord<K, MessageWrapper<V>>> res = new ArrayList<>(queue);
         queue.clear();
         return res;
     }
@@ -140,9 +146,9 @@ class CacheKey {
     }
 
     public static int compare(CacheKey o1, CacheKey o2) {
-        var compareProducer = Integer.compare(o1.producerId, o2.producerId);
+        int compareProducer = Integer.compare(o1.producerId, o2.producerId);
         if (compareProducer != 0) return compareProducer;
-        var compareTopic = o1.topicPartition.topic().compareTo(o2.topicPartition.topic());
+        int compareTopic = o1.topicPartition.topic().compareTo(o2.topicPartition.topic());
         if (compareTopic != 0) return compareTopic;
         return Integer.compare(o1.topicPartition.partition(), o2.topicPartition.partition());
     }

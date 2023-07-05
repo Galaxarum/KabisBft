@@ -19,7 +19,7 @@ public class KabisProducer<K extends Integer, V extends String> implements Kabis
     private final int clientId;
 
     /**
-     * Creates a new KabisProducer.
+     * Creates a new Kabis Producer.
      *
      * @param properties the properties to be used by the Kabis producer
      */
@@ -35,9 +35,7 @@ public class KabisProducer<K extends Integer, V extends String> implements Kabis
             simplerProperties.put("bootstrap.servers", servers);
             simplerProperties.put("client.id", id);
             this.kafkaProducers.add(new KafkaProducer<>(simplerProperties));
-
         }
-        System.out.println("[SafeSense] List of kafka producers: " + this.kafkaProducers);
         this.serviceProxy = new KabisServiceProxy(this.clientId);
     }
 
@@ -84,9 +82,8 @@ public class KabisProducer<K extends Integer, V extends String> implements Kabis
         V value = record.value();
         K key = record.key();
         MessageWrapper<V> wrappedValue = new MessageWrapper<>(value, this.clientId);
-        ProducerRecord<K, MessageWrapper<V>> wrappedRecord = new ProducerRecord<>(record.topic(), record.partition(), record.timestamp(), record.key(), wrappedValue, record.headers());
-        //TODO: Remove this print
-        System.out.println("Pushing validated record: " + wrappedRecord);
+        ProducerRecord<K, MessageWrapper<V>> wrappedRecord = new ProducerRecord<>(record.topic(), record.partition(),
+                record.timestamp(), record.key(), wrappedValue, record.headers());
 
         CompletableFuture<RecordMetadata>[] completableFutures = kafkaProducers.stream().map(prod -> {
             CompletableFuture<RecordMetadata> future = new CompletableFuture<>();
@@ -104,6 +101,8 @@ public class KabisProducer<K extends Integer, V extends String> implements Kabis
                     int partition = metadata.partition();
                     SecureIdentifier sid = SecureIdentifier.factory(key, value, topic, partition, this.clientId);
                     serviceProxy.push(sid);
+                    //TODO: Remove this print
+                    System.out.println("Pushing SID: " + sid);
                 }).join();
         CompletableFuture.allOf(completableFutures).join();
     }
@@ -118,7 +117,8 @@ public class KabisProducer<K extends Integer, V extends String> implements Kabis
      */
     private void pushUnvalidated(ProducerRecord<K, V> record) {
         MessageWrapper<V> wrappedValue = new MessageWrapper<>(record.value());
-        ProducerRecord<K, MessageWrapper<V>> wrappedRecord = new ProducerRecord<>(record.topic(), record.partition(), record.timestamp(), record.key(), wrappedValue, record.headers());
+        ProducerRecord<K, MessageWrapper<V>> wrappedRecord = new ProducerRecord<>(record.topic(), record.partition(),
+                record.timestamp(), record.key(), wrappedValue, record.headers());
         kafkaProducers.get(0).send(wrappedRecord);
     }
 
