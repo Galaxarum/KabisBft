@@ -18,6 +18,9 @@ public class KabisConsumer<K extends Integer, V extends String> implements Kabis
     private final KafkaPollingThread<K, V> kafkaPollingThread;
     private final Validator<K, V> validator;
 
+    //TODO: REMOVE THIS
+    public int counter = 0;
+
     /**
      * Creates a new KabisConsumer.
      *
@@ -60,6 +63,8 @@ public class KabisConsumer<K extends Integer, V extends String> implements Kabis
         //TODO: Remove all the prints
         List<SecureIdentifier> sids = serviceProxy.pull();
         System.out.printf("[" + this.getClass().getName() + "] Received %d sids%n", sids.size());
+        counter += sids.size();
+        System.out.println("[" + this.getClass().getName() + "] Total SIDS until now: " + counter);
 
         Map<TopicPartition, List<ConsumerRecord<K, V>>> validatedRecords = validator.verify(sids);
         System.out.printf("[" + this.getClass().getName() + "] Received %d validated records%n", validatedRecords.values().stream().map(List::size).reduce(Integer::sum).orElse(-1));

@@ -56,6 +56,7 @@ public abstract class ArtExhibitionConsumer extends ArtExhibitionClient {
             for (ConsumerRecord<Integer, String> record : records) {
                 i += 1;
                 System.out.println("[pollAndMeasure]: Received " + record.value() + " exhibition: " + record.partition());
+                System.out.println("[pollAndMeasure]: Total VALIDATED RECORDS until now: " + i);
             }
             //i += consumer.poll(POLL_TIMEOUT).count();
         }
