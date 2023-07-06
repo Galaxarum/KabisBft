@@ -80,6 +80,13 @@ public class KafkaPollingThread<K, V> {
         }
     }
 
+    /**
+     * Polls for records from each Kafka replica, and returns a list of records from each replica.
+     *
+     * @param excludedTopics The validated topics that must be excluded from the unvalidated polling
+     * @param timeout        The maximum time to block (must not be greater than Long.MAX_VALUE milliseconds)
+     * @return the consumer records grouped by partition
+     */
     public synchronized Map<TopicPartition, List<ConsumerRecord<K, V>>> pollUnvalidated(Collection<String> excludedTopics, Duration timeout) {
         pullKafka(0, timeout);
         Cache<K, V> cache = this.cacheReplicas.get(0);
