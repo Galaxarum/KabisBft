@@ -72,7 +72,7 @@ public class KeyStoreHelper {
             throw new CrypthographyException("Error computing signature", e);
         }
     }
-
+    
     /**
      * Verifies the signature of a value, using the public key of the signer.
      *
