@@ -31,7 +31,7 @@ public class KabisConsumer<K extends Integer, V extends String> implements Kabis
         int clientId = Integer.parseInt(properties.getProperty("client.id"));
         this.serviceProxy = new KabisServiceProxy(clientId);
         this.kafkaPollingThread = new KafkaPollingThread<>(properties);
-        this.validator = new Validator<>(kafkaPollingThread);
+        this.validator = new Validator<>(this.kafkaPollingThread);
     }
 
     /**
@@ -41,7 +41,7 @@ public class KabisConsumer<K extends Integer, V extends String> implements Kabis
      */
     @Override
     public void subscribe(Collection<String> topics) {
-        kafkaPollingThread.subscribe(topics);
+        this.kafkaPollingThread.subscribe(topics);
     }
 
     /**
@@ -49,7 +49,7 @@ public class KabisConsumer<K extends Integer, V extends String> implements Kabis
      */
     @Override
     public void unsubscribe() {
-        kafkaPollingThread.unsubscribe();
+        this.kafkaPollingThread.unsubscribe();
     }
 
     /**

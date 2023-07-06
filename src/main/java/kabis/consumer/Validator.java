@@ -43,7 +43,7 @@ public class Validator<K extends Integer, V extends String> {
                     //TODO: Remove this print
                     System.out.println("[VALIDATOR] SID VALIDATED");
                     MessageWrapper<V> wrapper = record.value();
-                    //TODO: Add timestamp to the constructor, has of now it is reset to the current time
+                    //TODO: Add timestamp to the constructor, as of now it is reset to the current time
                     ConsumerRecord<K, V> deserializedRecord = new ConsumerRecord<>(record.topic(), record.partition(), record.offset(), record.key(), wrapper.getValue());
                     record.headers().forEach(h -> deserializedRecord.headers().add(h));
                     topicPartitionValidatedRecords.add(deserializedRecord);
