@@ -39,7 +39,7 @@ public class KabisServiceProxy {
      * @param sid The SecureIdentifier to push
      */
     public void push(SecureIdentifier sid) {
-        try (var bytes = new ByteArrayOutputStream()) {
+        try (ByteArrayOutputStream bytes = new ByteArrayOutputStream()) {
             bytes.write(OPS.PUSH.ordinal());
             bytes.writeBytes(sid.serialize());
             this.bftServiceProxy.invokeOrdered(bytes.toByteArray());
@@ -59,11 +59,11 @@ public class KabisServiceProxy {
      * @return A list of SecureIdentifiers
      */
     public List<SecureIdentifier> pull() {
-        try (var bytes = new ByteArrayOutputStream()) {
+        try (ByteArrayOutputStream bytes = new ByteArrayOutputStream()) {
             bytes.write(OPS.PULL.ordinal());
             bytes.writeBytes(ByteBuffer.allocate(Integer.BYTES).putInt(this.nextPullIndex).array());
-            var request = bytes.toByteArray();
-            var responseBytes = this.orderedPulls ?
+            byte[] request = bytes.toByteArray();
+            byte[] responseBytes = this.orderedPulls ?
                     this.bftServiceProxy.invokeOrdered(request) :
                     this.bftServiceProxy.invokeUnordered(request);
             if (responseBytes == null || responseBytes.length == 0) {
@@ -74,7 +74,7 @@ public class KabisServiceProxy {
                 }
                 return List.of();
             }
-            var result = KabisServiceReplica.deserializeSidList(responseBytes);
+            List<SecureIdentifier> result = KabisServiceReplica.deserializeSidList(responseBytes);
             //TODO: Remove this print
             System.out.println("Pulled " + result.size() + " SIDs, nextPullIndex = " + this.nextPullIndex);
             this.nextPullIndex += result.size();
