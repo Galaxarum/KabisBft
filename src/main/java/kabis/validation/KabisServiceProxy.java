@@ -74,6 +74,7 @@ public class KabisServiceProxy {
                 }
                 return List.of();
             }
+            //TODO: Should deserializeSidList be decoupled from KabisServiceReplica?
             List<SecureIdentifier> result = KabisServiceReplica.deserializeSidList(responseBytes);
             //TODO: Remove this print
             System.out.println("Pulled " + result.size() + " SIDs, nextPullIndex = " + this.nextPullIndex);

@@ -120,22 +120,24 @@ public class KabisServiceReplica extends DefaultSingleRecoverable {
      */
     private byte[] pull(int index) {
         if (index > this.secureIdentifierList.size()) return new byte[0];
-        List<SecureIdentifier> logPortion;
+        List<SecureIdentifier> secureIdentifierSubList;
         synchronized (this.secureIdentifierList) {
-            logPortion = new ArrayList<>(this.secureIdentifierList.subList(index, this.secureIdentifierList.size()));
+            secureIdentifierSubList = new ArrayList<>(this.secureIdentifierList.subList(index, this.secureIdentifierList.size()));
+            //TODO: Remove this print
+            System.out.println("[KabisServiceReplica] PULL REQUEST FROM INDEX: " + index + " TO INDEX: " + this.secureIdentifierList.size());
         }
-        return serializeSidList(logPortion);
+        return serializeSidList(secureIdentifierSubList);
     }
 
     /**
      * Serializes a list of SecureIdentifiers to a byte array.
      *
-     * @param subLog the list of SecureIdentifiers to serialize.
+     * @param sidList the list of SecureIdentifiers to serialize.
      * @return the serialized list of SecureIdentifiers.
      */
-    public static byte[] serializeSidList(List<SecureIdentifier> subLog) {
+    public static byte[] serializeSidList(List<SecureIdentifier> sidList) {
         try (ByteArrayOutputStream bytes = new ByteArrayOutputStream()) {
-            for (SecureIdentifier sid : subLog) {
+            for (SecureIdentifier sid : sidList) {
                 byte[] serialized = sid.serialize();
                 bytes.writeBytes(ByteBuffer.allocate(Integer.BYTES).putInt(serialized.length).array());
                 bytes.writeBytes(serialized);
