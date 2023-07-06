@@ -123,8 +123,6 @@ public class KabisServiceReplica extends DefaultSingleRecoverable {
         List<SecureIdentifier> secureIdentifierSubList;
         synchronized (this.secureIdentifierList) {
             secureIdentifierSubList = new ArrayList<>(this.secureIdentifierList.subList(index, this.secureIdentifierList.size()));
-            //TODO: Remove this print
-            System.out.println("[KabisServiceReplica] PULL REQUEST FROM INDEX: " + index + " TO INDEX: " + this.secureIdentifierList.size());
         }
         return serializeSidList(secureIdentifierSubList);
     }

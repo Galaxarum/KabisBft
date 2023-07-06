@@ -101,8 +101,6 @@ public class KabisProducer<K extends Integer, V extends String> implements Kabis
                     int partition = metadata.partition();
                     SecureIdentifier sid = SecureIdentifier.factory(key, value, topic, partition, this.clientId);
                     this.serviceProxy.push(sid);
-                    //TODO: Remove this print
-                    System.out.println("Pushing SID: " + sid);
                 }).join();
         CompletableFuture.allOf(completableFutures).join();
     }

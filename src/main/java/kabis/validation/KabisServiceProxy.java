@@ -62,6 +62,8 @@ public class KabisServiceProxy {
         try (ByteArrayOutputStream bytes = new ByteArrayOutputStream()) {
             bytes.write(OPS.PULL.ordinal());
             bytes.writeBytes(ByteBuffer.allocate(Integer.BYTES).putInt(this.nextPullIndex).array());
+            //TODO: Remove this print
+            System.out.println("Sending poll request, nextPullIndex = " + this.nextPullIndex);
             byte[] request = bytes.toByteArray();
             byte[] responseBytes = this.orderedPulls ?
                     this.bftServiceProxy.invokeOrdered(request) :
@@ -76,9 +78,9 @@ public class KabisServiceProxy {
             }
             //TODO: Should deserializeSidList be decoupled from KabisServiceReplica?
             List<SecureIdentifier> result = KabisServiceReplica.deserializeSidList(responseBytes);
+            this.nextPullIndex += result.size();
             //TODO: Remove this print
             System.out.println("Pulled " + result.size() + " SIDs, nextPullIndex = " + this.nextPullIndex);
-            this.nextPullIndex += result.size();
             return result;
         } catch (IOException e) {
             throw new SerializationException(e);
