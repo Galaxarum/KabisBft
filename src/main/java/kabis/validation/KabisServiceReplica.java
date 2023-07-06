@@ -21,10 +21,24 @@ public class KabisServiceReplica extends DefaultSingleRecoverable {
     private static final Logger LOG = LoggerFactory.getLogger(KabisServiceReplica.class);
     private final List<SecureIdentifier> log = new LinkedList<>();
 
+    public KabisServiceReplica(int id) {
+        new bftsmart.tom.ServiceReplica(id, this, this);
+    }
+
+    public static void main(String[] args) {
+        if (args.length != 1) {
+            LOG.error("USAGE: {} <process id>", KabisServiceReplica.class.getCanonicalName());
+            System.exit(-1);
+        }
+        Security.addProvider(new BouncyCastleProvider());
+        int processId = Integer.parseInt(args[0]);
+        new KabisServiceReplica(processId);
+    }
+
     @Override
     public void installSnapshot(byte[] bytes) {
-        log.clear();
-        log.addAll(deserializeSidList(bytes));
+        this.log.clear();
+        this.log.addAll(deserializeSidList(bytes));
     }
 
     @Override
@@ -66,32 +80,18 @@ public class KabisServiceReplica extends DefaultSingleRecoverable {
         }
     }
 
-    public KabisServiceReplica(int id) {
-        new bftsmart.tom.ServiceReplica(id, this, this);
-    }
-
-    public static void main(String[] args) {
-        if (args.length != 1) {
-            LOG.error("USAGE: {} <process id>", KabisServiceReplica.class.getCanonicalName());
-            System.exit(-1);
-        }
-        Security.addProvider(new BouncyCastleProvider());
-        int processId = Integer.parseInt(args[0]);
-        new KabisServiceReplica(processId);
-    }
-
     private void push(byte[] serializedSid) {
         var sid = SecureIdentifier.deserialize(serializedSid);
-        synchronized (log) {
-            log.add(sid);
+        synchronized (this.log) {
+            this.log.add(sid);
         }
     }
 
     private byte[] pull(int index) {
-        if (index > log.size()) return new byte[0];
+        if (index > this.log.size()) return new byte[0];
         List<SecureIdentifier> logPortion;
-        synchronized (log) {
-            logPortion = new ArrayList<>(log.subList(index, log.size()));
+        synchronized (this.log) {
+            logPortion = new ArrayList<>(this.log.subList(index, this.log.size()));
         }
         return serializeSidList(logPortion);
     }

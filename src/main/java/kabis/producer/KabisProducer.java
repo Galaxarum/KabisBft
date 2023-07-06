@@ -59,8 +59,8 @@ public class KabisProducer<K extends Integer, V extends String> implements Kabis
      */
     @Override
     public void push(ProducerRecord<K, V> record) {
-        synchronized (validatedTopics) {
-            if (validatedTopics.contains(record.topic())) {
+        synchronized (this.validatedTopics) {
+            if (this.validatedTopics.contains(record.topic())) {
                 pushValidated(record);
             } else {
                 pushUnvalidated(record);
@@ -85,7 +85,7 @@ public class KabisProducer<K extends Integer, V extends String> implements Kabis
         ProducerRecord<K, MessageWrapper<V>> wrappedRecord = new ProducerRecord<>(record.topic(), record.partition(),
                 record.timestamp(), record.key(), wrappedValue, record.headers());
 
-        CompletableFuture<RecordMetadata>[] completableFutures = kafkaProducers.stream().map(prod -> {
+        CompletableFuture<RecordMetadata>[] completableFutures = this.kafkaProducers.stream().map(prod -> {
             CompletableFuture<RecordMetadata> future = new CompletableFuture<>();
             prod.send(wrappedRecord, ((metadata, exception) -> {
                 if (exception == null) future.complete(metadata);
@@ -100,7 +100,7 @@ public class KabisProducer<K extends Integer, V extends String> implements Kabis
                     String topic = metadata.topic();
                     int partition = metadata.partition();
                     SecureIdentifier sid = SecureIdentifier.factory(key, value, topic, partition, this.clientId);
-                    serviceProxy.push(sid);
+                    this.serviceProxy.push(sid);
                     //TODO: Remove this print
                     System.out.println("Pushing SID: " + sid);
                 }).join();
@@ -119,7 +119,7 @@ public class KabisProducer<K extends Integer, V extends String> implements Kabis
         MessageWrapper<V> wrappedValue = new MessageWrapper<>(record.value());
         ProducerRecord<K, MessageWrapper<V>> wrappedRecord = new ProducerRecord<>(record.topic(), record.partition(),
                 record.timestamp(), record.key(), wrappedValue, record.headers());
-        kafkaProducers.get(0).send(wrappedRecord);
+        this.kafkaProducers.get(0).send(wrappedRecord);
     }
 
     /**
@@ -127,7 +127,7 @@ public class KabisProducer<K extends Integer, V extends String> implements Kabis
      */
     @Override
     public void flush() {
-        kafkaProducers.forEach(KafkaProducer::flush);
+        this.kafkaProducers.forEach(KafkaProducer::flush);
     }
 
     /**
@@ -135,7 +135,7 @@ public class KabisProducer<K extends Integer, V extends String> implements Kabis
      */
     @Override
     public void close() {
-        kafkaProducers.forEach(KafkaProducer::close);
+        this.kafkaProducers.forEach(KafkaProducer::close);
     }
 
     /**
@@ -145,6 +145,6 @@ public class KabisProducer<K extends Integer, V extends String> implements Kabis
      */
     @Override
     public void close(Duration duration) {
-        kafkaProducers.forEach(p -> p.close(duration));
+        this.kafkaProducers.forEach(p -> p.close(duration));
     }
 }

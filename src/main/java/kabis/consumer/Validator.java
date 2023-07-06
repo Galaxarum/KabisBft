@@ -36,7 +36,7 @@ public class Validator<K extends Integer, V extends String> {
             List<ConsumerRecord<K, V>> topicPartitionValidatedRecords = mapTopicPartitionValidatedRecords.computeIfAbsent(sid.getTopicPartition(), tp -> new LinkedList<>());
             //TODO: Remove this print
             System.out.println("[VALIDATOR] SID TP: " + sid.getTopicPartition() + " SID SENDER ID: " + sid.getSenderId());
-            List<ConsumerRecord<K, MessageWrapper<V>>> recordsFromDifferentReplicas = kafkaPollingThread.poll(sid.getTopicPartition(), sid.getSenderId(), KAFKA_POLL_TIMEOUT);
+            List<ConsumerRecord<K, MessageWrapper<V>>> recordsFromDifferentReplicas = this.kafkaPollingThread.poll(sid.getTopicPartition(), sid.getSenderId(), this.KAFKA_POLL_TIMEOUT);
 
             for (ConsumerRecord<K, MessageWrapper<V>> record : recordsFromDifferentReplicas) {
                 if (sid.checkProof(record)) {

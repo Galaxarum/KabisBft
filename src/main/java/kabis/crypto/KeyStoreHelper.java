@@ -33,12 +33,12 @@ public class KeyStoreHelper {
             for (File file : files) {
                 String idString = file.getName().replaceAll("publickey|privatekey", "");
                 int id = Integer.parseInt(idString);
-                if (keyPairs.containsKey(id)) continue;
+                if (this.keyPairs.containsKey(id)) continue;
                 ECDSAKeyLoader keyLoader = new ECDSAKeyLoader(id, "config", true, "ECDSA");
                 PrivateKey priK = keyLoader.loadPrivateKey();
                 PublicKey pubK = keyLoader.loadPublicKey();
                 KeyPair kp = new KeyPair(pubK, priK);
-                keyPairs.put(id, kp);
+                this.keyPairs.put(id, kp);
                 System.out.println("Adding keypair for id " + id);
             }
         } catch (Exception e) {
@@ -61,7 +61,7 @@ public class KeyStoreHelper {
         try {
             //TODO: Add support to multiple algorithms
             Signature sign = Signature.getInstance("SHA256withECDSA");
-            sign.initSign(keyPairs.get(signerId).getPrivate());
+            sign.initSign(this.keyPairs.get(signerId).getPrivate());
             sign.update(values);
             return sign.sign();
         } catch (NoSuchAlgorithmException | NullPointerException e) {
@@ -72,7 +72,7 @@ public class KeyStoreHelper {
             throw new CrypthographyException("Error computing signature", e);
         }
     }
-    
+
     /**
      * Verifies the signature of a value, using the public key of the signer.
      *
@@ -85,7 +85,7 @@ public class KeyStoreHelper {
         try {
             //TODO: Add support to multiple algorithms
             Signature signature = Signature.getInstance("SHA256withECDSA");
-            signature.initVerify(keyPairs.get(signerId).getPublic());
+            signature.initVerify(this.keyPairs.get(signerId).getPublic());
             signature.update(value);
             return signature.verify(sign);
         } catch (NoSuchAlgorithmException | NullPointerException e) {

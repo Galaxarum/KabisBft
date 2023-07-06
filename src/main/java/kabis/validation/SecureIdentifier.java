@@ -98,7 +98,7 @@ public abstract class SecureIdentifier {
     }
 
     public TopicPartition getTopicPartition() {
-        return new TopicPartition(topic, partition);
+        return new TopicPartition(this.topic, this.partition);
     }
 
     public int getSenderId() {
@@ -114,16 +114,16 @@ public abstract class SecureIdentifier {
      */
     public byte[] serialize() {
         try (ByteArrayOutputStream bytes = new ByteArrayOutputStream()) {
-            bytes.writeBytes(ByteBuffer.allocate(Integer.BYTES).putInt(proof.length).array());
-            bytes.writeBytes(proof);
+            bytes.writeBytes(ByteBuffer.allocate(Integer.BYTES).putInt(this.proof.length).array());
+            bytes.writeBytes(this.proof);
 
-            byte[] topicBytes = topic.getBytes();
+            byte[] topicBytes = this.topic.getBytes();
             bytes.writeBytes(ByteBuffer.allocate(Integer.BYTES).putInt(topicBytes.length).array());
             bytes.writeBytes(topicBytes);
 
-            bytes.write(partition);
+            bytes.write(this.partition);
 
-            bytes.writeBytes(ByteBuffer.allocate(Integer.BYTES).putInt(senderId).array());
+            bytes.writeBytes(ByteBuffer.allocate(Integer.BYTES).putInt(this.senderId).array());
 
             return bytes.toByteArray();
         } catch (IOException e) {

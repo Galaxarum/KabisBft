@@ -42,7 +42,7 @@ public class KabisServiceProxy {
         try (var bytes = new ByteArrayOutputStream()) {
             bytes.write(OPS.PUSH.ordinal());
             bytes.writeBytes(sid.serialize());
-            bftServiceProxy.invokeOrdered(bytes.toByteArray());
+            this.bftServiceProxy.invokeOrdered(bytes.toByteArray());
         } catch (IOException e) {
             throw new SerializationException(e);
         }
@@ -61,11 +61,11 @@ public class KabisServiceProxy {
     public List<SecureIdentifier> pull() {
         try (var bytes = new ByteArrayOutputStream()) {
             bytes.write(OPS.PULL.ordinal());
-            bytes.writeBytes(ByteBuffer.allocate(Integer.BYTES).putInt(nextPullIndex).array());
+            bytes.writeBytes(ByteBuffer.allocate(Integer.BYTES).putInt(this.nextPullIndex).array());
             var request = bytes.toByteArray();
-            var responseBytes = orderedPulls ?
-                    bftServiceProxy.invokeOrdered(request) :
-                    bftServiceProxy.invokeUnordered(request);
+            var responseBytes = this.orderedPulls ?
+                    this.bftServiceProxy.invokeOrdered(request) :
+                    this.bftServiceProxy.invokeUnordered(request);
             if (responseBytes == null || responseBytes.length == 0) {
                 //TODO: Remove this sleep?
                 try {
@@ -76,8 +76,8 @@ public class KabisServiceProxy {
             }
             var result = KabisServiceReplica.deserializeSidList(responseBytes);
             //TODO: Remove this print
-            System.out.println("Pulled " + result.size() + " SIDs, nextPullIndex = " + nextPullIndex);
-            nextPullIndex += result.size();
+            System.out.println("Pulled " + result.size() + " SIDs, nextPullIndex = " + this.nextPullIndex);
+            this.nextPullIndex += result.size();
             return result;
         } catch (IOException e) {
             throw new SerializationException(e);
