@@ -5,6 +5,9 @@ import kabis.validation.SecureIdentifier;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.common.TopicPartition;
+import org.apache.kafka.common.utils.Utils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.util.*;
@@ -17,7 +20,7 @@ public class KabisConsumer<K extends Integer, V extends String> implements Kabis
     private final KabisServiceProxy serviceProxy;
     private final KafkaPollingThread<K, V> kafkaPollingThread;
     private final Validator<K, V> validator;
-
+    private final Logger log;
     //TODO: REMOVE THIS
     public int counter = 0;
 
@@ -27,6 +30,7 @@ public class KabisConsumer<K extends Integer, V extends String> implements Kabis
      * @param properties the properties to be used by the Kabis consumer
      */
     public KabisConsumer(Properties properties) {
+        this.log = LoggerFactory.getLogger(KabisConsumer.class);
         //TODO: Check if the properties are valid, otherwise throw an exception
         int clientId = Integer.parseInt(properties.getProperty("client.id"));
         this.serviceProxy = new KabisServiceProxy(clientId);
@@ -42,6 +46,7 @@ public class KabisConsumer<K extends Integer, V extends String> implements Kabis
     @Override
     public void subscribe(Collection<String> topics) {
         this.kafkaPollingThread.subscribe(topics);
+        log.info("Subscribed to topic(s): {}", Utils.join(topics, ", "));
     }
 
     /**
@@ -50,6 +55,7 @@ public class KabisConsumer<K extends Integer, V extends String> implements Kabis
     @Override
     public void unsubscribe() {
         this.kafkaPollingThread.unsubscribe();
+        log.info("Unsubscribed from all topics");
     }
 
     /**
@@ -88,6 +94,7 @@ public class KabisConsumer<K extends Integer, V extends String> implements Kabis
     @Override
     public void close() {
         this.kafkaPollingThread.close();
+        log.info("Consumer closed successfully");
     }
 
     /**
@@ -110,6 +117,15 @@ public class KabisConsumer<K extends Integer, V extends String> implements Kabis
         synchronized (this.validatedTopics) {
             this.validatedTopics.clear();
             this.validatedTopics.addAll(validatedTopics);
+
+            //TODO: Check if all validated topics are assigned to the consumer
+            //TODO: Catch exception and log error
+            //List<TopicPartition> assignedPartitions = this.kafkaPollingThread.getAssignedPartitions();
+            // Check if all validated topics are assigned to the consumer (if not, throw an exception)
+            //if (validatedTopics.stream().noneMatch(topic -> assignedPartitions.stream().noneMatch(topicPartition -> topicPartition.topic().equals(topic))))
+            //throw new RuntimeException("Not all validated topics are assigned to the consumer!");
+            //this.log.info("Updated partitions assigned to the consumer for validated topics: {}", Utils.join(assignedPartitions, ", "));
         }
+        this.log.info("Updated validated topics: {}", Utils.join(validatedTopics, ", "));
     }
 }

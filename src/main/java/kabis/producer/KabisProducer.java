@@ -6,6 +6,9 @@ import kabis.validation.SecureIdentifier;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
+import org.apache.kafka.common.utils.Utils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.util.*;
@@ -17,6 +20,7 @@ public class KabisProducer<K extends Integer, V extends String> implements Kabis
     private final List<KafkaProducer<K, MessageWrapper<V>>> kafkaProducers;
     private final KabisServiceProxy serviceProxy;
     private final int clientId;
+    private final Logger log;
 
     /**
      * Creates a new Kabis Producer.
@@ -24,6 +28,7 @@ public class KabisProducer<K extends Integer, V extends String> implements Kabis
      * @param properties the properties to be used by the Kabis producer
      */
     public KabisProducer(Properties properties) {
+        this.log = LoggerFactory.getLogger(KabisProducer.class);
         //TODO: Improve the regex + check if the properties are valid, otherwise throw an exception
         String[] serversReplicas = properties.getProperty("bootstrap.servers").split(";");
         this.clientId = Integer.parseInt(properties.getProperty("client.id"));
@@ -50,6 +55,7 @@ public class KabisProducer<K extends Integer, V extends String> implements Kabis
             this.validatedTopics.clear();
             this.validatedTopics.addAll(validatedTopics);
         }
+        log.info("Updated topology: {}", Utils.join(validatedTopics, ", "));
     }
 
     /**
@@ -134,6 +140,7 @@ public class KabisProducer<K extends Integer, V extends String> implements Kabis
     @Override
     public void close() {
         this.kafkaProducers.forEach(KafkaProducer::close);
+        this.log.info("Producer closed successfully");
     }
 
     /**
@@ -144,5 +151,6 @@ public class KabisProducer<K extends Integer, V extends String> implements Kabis
     @Override
     public void close(Duration duration) {
         this.kafkaProducers.forEach(p -> p.close(duration));
+        this.log.info("Producer closed successfully");
     }
 }
