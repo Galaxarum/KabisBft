@@ -3,6 +3,7 @@ package kabis.art_exhibition;
 import kabis.producer.KabisProducer;
 
 import java.util.Arrays;
+import java.util.Properties;
 
 import static java.lang.Integer.parseInt;
 
@@ -24,7 +25,10 @@ public class SafeSense extends ArtExhibitionProducer {
     }
 
     private void run() {
-        KabisProducer<Integer, String> safeSenseProducer = new KabisProducer<>(getProperties());
+        Properties properties = readProperties();
+        properties.setProperty("client.id", String.valueOf(getClientId()));
+
+        KabisProducer<Integer, String> safeSenseProducer = new KabisProducer<>(properties);
         safeSenseProducer.updateTopology(TOPICS);
         System.out.println("[SafeSense] Kabis Producer created");
 

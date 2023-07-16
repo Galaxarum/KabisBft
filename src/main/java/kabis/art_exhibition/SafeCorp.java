@@ -35,21 +35,25 @@ public class SafeCorp extends ArtExhibitionProducer {
     }
 
     private void run() {
-        Properties properties = getProperties();
+        Properties consumerProperties = readProperties("consumer.config.properties");
+        consumerProperties.setProperty("client.id", String.valueOf(getClientId()));
 
-        KabisConsumer<Integer, String> safeCorpConsumer = new KabisConsumer<>(properties);
+        Properties producerProperties = readProperties("producer.config.properties");
+        producerProperties.setProperty("client.id", String.valueOf(getClientId()));
+
+        KabisConsumer<Integer, String> safeCorpConsumer = new KabisConsumer<>(consumerProperties);
         safeCorpConsumer.subscribe(TOPICS);
         safeCorpConsumer.updateTopology(TOPICS);
         System.out.println("[SafeCorp] Kabis Consumer created");
 
-        KabisProducer<Integer, String> safeCorpProducer = new KabisProducer<>(properties);
+        KabisProducer<Integer, String> safeCorpProducer = new KabisProducer<>(producerProperties);
         safeCorpProducer.updateTopology(TOPICS);
         System.out.println("[SafeCorp] Kabis Producer created");
 
         // -- READ TRUE AND FALSE ALARMS AND RESPOND --
         System.out.println("[SafeCorp] Reading alarms");
         String responseMessage = "[SafeCorp] ALARM RECEIVED ";
-        // * getNumberOfArtExhibitions() will be removed when scaling on multiple consumers within the same consumer group,
+        //TODO: * getNumberOfArtExhibitions() will be removed when scaling on multiple consumers within the same consumer group,
         // every consumer will only read its own exhibition
         Integer recordsToRead = (getNumberOfTrueAlarms() + getNumberOfFalseAlarms()) * getNumberOfArtExhibitions();
         long receivingTime = pollAndRespondMeasure(safeCorpConsumer, safeCorpProducer, recordsToRead, responseMessage);
@@ -84,14 +88,12 @@ public class SafeCorp extends ArtExhibitionProducer {
                     i += 1;
                     System.out.println("[pollAndRespondMeasure]: Received " + recordMessage + " exhibition: " + record.partition());
                     ProducerRecord<Integer, String> responseRecord = new ProducerRecord<>(Topics.ART_EXHIBITION.toString(), record.partition(), record.key(), message + recordMessage);
-                    responseRecord.headers().add("clientId", String.valueOf(getClientId()).getBytes());
                     System.out.println("[pollAndRespondMeasure]: Sending " + responseRecord.value() + " exhibition: " + responseRecord.key());
                     producer.push(responseRecord);
                     System.out.println("[pollAndRespondMeasure]: Message sent, waiting for next message");
                 }
             }
         }
-        producer.flush();
         long t2 = System.nanoTime();
         System.out.println("[pollAndRespondMeasure]: All messages read!");
 

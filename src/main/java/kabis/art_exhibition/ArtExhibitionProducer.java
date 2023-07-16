@@ -3,8 +3,6 @@ package kabis.art_exhibition;
 import kabis.producer.KabisProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 
-import java.util.Properties;
-
 public abstract class ArtExhibitionProducer extends ArtExhibitionClient {
     private final Integer clientId;
     private final Integer numberOfArtExhibitions;
@@ -23,10 +21,6 @@ public abstract class ArtExhibitionProducer extends ArtExhibitionClient {
         this.numberOfTrueAlarms = numberOfTrueAlarms;
         this.numberOfFalseAlarms = numberOfFalseAlarms;
         this.numberOfUncaughtBreaches = numberOfUncaughtBreaches;
-
-        Properties properties = getProperties();
-        properties.setProperty("client.id", String.valueOf(this.clientId));
-        setProperties(properties);
     }
 
     protected Integer getNumberOfArtExhibitions() {

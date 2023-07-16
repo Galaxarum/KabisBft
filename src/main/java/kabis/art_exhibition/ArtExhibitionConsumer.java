@@ -5,7 +5,6 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 
 import java.time.Duration;
-import java.util.Properties;
 
 public abstract class ArtExhibitionConsumer extends ArtExhibitionClient {
     private static final Duration POLL_TIMEOUT = Duration.ofSeconds(1);
@@ -21,10 +20,6 @@ public abstract class ArtExhibitionConsumer extends ArtExhibitionClient {
         this.numberOfTrueAlarms = numberOfTrueAlarms;
         this.numberOfFalseAlarms = numberOfFalseAlarms;
         this.numberOfUncaughtBreaches = numberOfUncaughtBreaches;
-
-        Properties properties = getProperties();
-        properties.setProperty("client.id", String.valueOf(this.clientId));
-        setProperties(properties);
     }
 
     protected Integer getClientId() {

@@ -3,6 +3,7 @@ package kabis.art_exhibition;
 import kabis.consumer.KabisConsumer;
 
 import java.util.Arrays;
+import java.util.Properties;
 
 import static java.lang.Integer.parseInt;
 
@@ -27,13 +28,16 @@ public class Ensure extends ArtExhibitionConsumer {
     }
 
     private void run() {
-        KabisConsumer<Integer, String> ensureConsumer = new KabisConsumer<>(getProperties());
+        Properties properties = readProperties();
+        properties.setProperty("client.id", String.valueOf(getClientId()));
+
+        KabisConsumer<Integer, String> ensureConsumer = new KabisConsumer<>(properties);
         ensureConsumer.subscribe(TOPICS);
         ensureConsumer.updateTopology(TOPICS);
         System.out.println("[Ensure] Kabis Consumer created");
 
         System.out.println("[Ensure] Reading alarms");
-        // * getNumberOfArtExhibitions() will be removed when scaling on multiple consumers within the same consumer group,
+        //TODO: * getNumberOfArtExhibitions() will be removed when scaling on multiple consumers within the same consumer group,
         // every consumer will only read its own exhibition
         int recordsToRead = ((getNumberOfTrueAlarms() + getNumberOfFalseAlarms()) * 2 + getNumberOfUncaughtBreaches()) * getNumberOfArtExhibitions();
         long time = pollAndMeasure(ensureConsumer, recordsToRead);

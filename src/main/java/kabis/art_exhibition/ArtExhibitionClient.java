@@ -9,27 +9,39 @@ import java.util.List;
 import java.util.Properties;
 
 public abstract class ArtExhibitionClient {
-    private Properties properties;
-
     protected static final List<String> TOPICS = Collections.singletonList(Topics.ART_EXHIBITION.toString());
-
-    protected Properties getProperties() {
-        return properties;
-    }
-
-    public void setProperties(Properties properties) {
-        this.properties = properties;
-    }
 
     protected ArtExhibitionClient() {
         Security.addProvider(new BouncyCastleProvider());
-        this.properties = readProperties();
     }
 
-    private Properties readProperties() {
+    /**
+     * Reads the properties file and returns the properties object,
+     * by default it reads the config.properties file.
+     *
+     * @return Properties object
+     */
+    protected Properties readProperties() {
         Properties properties = new Properties();
         try {
             properties.load(new FileInputStream("config.properties"));
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
+        return properties;
+    }
+
+    /**
+     * Reads the properties file and returns the properties object,
+     *
+     * @param propertiesFileName the name of the properties file
+     * @return Properties object
+     */
+    protected Properties readProperties(String propertiesFileName) {
+        Properties properties = new Properties();
+        try {
+            properties.load(new FileInputStream(propertiesFileName));
         } catch (Exception e) {
             e.printStackTrace();
             System.exit(1);
