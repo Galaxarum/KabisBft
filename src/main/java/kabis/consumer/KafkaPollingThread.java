@@ -49,11 +49,11 @@ public class KafkaPollingThread<K, V> {
      * @throws IllegalStateException if the Kafka replicas have different assigned partitions
      */
     public List<TopicPartition> getAssignedPartitions() {
-        pullKafka(0, Duration.ofMinutes(1));
+        pullKafka(0, Duration.ofSeconds(30));
         Set<TopicPartition> assignedPartitions = this.consumers.get(0).assignment();
         System.out.println("[getAssignedPartitions] Replica 0: " + assignedPartitions);
         for (int replicaIndex = 1; replicaIndex < this.cacheReplicas.size(); replicaIndex++) {
-            pullKafka(replicaIndex, Duration.ofMinutes(1));
+            pullKafka(replicaIndex, Duration.ofSeconds(30));
             Set<TopicPartition> assignedPartitionsReplica = this.consumers.get(replicaIndex).assignment();
             System.out.println("[getAssignedPartitions] Replica 1: " + assignedPartitions);
             if (!assignedPartitionsReplica.equals(assignedPartitions)) {
