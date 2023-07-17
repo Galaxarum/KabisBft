@@ -27,7 +27,7 @@ public class Ensure extends ArtExhibitionConsumer {
         System.exit(0);
     }
 
-    private void run() throws InterruptedException {
+    private void run() {
         Properties properties = readProperties();
         properties.setProperty("client.id", String.valueOf(getClientId()));
 
@@ -35,11 +35,6 @@ public class Ensure extends ArtExhibitionConsumer {
         ensureConsumer.subscribe(TOPICS);
         ensureConsumer.updateTopology(TOPICS);
         System.out.println("[Ensure] Kabis Consumer created");
-
-        Thread.sleep(10000);
-        System.out.println("[Ensure] NOW NEW TOPIC!!!!");
-        ensureConsumer.subscribe(TEST_TOPICS);
-        ensureConsumer.updateTopology(TEST_TOPICS);
 
         System.out.println("[Ensure] Reading alarms");
         //TODO: * getNumberOfArtExhibitions() will be removed when scaling on multiple consumers within the same consumer group,

@@ -43,7 +43,8 @@ public class KafkaPollingThread<K, V> {
     }
 
     /**
-     * Returns the list of assigned partitions to the Kafka consumers.
+     * Triggers a new poll for records, with a timeout of 30 seconds. The records are stored in the cache.
+     * Then the consumers assignment is checked.
      *
      * @return the list of assigned partitions to the Kafka consumers
      * @throws IllegalStateException if the Kafka replicas have different assigned partitions
@@ -51,11 +52,9 @@ public class KafkaPollingThread<K, V> {
     public List<TopicPartition> getAssignedPartitions() {
         pullKafka(0, Duration.ofSeconds(30));
         Set<TopicPartition> assignedPartitions = this.consumers.get(0).assignment();
-        System.out.println("[getAssignedPartitions] Replica 0: " + assignedPartitions);
         for (int replicaIndex = 1; replicaIndex < this.cacheReplicas.size(); replicaIndex++) {
             pullKafka(replicaIndex, Duration.ofSeconds(30));
             Set<TopicPartition> assignedPartitionsReplica = this.consumers.get(replicaIndex).assignment();
-            System.out.println("[getAssignedPartitions] Replica 1: " + assignedPartitions);
             if (!assignedPartitionsReplica.equals(assignedPartitions)) {
                 throw new IllegalStateException("The Kafka replicas have different assigned partitions");
             }

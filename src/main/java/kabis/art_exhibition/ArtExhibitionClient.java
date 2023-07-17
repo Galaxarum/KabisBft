@@ -10,8 +10,6 @@ import java.util.Properties;
 
 public abstract class ArtExhibitionClient {
     protected static final List<String> TOPICS = Collections.singletonList(Topics.ART_EXHIBITION.toString());
-    //TODO: REMOVE TEST TOPICS
-    protected static final List<String> TEST_TOPICS = Collections.singletonList("test");
 
     protected ArtExhibitionClient() {
         Security.addProvider(new BouncyCastleProvider());

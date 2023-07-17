@@ -41,6 +41,7 @@ public class KabisProducer<K extends Integer, V extends String> implements Kabis
             simplerProperties.put("client.id", id);
             this.kafkaProducers.add(new KafkaProducer<>(simplerProperties));
         }
+        // TODO: Add orderedPulls support
         this.serviceProxy = KabisServiceProxy.getInstance();
         this.serviceProxy.init(this.clientId, false);
     }

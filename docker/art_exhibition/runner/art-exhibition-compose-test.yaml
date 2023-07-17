@@ -1,14 +1,6 @@
 version: "3.8"
 
 networks:
-  #bft-network:
-  #  name: bft_benchmarks
-  #  external: true
-  #  driver: overlay
-  #kafka-network:
-  #  name: kafka_benchmarks
-  #  external: true
-  #  driver: overlay
   kafka-network:
     driver: bridge
   bft-network:
