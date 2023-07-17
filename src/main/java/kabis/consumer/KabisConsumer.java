@@ -73,6 +73,7 @@ public class KabisConsumer<K extends Integer, V extends String> implements Kabis
         this.counter += sids.size();
         System.out.println("[" + this.getClass().getName() + "] Total SIDS until now: " + this.counter);
 
+        // TODO: Why is duration not passed to the validator? And a new one is created?
         Map<TopicPartition, List<ConsumerRecord<K, V>>> validatedRecords = this.validator.verify(sids);
         //System.out.printf("[" + this.getClass().getName() + "] Received %d validated records%n", validatedRecords.values().stream().map(List::size).reduce(Integer::sum).orElse(-1));
         //if (!validatedRecords.isEmpty())
