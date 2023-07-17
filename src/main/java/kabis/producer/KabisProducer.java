@@ -41,7 +41,8 @@ public class KabisProducer<K extends Integer, V extends String> implements Kabis
             simplerProperties.put("client.id", id);
             this.kafkaProducers.add(new KafkaProducer<>(simplerProperties));
         }
-        this.serviceProxy = new KabisServiceProxy(this.clientId);
+        this.serviceProxy = KabisServiceProxy.getInstance();
+        this.serviceProxy.init(this.clientId, false);
     }
 
     /**

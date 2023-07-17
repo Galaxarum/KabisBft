@@ -9,18 +9,23 @@ import java.nio.ByteBuffer;
 import java.util.List;
 
 public class KabisServiceProxy {
-    private final ServiceProxy bftServiceProxy;
-    private final boolean orderedPulls;
+    private static final KabisServiceProxy instance = new KabisServiceProxy();
+    private boolean isInitialized = false;
+    private ServiceProxy bftServiceProxy;
+    private boolean orderedPulls;
     private int nextPullIndex = 0;
+
+    private KabisServiceProxy() {
+    }
 
     /**
      * Creates a new KabisServiceProxy
      *
      * @param id The id of the service proxy
      */
-    public KabisServiceProxy(int id) {
-        this(id, false);
-    }
+//    public KabisServiceProxy(int id) {
+//        this(id, false);
+//    }
 
     /**
      * Creates a new KabisServiceProxy
@@ -28,9 +33,20 @@ public class KabisServiceProxy {
      * @param id           The id of the service proxy
      * @param orderedPulls Whether to use ordered pulls
      */
-    public KabisServiceProxy(int id, boolean orderedPulls) {
-        this.bftServiceProxy = new ServiceProxy(id);
-        this.orderedPulls = orderedPulls;
+//    public KabisServiceProxy(int id, boolean orderedPulls) {
+//        this.bftServiceProxy = new ServiceProxy(id);
+//        this.orderedPulls = orderedPulls;
+//    }
+    public void init(int id, boolean orderedPulls) {
+        if (!this.isInitialized) {
+            this.bftServiceProxy = new ServiceProxy(id);
+            this.orderedPulls = orderedPulls;
+            this.isInitialized = true;
+        }
+    }
+
+    public static KabisServiceProxy getInstance() {
+        return instance;
     }
 
     /**

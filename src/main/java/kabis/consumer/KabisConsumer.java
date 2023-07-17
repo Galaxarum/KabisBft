@@ -33,7 +33,9 @@ public class KabisConsumer<K extends Integer, V extends String> implements Kabis
         this.log = LoggerFactory.getLogger(KabisConsumer.class);
         //TODO: Check if the properties are valid, otherwise throw an exception
         int clientId = Integer.parseInt(properties.getProperty("client.id"));
-        this.serviceProxy = new KabisServiceProxy(clientId);
+        // TODO: Add orderedPulls support
+        this.serviceProxy = KabisServiceProxy.getInstance();
+        this.serviceProxy.init(clientId, false);
         this.kafkaPollingThread = new KafkaPollingThread<>(properties);
         this.validator = new Validator<>(this.kafkaPollingThread);
     }
