@@ -16,23 +16,23 @@ import static kabis.benchmark.BenchmarkResult.TOPICS;
 public class BftOnlySender {
     private static final Logger LOG = LoggerFactory.getLogger(BftOnlySender.class);
 
-    public static long measureSendingTime(KabisServiceProxy serviceProxy,int numRequests,String message,int senderId){
+    public static long measureSendingTime(KabisServiceProxy serviceProxy, int numRequests, String message, int senderId) {
         var t1 = System.nanoTime();
-        for(int i=0;i<numRequests;i++){
-            var iMod = i%TOPICS.size();
-            var record = SecureIdentifier.factory(i,message,TOPICS.get(iMod),0,senderId);
+        for (int i = 0; i < numRequests; i++) {
+            var iMod = i % TOPICS.size();
+            var record = SecureIdentifier.factory(i, message, TOPICS.get(iMod), 0, senderId);
             serviceProxy.push(record);
         }
         var t2 = System.nanoTime();
-        return t2-t1;
+        return t2 - t1;
     }
 
     public static void main(String[] args) throws IOException, InterruptedException {
-        if(args.length!=3){
+        if (args.length != 3) {
             LOG.error("USAGE: {} <id> <numOperations (multiple of {})> <payloadSize (in bytes)>",
                     BftOnlySender.class.getCanonicalName(),
                     TOPICS.size()
-                    );
+            );
             System.exit(1);
         }
         Security.addProvider(new BouncyCastleProvider());
@@ -47,12 +47,13 @@ public class BftOnlySender {
 
         Thread.sleep(10000);
 
-        KabisServiceProxy proxy = new KabisServiceProxy(clientId);
+        KabisServiceProxy proxy = KabisServiceProxy.getInstance();
+        proxy.init(clientId, false);
 
         //Real measure
-        System.out.printf("BFT %d: Sending %d messages.%n",payloadSize,numOperations);
-        var time = measureSendingTime(proxy,numOperations,message,clientId);
-        BenchmarkResult.storeThroughputToDisk(BenchmarkResult.buildThroughputString(numOperations,payloadSize,0,time));
+        System.out.printf("BFT %d: Sending %d messages.%n", payloadSize, numOperations);
+        var time = measureSendingTime(proxy, numOperations, message, clientId);
+        BenchmarkResult.storeThroughputToDisk(BenchmarkResult.buildThroughputString(numOperations, payloadSize, 0, time));
         System.out.println("Experiment result saved");
     }
 

@@ -8,6 +8,11 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.List;
 
+/**
+ * A singleton proxy for the KabisServiceReplica.
+ * The KabisServiceProxy is used to push and pull SecureIdentifiers to and from the KabisServiceReplica.
+ * It's a singleton, since an application can have multiple KabisProducers and KabisConsumers, but only one KabisServiceProxy.
+ */
 public class KabisServiceProxy {
     private static final KabisServiceProxy instance = new KabisServiceProxy();
     private boolean isInitialized = false;
@@ -19,25 +24,13 @@ public class KabisServiceProxy {
     }
 
     /**
-     * Creates a new KabisServiceProxy
+     * Initializes the KabisServiceProxy with the given id and orderedPulls flag,
+     * only if it has not been initialized before.
      *
-     * @param id The id of the service proxy
+     * @param id           The id of the KabisServiceReplica to connect to
+     * @param orderedPulls Whether to pull SecureIdentifiers in order or not
      */
-//    public KabisServiceProxy(int id) {
-//        this(id, false);
-//    }
-
-    /**
-     * Creates a new KabisServiceProxy
-     *
-     * @param id           The id of the service proxy
-     * @param orderedPulls Whether to use ordered pulls
-     */
-//    public KabisServiceProxy(int id, boolean orderedPulls) {
-//        this.bftServiceProxy = new ServiceProxy(id);
-//        this.orderedPulls = orderedPulls;
-//    }
-    public void init(int id, boolean orderedPulls) {
+    public synchronized void init(int id, boolean orderedPulls) {
         if (!this.isInitialized) {
             this.bftServiceProxy = new ServiceProxy(id);
             this.orderedPulls = orderedPulls;
@@ -78,8 +71,6 @@ public class KabisServiceProxy {
         try (ByteArrayOutputStream bytes = new ByteArrayOutputStream()) {
             bytes.write(OPS.PULL.ordinal());
             bytes.writeBytes(ByteBuffer.allocate(Integer.BYTES).putInt(this.nextPullIndex).array());
-            //TODO: Remove this print
-            System.out.println("Sending poll request, nextPullIndex = " + this.nextPullIndex);
             byte[] request = bytes.toByteArray();
             byte[] responseBytes = this.orderedPulls ?
                     this.bftServiceProxy.invokeOrdered(request) :
