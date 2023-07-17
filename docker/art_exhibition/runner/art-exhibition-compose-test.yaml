@@ -335,21 +335,21 @@ services:
       - NUM_FALSE_ALARMS=$NUM_FALSE_ALARMS
     volumes:
       - ./results/safe-sense:/usr/kabis/result
-  #safe-corp:
-  #  image: "${DOCKERHUB_USERNAME}/safe-corp:latest"
-  #  networks:
-  #    - kafka-network
-  #    - bft-network
-  #  depends_on:
-  #    - "init-kafka"
-  #  environment:
-  #    - CLIENT_ID=1
-  #    - NUM_EXHIBITIONS=$NUM_EXHIBITIONS
-  #    - NUM_TRUE_ALARMS=$NUM_TRUE_ALARMS
-  #    - NUM_FALSE_ALARMS=$NUM_FALSE_ALARMS
-  #    - NUM_UNCAUGHT_BREACHES=$NUM_UNCAUGHT_BREACHES
-  #  volumes:
-  #    - ./results/safe-corp:/usr/kabis/result
+  safe-corp:
+    image: "${DOCKERHUB_USERNAME}/safe-corp:latest"
+    networks:
+      - kafka-network
+      - bft-network
+    depends_on:
+      - "init-kafka"
+    environment:
+      - CLIENT_ID=1
+      - NUM_EXHIBITIONS=$NUM_EXHIBITIONS
+      - NUM_TRUE_ALARMS=$NUM_TRUE_ALARMS
+      - NUM_FALSE_ALARMS=$NUM_FALSE_ALARMS
+      - NUM_UNCAUGHT_BREACHES=$NUM_UNCAUGHT_BREACHES
+    volumes:
+      - ./results/safe-corp:/usr/kabis/result
   art-estate:
     image: "${DOCKERHUB_USERNAME}/art-estate:latest"
     networks:
