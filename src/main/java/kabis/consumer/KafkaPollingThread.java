@@ -92,10 +92,10 @@ public class KafkaPollingThread<K, V> {
             this.replicaPartitionsUpdated.replaceAll((k, v) -> false);
             if (this.assignedPartitions.values().stream().skip(1).allMatch(partitions -> this.assignedPartitions.get(0).equals(partitions))) {
                 this.log.info("All replicas have the same partitions");
+                System.out.println("[updateAssignedPartitions] Returning to the KabisConsumer: " + this.assignedPartitions.get(0));
                 //TODO:  return the partitions of the first replica to the kabis consumer
             }
         }
-        System.out.print("[updateAssignedPartitions] Partitions updated for replica " + replicaIndex + ": " + assignedPartitions);
     }
 
     /**
