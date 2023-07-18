@@ -50,7 +50,7 @@ public class KabisConsumer<K extends Integer, V extends String> implements Kabis
     @Override
     public void subscribe(Collection<String> topics) {
         this.kafkaPollingThread.subscribe(topics);
-        log.info("Subscribed to topic(s): {}", Utils.join(topics, ", "));
+        this.log.info("Subscribed to topic(s): {}", Utils.join(topics, ", "));
     }
 
     /**
@@ -59,7 +59,7 @@ public class KabisConsumer<K extends Integer, V extends String> implements Kabis
     @Override
     public void unsubscribe() {
         this.kafkaPollingThread.unsubscribe();
-        log.info("Unsubscribed from all topics");
+        this.log.info("Unsubscribed from all topics");
     }
 
     /**
@@ -99,7 +99,7 @@ public class KabisConsumer<K extends Integer, V extends String> implements Kabis
     @Override
     public void close() {
         this.kafkaPollingThread.close();
-        log.info("Consumer closed successfully");
+        this.log.info("Consumer closed successfully");
     }
 
     /**
