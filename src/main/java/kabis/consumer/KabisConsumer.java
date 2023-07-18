@@ -122,10 +122,10 @@ public class KabisConsumer<K extends Integer, V extends String> implements Kabis
         synchronized (this.validatedTopics) {
             this.validatedTopics.clear();
             this.validatedTopics.addAll(validatedTopics);
-
-            while (this.validatedTopics.stream().anyMatch(topic -> this.assignedPartitions.stream().noneMatch(partition -> partition.topic().equals(topic)))) {
-                this.assignedPartitions = this.kafkaPollingThread.getAssignedPartitions();
-            }
+        }
+        while (this.validatedTopics.stream().anyMatch(topic -> this.assignedPartitions.stream().noneMatch(partition -> partition.topic().equals(topic)))) {
+            System.out.println("[updateTopology] Waiting for the consumer to be assigned to all validated topics");
+            this.assignedPartitions = this.kafkaPollingThread.getAssignedPartitions();
         }
         if (!this.assignedPartitions.isEmpty())
             this.log.info("Updated partitions assigned to the consumer: {}", Utils.join(assignedPartitions, ", "));
