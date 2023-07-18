@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class KafkaConsumerRebalanceListener<K, V> implements ConsumerRebalanceListener {
+public class KafkaConsumerRebalanceListener<K extends Integer, V extends String> implements ConsumerRebalanceListener {
 
     private final KafkaPollingThread<K, V> kafkaPollingThread;
     private final int replicaIndex;

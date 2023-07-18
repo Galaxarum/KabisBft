@@ -24,7 +24,7 @@ public class KabisConsumer<K extends Integer, V extends String> implements Kabis
     //TODO: REMOVE THIS
     public int counter = 0;
 
-    private List<TopicPartition> assignedPartitions = new ArrayList<>();
+    private final List<TopicPartition> assignedPartitions = new ArrayList<>();
 
     /**
      * Creates a new KabisConsumer.
@@ -38,7 +38,7 @@ public class KabisConsumer<K extends Integer, V extends String> implements Kabis
         // TODO: Add orderedPulls support
         this.serviceProxy = KabisServiceProxy.getInstance();
         this.serviceProxy.init(clientId, false);
-        this.kafkaPollingThread = new KafkaPollingThread<>(properties);
+        this.kafkaPollingThread = new KafkaPollingThread<>(properties, this);
         this.validator = new Validator<>(this.kafkaPollingThread);
     }
 
@@ -70,6 +70,11 @@ public class KabisConsumer<K extends Integer, V extends String> implements Kabis
      */
     @Override
     public ConsumerRecords<K, V> poll(Duration duration) {
+        if (this.assignedPartitions.isEmpty()) {
+            this.log.info("No partitions assigned yet, skipping poll");
+            return ConsumerRecords.empty();
+        }
+        
         //TODO: Remove all the prints
         List<SecureIdentifier> sids = this.serviceProxy.pull();
         System.out.printf("[" + this.getClass().getName() + "] Received %d sids%n", sids.size());
@@ -125,5 +130,13 @@ public class KabisConsumer<K extends Integer, V extends String> implements Kabis
         }
         this.log.info("Updated list of validated topics: {}", Utils.join(validatedTopics, ", "));
         this.kafkaPollingThread.fetchPartitions();
+    }
+
+    public void updateAssignedPartitions(List<TopicPartition> assignedPartitions) {
+        synchronized (this.assignedPartitions) {
+            this.assignedPartitions.clear();
+            this.assignedPartitions.addAll(assignedPartitions);
+        }
+        this.log.info("Updated list of assigned partitions: {}", Utils.join(assignedPartitions, ", "));
     }
 }

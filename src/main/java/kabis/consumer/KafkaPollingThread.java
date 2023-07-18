@@ -12,7 +12,7 @@ import java.time.Duration;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class KafkaPollingThread<K, V> {
+public class KafkaPollingThread<K extends Integer, V extends String> {
     /**
      * List of Kafka consumers, one for each Kafka replica.
      */
@@ -21,6 +21,8 @@ public class KafkaPollingThread<K, V> {
      * List of caches, one for each Kafka replica.
      */
     private final List<Cache<K, V>> cacheReplicas;
+
+    private final KabisConsumer<K, V> kabisConsumer;
 
     private final Map<Integer, List<TopicPartition>> assignedPartitions;
     private final Map<Integer, Boolean> replicaPartitionsUpdated;
@@ -31,8 +33,9 @@ public class KafkaPollingThread<K, V> {
      *
      * @param properties the properties to be used by the KafkaPollingThread
      */
-    public KafkaPollingThread(Properties properties) {
+    public KafkaPollingThread(Properties properties, KabisConsumer<K, V> kabisConsumer) {
         this.log = LoggerFactory.getLogger(KafkaPollingThread.class);
+        this.kabisConsumer = kabisConsumer;
         //TODO: Check if the properties are valid, otherwise throw an exception
         String[] serversReplicas = properties.getProperty("bootstrap.servers").split(";");
         ArrayList<KafkaConsumer<K, MessageWrapper<V>>> consumers = new ArrayList<>(serversReplicas.length);
@@ -93,8 +96,7 @@ public class KafkaPollingThread<K, V> {
             if (this.assignedPartitions.values().stream().skip(1).allMatch(partitions -> this.assignedPartitions.get(0).equals(partitions))) {
                 this.replicaPartitionsUpdated.replaceAll((k, v) -> false);
                 this.log.info("All replicas have the same partitions");
-                System.out.println("[updateAssignedPartitions] Returning to the KabisConsumer: " + this.assignedPartitions.get(0));
-                //TODO:  return the partitions of the first replica to the kabis consumer
+                kabisConsumer.updateAssignedPartitions(this.assignedPartitions.get(0));
             }
         }
     }
