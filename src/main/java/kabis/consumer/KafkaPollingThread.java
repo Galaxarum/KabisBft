@@ -15,10 +15,13 @@ public class KafkaPollingThread<K, V> {
      * List of Kafka consumers, one for each Kafka replica.
      */
     private final List<KafkaConsumer<K, MessageWrapper<V>>> consumers;
+    private final List<KafkaConsumerRebalanceListener<K, V>> consumersRebalanceListeners;
     /**
      * List of caches, one for each Kafka replica.
      */
     private final List<Cache<K, V>> cacheReplicas;
+
+    private final Map<Integer, List<TopicPartition>> assignedPartitions = new HashMap<>();
 
     /**
      * Creates a new KafkaPollingThread.
@@ -29,6 +32,7 @@ public class KafkaPollingThread<K, V> {
         //TODO: Check if the properties are valid, otherwise throw an exception
         String[] serversReplicas = properties.getProperty("bootstrap.servers").split(";");
         ArrayList<KafkaConsumer<K, MessageWrapper<V>>> consumers = new ArrayList<>(serversReplicas.length);
+        ArrayList<KafkaConsumerRebalanceListener<K, V>> consumersRebalanceListeners = new ArrayList<>(serversReplicas.length);
         this.cacheReplicas = new ArrayList<>(serversReplicas.length);
         for (int i = 0; i < serversReplicas.length; i++) {
             String servers = serversReplicas[i];
@@ -37,9 +41,11 @@ public class KafkaPollingThread<K, V> {
             simplerProperties.put("bootstrap.servers", servers);
             simplerProperties.put("client.id", id);
             consumers.add(new KafkaConsumer<>(simplerProperties));
+            consumersRebalanceListeners.add(new KafkaConsumerRebalanceListener<>(this, i));
             this.cacheReplicas.add(new Cache<>());
         }
         this.consumers = Collections.unmodifiableList(consumers);
+        this.consumersRebalanceListeners = Collections.unmodifiableList(consumersRebalanceListeners);
     }
 
     /**
@@ -50,7 +56,7 @@ public class KafkaPollingThread<K, V> {
      * @throws IllegalStateException if the Kafka replicas have different assigned partitions
      */
     public List<TopicPartition> getAssignedPartitions() {
-        pullKafka(0, Duration.ofSeconds(30));
+        /*pullKafka(0, Duration.ofSeconds(30));
         Set<TopicPartition> assignedPartitions = this.consumers.get(0).assignment();
         for (int replicaIndex = 1; replicaIndex < this.cacheReplicas.size(); replicaIndex++) {
             pullKafka(replicaIndex, Duration.ofSeconds(30));
@@ -59,7 +65,18 @@ public class KafkaPollingThread<K, V> {
                 throw new IllegalStateException("The Kafka replicas have different assigned partitions");
             }
         }
-        return new ArrayList<>(assignedPartitions);
+        return new ArrayList<>(assignedPartitions);*/
+
+        System.out.println("[getAssignedPartitions] assignedPartitions: " + assignedPartitions);
+        boolean samePartitionsForAllReplicas = this.assignedPartitions.values().stream().skip(1).allMatch(partitions -> partitions.equals(this.assignedPartitions.get(0)));
+        if (!samePartitionsForAllReplicas) {
+            throw new IllegalStateException("The Kafka replicas have different assigned partitions");
+        }
+        return assignedPartitions.get(0);
+    }
+
+    public void updateAssignedPartitions(int index, List<TopicPartition> partitions) {
+        this.assignedPartitions.put(index, partitions);
     }
 
     /**
@@ -125,8 +142,16 @@ public class KafkaPollingThread<K, V> {
         return map;
     }
 
+    /**
+     * Subscribes to the given topics.
+     * Also adds a rebalance listener to each consumer subscription, which updates the assigned partitions.
+     *
+     * @param topics The topics to subscribe to
+     */
     public void subscribe(Collection<String> topics) {
-        this.consumers.forEach(c -> c.subscribe(topics));
+        for (int i = 0; i < this.consumers.size(); i++) {
+            this.consumers.get(i).subscribe(topics, this.consumersRebalanceListeners.get(i));
+        }
     }
 
     public void unsubscribe() {

@@ -24,7 +24,7 @@ public class KabisConsumer<K extends Integer, V extends String> implements Kabis
     //TODO: REMOVE THIS
     public int counter = 0;
 
-    //private List<TopicPartition> assignedPartitions = new ArrayList<>();
+    private List<TopicPartition> assignedPartitions = new ArrayList<>();
 
     /**
      * Creates a new KabisConsumer.
@@ -70,6 +70,10 @@ public class KabisConsumer<K extends Integer, V extends String> implements Kabis
      */
     @Override
     public ConsumerRecords<K, V> poll(Duration duration) {
+        /*while (this.validatedTopics.stream().anyMatch(topic -> this.assignedPartitions.stream().noneMatch(partition -> partition.topic().equals(topic)))) {
+            this.assignedPartitions = this.kafkaPollingThread.getAssignedPartitions();
+        }*/
+
         //TODO: Remove all the prints
         List<SecureIdentifier> sids = this.serviceProxy.pull();
         System.out.printf("[" + this.getClass().getName() + "] Received %d sids%n", sids.size());
@@ -122,10 +126,12 @@ public class KabisConsumer<K extends Integer, V extends String> implements Kabis
         synchronized (this.validatedTopics) {
             this.validatedTopics.clear();
             this.validatedTopics.addAll(validatedTopics);
-            // TODO: Move assignedPartitions outside the synchronized block?
-            //this.assignedPartitions = this.kafkaPollingThread.getAssignedPartitions();
-            //this.log.info("Updated partitions assigned to the consumer for validated topics: {}", Utils.join(assignedPartitions, ", "));
         }
+        this.assignedPartitions = this.kafkaPollingThread.getAssignedPartitions();
+        if (!this.assignedPartitions.isEmpty())
+            this.log.info("Updated partitions assigned to the consumer: {}", Utils.join(assignedPartitions, ", "));
+        else
+            this.log.info("No partitions assigned to the consumer");
         this.log.info("Updated list of validated topics: {}", Utils.join(validatedTopics, ", "));
     }
 }
