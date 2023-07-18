@@ -26,7 +26,7 @@ public class KabisConsumer<K extends Integer, V extends String> implements Kabis
 
     private final List<TopicPartition> assignedPartitions = new ArrayList<>();
     private Boolean rebalanceNeeded = true;
-    private final PollingThread pollingThread;
+    private final PollingThread<K, V> pollingThread;
     private List<SecureIdentifier> pulledSids = new ArrayList<>();
 
     /**
@@ -43,7 +43,7 @@ public class KabisConsumer<K extends Integer, V extends String> implements Kabis
         this.serviceProxy.init(clientId, false);
         this.kafkaPollingThread = new KafkaPollingThread<>(properties, this);
         this.validator = new Validator<>(this.kafkaPollingThread);
-        this.pollingThread = new PollingThread(this);
+        this.pollingThread = new PollingThread<>(this);
     }
 
     /**
