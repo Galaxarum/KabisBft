@@ -5,6 +5,8 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.TopicPartition;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.util.*;
@@ -21,6 +23,7 @@ public class KafkaPollingThread<K, V> {
     private final List<Cache<K, V>> cacheReplicas;
 
     private final Map<Integer, List<TopicPartition>> assignedPartitions = new HashMap<>();
+    private final Logger log;
 
     /**
      * Creates a new KafkaPollingThread.
@@ -28,6 +31,7 @@ public class KafkaPollingThread<K, V> {
      * @param properties the properties to be used by the KafkaPollingThread
      */
     public KafkaPollingThread(Properties properties) {
+        this.log = LoggerFactory.getLogger(KafkaPollingThread.class);
         //TODO: Check if the properties are valid, otherwise throw an exception
         String[] serversReplicas = properties.getProperty("bootstrap.servers").split(";");
         ArrayList<KafkaConsumer<K, MessageWrapper<V>>> consumers = new ArrayList<>(serversReplicas.length);
@@ -45,33 +49,13 @@ public class KafkaPollingThread<K, V> {
     }
 
     /**
-     * Triggers a new poll for records, with a timeout of 30 seconds. The records are stored in the cache.
-     * Then the consumers assignment is checked.
-     *
-     * @return the list of assigned partitions to the Kafka consumers
-     * @throws IllegalStateException if the Kafka replicas have different assigned partitions
-     */
-    public List<TopicPartition> getAssignedPartitions() {
-        Set<TopicPartition> firstReplicaPartitions = fetchPartitions(0);
-        for (int replicaIndex = 1; replicaIndex < this.consumers.size(); replicaIndex++) {
-            Set<TopicPartition> assignedPartitionsReplica = fetchPartitions(replicaIndex);
-            if (assignedPartitionsReplica.isEmpty() || firstReplicaPartitions.isEmpty())
-                return new ArrayList<>();
-            if (!assignedPartitionsReplica.equals(firstReplicaPartitions))
-                throw new IllegalStateException("The Kafka replicas have different assigned partitions");
-        }
-        return new ArrayList<>(firstReplicaPartitions);
-    }
-
-    /**
      * Fetches the assigned partitions to a Kafka consumer from a given replica.
-     *
-     * @param replicaIndex the index of the replica
-     * @return the assigned partitions to the Kafka consumer of the given replica
      */
-    private Set<TopicPartition> fetchPartitions(int replicaIndex) {
-        pullKafka(replicaIndex, Duration.ofSeconds(30));
-        return this.consumers.get(replicaIndex).assignment();
+    public void fetchPartitions() {
+        for (int replicaIndex = 0; replicaIndex < this.consumers.size(); replicaIndex++) {
+            this.log.info("Fetching partitions for replica {}", replicaIndex);
+            pullKafka(replicaIndex, Duration.ofSeconds(30));
+        }
     }
 
     public void updateAssignedPartitions(int replicaIndex, List<TopicPartition> assignedPartitions) {
