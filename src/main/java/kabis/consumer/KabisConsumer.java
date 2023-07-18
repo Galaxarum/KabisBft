@@ -26,6 +26,8 @@ public class KabisConsumer<K extends Integer, V extends String> implements Kabis
 
     private final List<TopicPartition> assignedPartitions = new ArrayList<>();
     private Boolean rebalanceNeeded = true;
+    private final PollingThread pollingThread;
+    private List<SecureIdentifier> pulledSids = new ArrayList<>();
 
     /**
      * Creates a new KabisConsumer.
@@ -41,6 +43,7 @@ public class KabisConsumer<K extends Integer, V extends String> implements Kabis
         this.serviceProxy.init(clientId, false);
         this.kafkaPollingThread = new KafkaPollingThread<>(properties, this);
         this.validator = new Validator<>(this.kafkaPollingThread);
+        this.pollingThread = new PollingThread(this);
     }
 
     /**
@@ -63,6 +66,26 @@ public class KabisConsumer<K extends Integer, V extends String> implements Kabis
         this.log.info("Unsubscribed from all topics");
     }
 
+    /**
+     * Polls for records.
+     *
+     * @param duration The maximum time to block (must not be greater than Long.MAX_VALUE milliseconds)
+     * @return the records
+     */
+    @Override
+    public ConsumerRecords<K, V> poll(Duration duration) {
+        if (this.rebalanceNeeded) return new ConsumerRecords<>(new HashMap<>());
+
+        this.pollingThread.setDuration(duration);
+        this.pollingThread.start();
+        try {
+            this.pollingThread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        return this.pollingThread.getRecords();
+    }
 
     /**
      * Polls for records.
@@ -70,15 +93,17 @@ public class KabisConsumer<K extends Integer, V extends String> implements Kabis
      * @param duration The maximum time to block (must not be greater than Long.MAX_VALUE milliseconds)
      * @return the records
      */
-    private ConsumerRecords<K, V> pollRecords(Duration duration) {
-        List<SecureIdentifier> sids = this.serviceProxy.pull();
-        System.out.printf("[" + this.getClass().getName() + "] Received %d sids%n", sids.size());
+    protected ConsumerRecords<K, V> pollRecords(Duration duration) {
+        if (this.pulledSids.isEmpty()) this.pulledSids = this.serviceProxy.pull();
+        this.pulledSids = this.pulledSids.stream().filter(sid -> this.assignedPartitions.contains(sid.getTopicPartition())).collect(Collectors.toList());
+
+        System.out.printf("[" + this.getClass().getName() + "] Received %d sids%n", this.pulledSids.size());
         //TODO: Remove counter!
-        this.counter += sids.size();
+        this.counter += this.pulledSids.size();
         System.out.println("[" + this.getClass().getName() + "] Total SIDS until now: " + this.counter);
 
         // TODO: Why is duration not passed to the validator? And a new one is created?
-        Map<TopicPartition, List<ConsumerRecord<K, V>>> validatedRecords = this.validator.verify(sids);
+        Map<TopicPartition, List<ConsumerRecord<K, V>>> validatedRecords = this.validator.verify(this.pulledSids);
         //System.out.printf("[" + this.getClass().getName() + "] Received %d validated records%n", validatedRecords.values().stream().map(List::size).reduce(Integer::sum).orElse(-1));
         //if (!validatedRecords.isEmpty())
         //System.out.println("[" + this.getClass().getName() + "] Validated records: " + validatedRecords.values());
@@ -90,19 +115,7 @@ public class KabisConsumer<K extends Integer, V extends String> implements Kabis
                         )
                 );
 
-        return new ConsumerRecords<>(mergedMap);
-    }
-
-    /**
-     * Polls for records.
-     *
-     * @param duration The maximum time to block (must not be greater than Long.MAX_VALUE milliseconds)
-     * @return the records
-     */
-    @Override
-    public ConsumerRecords<K, V> poll(Duration duration) {
-
-
+        this.pulledSids.clear();
         return new ConsumerRecords<>(mergedMap);
     }
 
@@ -157,6 +170,34 @@ public class KabisConsumer<K extends Integer, V extends String> implements Kabis
 
     public void setRebalanceNeeded() {
         this.rebalanceNeeded = true;
+        this.pollingThread.interrupt();
+    }
+}
 
+class PollingThread<K extends Integer, V extends String> extends Thread {
+    private Duration duration;
+    private final KabisConsumer<K, V> kabisConsumer;
+    private ConsumerRecords<K, V> records;
+    private final Object recordsLock = new Object();
+
+    public PollingThread(KabisConsumer<K, V> kabisConsumer) {
+        this.kabisConsumer = kabisConsumer;
+        this.duration = Duration.ofSeconds(1);
+    }
+
+    public void setDuration(Duration duration) {
+        this.duration = duration;
+    }
+
+    public void run() {
+        synchronized (this.recordsLock) {
+            this.records = this.kabisConsumer.pollRecords(this.duration);
+        }
+    }
+
+    public ConsumerRecords<K, V> getRecords() {
+        synchronized (this.recordsLock) {
+            return this.records;
+        }
     }
 }
