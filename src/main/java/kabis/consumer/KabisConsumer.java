@@ -124,6 +124,7 @@ public class KabisConsumer<K extends Integer, V extends String> implements Kabis
             this.validatedTopics.addAll(validatedTopics);
         }
         this.log.info("Updated list of validated topics: {}", Utils.join(validatedTopics, ", "));
+        this.assignedPartitions = this.kafkaPollingThread.getAssignedPartitions();
         while (this.validatedTopics.stream().anyMatch(topic -> this.assignedPartitions.stream().noneMatch(partition -> partition.topic().equals(topic)))) {
             System.out.println("[updateTopology] Waiting for the consumer to be assigned to all validated topics");
             this.assignedPartitions = this.kafkaPollingThread.getAssignedPartitions();
