@@ -23,6 +23,7 @@ public class KafkaPollingThread<K, V> {
     private final List<Cache<K, V>> cacheReplicas;
 
     private final Map<Integer, List<TopicPartition>> assignedPartitions = new HashMap<>();
+    private final Map<Integer, Boolean> replicaPartitionsUpdated = new HashMap<>();
     private final Logger log;
 
     /**
@@ -60,6 +61,15 @@ public class KafkaPollingThread<K, V> {
 
     public void updateAssignedPartitions(int replicaIndex, List<TopicPartition> assignedPartitions) {
         this.assignedPartitions.put(replicaIndex, assignedPartitions);
+        this.replicaPartitionsUpdated.put(replicaIndex, true);
+        if (this.replicaPartitionsUpdated.values().stream().allMatch(replicaUpdated -> replicaUpdated)) {
+            this.log.info("All replicas have updated their partitions");
+            this.replicaPartitionsUpdated.replaceAll((k, v) -> false);
+            if (this.assignedPartitions.values().stream().skip(1).allMatch(partitions -> this.assignedPartitions.get(0).equals(partitions))) {
+                this.log.info("All replicas have the same partitions");
+                //TODO:  return the partitions of the first replica to the kabis consumer
+            }
+        }
         System.out.print("[updateAssignedPartitions] Partitions updated for replica " + replicaIndex + ": " + assignedPartitions);
     }
 
