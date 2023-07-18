@@ -43,7 +43,7 @@ dependencies {
     implementation 'io.netty:netty-all:4.1.77.Final'
 }
 
-java{
+java {
     sourceCompatibility = '1.11'
     targetCompatibility = '1.11'
 }
@@ -52,8 +52,8 @@ test {
     useJUnitPlatform()
 }
 
-idea{
-    module{
+idea {
+    module {
         downloadJavadoc = true
         downloadSources = true
     }
@@ -71,11 +71,15 @@ task kabisServiceReplicaShadowJar(type: ShadowJar) {
     exclude("META-INF/*.DSA")
 }
 
-task kabisServiceReplicaJar(type: Copy){
+task kabisServiceReplicaJar(type: Copy) {
     dependsOn kabisServiceReplicaShadowJar
     copy {
         from 'build/libs/service-replica.jar'
-        into 'docker/kabis_benchmark'
+        into 'docker/benchmark/kabis_benchmark'
+    }
+    copy {
+        from 'build/libs/service-replica.jar'
+        into 'docker/art_exhibition/art_exhibition_benchmark'
     }
 }
 
@@ -91,11 +95,11 @@ task kabisSenderShadowJar(type: ShadowJar) {
     exclude("META-INF/*.DSA")
 }
 
-task kabisSenderJar(type: Copy){
+task kabisSenderJar(type: Copy) {
     dependsOn kabisSenderShadowJar
     copy {
         from 'build/libs/kabis-sender.jar'
-        into 'docker/kabis_benchmark'
+        into 'docker/benchmark/kabis_benchmark'
     }
 }
 
@@ -111,11 +115,11 @@ task kabisReceiverShadowJar(type: ShadowJar) {
     exclude("META-INF/*.DSA")
 }
 
-task kabisReceiverJar(type: Copy){
+task kabisReceiverJar(type: Copy) {
     dependsOn kabisReceiverShadowJar
-    copy{
+    copy {
         from 'build/libs/kabis-receiver.jar'
-        into 'docker/kabis_benchmark'
+        into 'docker/benchmark/kabis_benchmark'
     }
 }
 
@@ -131,11 +135,11 @@ task kafkaSenderShadowJar(type: ShadowJar) {
     exclude("META-INF/*.DSA")
 }
 
-task kafkaSenderJar(type: Copy){
+task kafkaSenderJar(type: Copy) {
     dependsOn kafkaSenderShadowJar
     copy {
         from 'build/libs/kafka-sender.jar'
-        into 'docker/kafka_benchmark'
+        into 'docker/benchmark/kafka_benchmark'
     }
 }
 
@@ -151,11 +155,11 @@ task kafkaReceiverShadowJar(type: ShadowJar) {
     exclude("META-INF/*.DSA")
 }
 
-task kafkaReceiverJar(type: Copy){
+task kafkaReceiverJar(type: Copy) {
     dependsOn kafkaReceiverShadowJar
-    copy{
+    copy {
         from 'build/libs/kafka-receiver.jar'
-        into 'docker/kafka_benchmark'
+        into 'docker/benchmark/kafka_benchmark'
     }
 }
 
@@ -171,11 +175,11 @@ task bftReceiverShadowJar(type: ShadowJar) {
     exclude("META-INF/*.DSA")
 }
 
-task bftReceiverJar(type: Copy){
+task bftReceiverJar(type: Copy) {
     dependsOn bftReceiverShadowJar
-    copy{
+    copy {
         from 'build/libs/bft-receiver.jar'
-        into 'docker/bft_benchmark'
+        into 'docker/benchmark/bft_benchmark'
     }
 }
 
@@ -191,11 +195,11 @@ task bftSenderShadowJar(type: ShadowJar) {
     exclude("META-INF/*.DSA")
 }
 
-task bftSenderJar(type: Copy){
+task bftSenderJar(type: Copy) {
     dependsOn bftSenderShadowJar
-    copy{
+    copy {
         from 'build/libs/bft-sender.jar'
-        into 'docker/bft_benchmark'
+        into 'docker/benchmark/bft_benchmark'
     }
 }
 
@@ -212,10 +216,90 @@ task bftServiceReplicaShadowJar(type: ShadowJar) {
     exclude("META-INF/*.DSA")
 }
 
-task bftServiceReplicaJar(type: Copy){
+task bftServiceReplicaJar(type: Copy) {
     dependsOn bftServiceReplicaShadowJar
     copy {
         from 'build/libs/bft-service-replica.jar'
-        into 'docker/bft_benchmark'
+        into 'docker/benchmark/bft_benchmark'
+    }
+}
+
+task artEstateShadowJar(type: ShadowJar) {
+    manifest {
+        attributes 'Main-Class': 'kabis.art_exhibition.ArtEstate'
+    }
+
+    archiveName 'art-estate.jar'
+    from sourceSets.main.output
+    configurations = [project.configurations.compileClasspath]
+    exclude("META-INF/*.SF")
+    exclude("META-INF/*.DSA")
+}
+
+task artEstateJar(type: Copy) {
+    dependsOn artEstateShadowJar
+    copy {
+        from 'build/libs/art-estate.jar'
+        into 'docker/art_exhibition/art_exhibition_benchmark'
+    }
+}
+
+task ensureShadowJar(type: ShadowJar) {
+    manifest {
+        attributes 'Main-Class': 'kabis.art_exhibition.Ensure'
+    }
+
+    archiveName 'ensure.jar'
+    from sourceSets.main.output
+    configurations = [project.configurations.compileClasspath]
+    exclude("META-INF/*.SF")
+    exclude("META-INF/*.DSA")
+}
+
+task ensureJar(type: Copy) {
+    dependsOn ensureShadowJar
+    copy {
+        from 'build/libs/ensure.jar'
+        into 'docker/art_exhibition/art_exhibition_benchmark'
+    }
+}
+
+task safeCorpShadowJar(type: ShadowJar) {
+    manifest {
+        attributes 'Main-Class': 'kabis.art_exhibition.SafeCorp'
+    }
+
+    archiveName 'safe-corp.jar'
+    from sourceSets.main.output
+    configurations = [project.configurations.compileClasspath]
+    exclude("META-INF/*.SF")
+    exclude("META-INF/*.DSA")
+}
+
+task safeCorpJar(type: Copy) {
+    dependsOn safeCorpShadowJar
+    copy {
+        from 'build/libs/safe-corp.jar'
+        into 'docker/art_exhibition/art_exhibition_benchmark'
+    }
+}
+
+task safeSenseShadowJar(type: ShadowJar) {
+    manifest {
+        attributes 'Main-Class': 'kabis.art_exhibition.SafeSense'
+    }
+
+    archiveName 'safe-sense.jar'
+    from sourceSets.main.output
+    configurations = [project.configurations.compileClasspath]
+    exclude("META-INF/*.SF")
+    exclude("META-INF/*.DSA")
+}
+
+task safeSenseJar(type: Copy) {
+    dependsOn safeSenseShadowJar
+    copy {
+        from 'build/libs/safe-sense.jar'
+        into 'docker/art_exhibition/art_exhibition_benchmark'
     }
 }

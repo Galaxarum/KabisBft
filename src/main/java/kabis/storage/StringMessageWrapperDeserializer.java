@@ -10,10 +10,10 @@ import java.nio.ByteBuffer;
 public class StringMessageWrapperDeserializer implements Deserializer<MessageWrapper<String>> {
     @Override
     public MessageWrapper<String> deserialize(String topic, byte[] data) {
-        try (var in = new ByteArrayInputStream(data)){
-            var senderId = ByteBuffer.wrap(in.readNBytes(Integer.BYTES)).getInt();
-            var value = new String(in.readAllBytes());
-            return new MessageWrapper<>(value,senderId);
+        try (ByteArrayInputStream in = new ByteArrayInputStream(data)) {
+            int senderId = ByteBuffer.wrap(in.readNBytes(Integer.BYTES)).getInt();
+            String value = new String(in.readAllBytes());
+            return new MessageWrapper<>(value, senderId);
         } catch (IOException e) {
             throw new SerializationException(e);
         }
