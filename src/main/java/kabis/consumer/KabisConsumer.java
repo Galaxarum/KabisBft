@@ -24,6 +24,9 @@ public class KabisConsumer<K extends Integer, V extends String> implements Kabis
     //TODO: REMOVE THIS
     public int counter = 0;
 
+    private final List<TopicPartition> assignedPartitions = new ArrayList<>();
+    private Boolean rebalanceNeeded = true;
+
     /**
      * Creates a new KabisConsumer.
      *
@@ -36,7 +39,7 @@ public class KabisConsumer<K extends Integer, V extends String> implements Kabis
         // TODO: Add orderedPulls support
         this.serviceProxy = KabisServiceProxy.getInstance();
         this.serviceProxy.init(clientId, false);
-        this.kafkaPollingThread = new KafkaPollingThread<>(properties);
+        this.kafkaPollingThread = new KafkaPollingThread<>(properties, this);
         this.validator = new Validator<>(this.kafkaPollingThread);
     }
 
@@ -68,7 +71,12 @@ public class KabisConsumer<K extends Integer, V extends String> implements Kabis
      */
     @Override
     public ConsumerRecords<K, V> poll(Duration duration) {
+        if (this.rebalanceNeeded) {
+            this.log.info("Rebalance needed, returning empty records");
+            return ConsumerRecords.empty();
+        }
         //TODO: Remove all the prints
+        System.out.println("[" + this.getClass().getName() + "] RebalanceNeeded is false, pulling...");
         List<SecureIdentifier> sids = this.serviceProxy.pull();
         System.out.printf("[" + this.getClass().getName() + "] Received %d sids%n", sids.size());
         //TODO: Remove counter!
@@ -122,5 +130,26 @@ public class KabisConsumer<K extends Integer, V extends String> implements Kabis
             this.validatedTopics.clear();
             this.validatedTopics.addAll(validatedTopics);
         }
+        this.rebalanceNeeded = true;
+        this.log.info("Updated list of validated topics: {}", Utils.join(validatedTopics, ", "));
+        this.kafkaPollingThread.fetchPartitions();
+    }
+
+    /**
+     * Updates the list of assigned partitions.
+     *
+     * @param assignedPartitions the new list of assigned partitions
+     */
+    public void updateAssignedPartitions(List<TopicPartition> assignedPartitions) {
+        synchronized (this.assignedPartitions) {
+            this.assignedPartitions.clear();
+            this.assignedPartitions.addAll(assignedPartitions);
+        }
+        this.rebalanceNeeded = false;
+        this.log.info("Updated list of assigned partitions: {}", Utils.join(assignedPartitions, ", "));
+    }
+
+    public void setRebalanceNeeded() {
+        this.rebalanceNeeded = true;
     }
 }
