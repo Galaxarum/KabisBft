@@ -76,6 +76,7 @@ public class KafkaPollingThread<K, V> {
         this.log.info("Replica {}, partitions revoked: {}", replicaIndex, revokedPartitions);
     }
 
+
     /**
      * Updates the assigned partitions for a given replica.
      *
@@ -89,8 +90,8 @@ public class KafkaPollingThread<K, V> {
         this.replicaPartitionsUpdated.put(replicaIndex, true);
         if (this.replicaPartitionsUpdated.values().stream().allMatch(replicaUpdated -> replicaUpdated)) {
             this.log.info("All replicas have updated their partitions");
-            this.replicaPartitionsUpdated.replaceAll((k, v) -> false);
             if (this.assignedPartitions.values().stream().skip(1).allMatch(partitions -> this.assignedPartitions.get(0).equals(partitions))) {
+                this.replicaPartitionsUpdated.replaceAll((k, v) -> false);
                 this.log.info("All replicas have the same partitions");
                 System.out.println("[updateAssignedPartitions] Returning to the KabisConsumer: " + this.assignedPartitions.get(0));
                 //TODO:  return the partitions of the first replica to the kabis consumer
