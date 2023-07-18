@@ -63,20 +63,14 @@ public class KabisConsumer<K extends Integer, V extends String> implements Kabis
         this.log.info("Unsubscribed from all topics");
     }
 
+
     /**
      * Polls for records.
      *
      * @param duration The maximum time to block (must not be greater than Long.MAX_VALUE milliseconds)
      * @return the records
      */
-    @Override
-    public ConsumerRecords<K, V> poll(Duration duration) {
-        if (this.rebalanceNeeded) {
-            this.log.info("Rebalance needed, returning empty records");
-            return ConsumerRecords.empty();
-        }
-        //TODO: Remove all the prints
-        System.out.println("[" + this.getClass().getName() + "] RebalanceNeeded is false, pulling...");
+    private ConsumerRecords<K, V> pollRecords(Duration duration) {
         List<SecureIdentifier> sids = this.serviceProxy.pull();
         System.out.printf("[" + this.getClass().getName() + "] Received %d sids%n", sids.size());
         //TODO: Remove counter!
@@ -97,7 +91,19 @@ public class KabisConsumer<K extends Integer, V extends String> implements Kabis
                 );
 
         return new ConsumerRecords<>(mergedMap);
+    }
 
+    /**
+     * Polls for records.
+     *
+     * @param duration The maximum time to block (must not be greater than Long.MAX_VALUE milliseconds)
+     * @return the records
+     */
+    @Override
+    public ConsumerRecords<K, V> poll(Duration duration) {
+
+
+        return new ConsumerRecords<>(mergedMap);
     }
 
     /**
@@ -151,5 +157,6 @@ public class KabisConsumer<K extends Integer, V extends String> implements Kabis
 
     public void setRebalanceNeeded() {
         this.rebalanceNeeded = true;
+
     }
 }
