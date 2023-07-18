@@ -22,8 +22,8 @@ public class KafkaPollingThread<K, V> {
      */
     private final List<Cache<K, V>> cacheReplicas;
 
-    private final Map<Integer, List<TopicPartition>> assignedPartitions = new HashMap<>();
-    private final Map<Integer, Boolean> replicaPartitionsUpdated = new HashMap<>();
+    private final Map<Integer, List<TopicPartition>> assignedPartitions;
+    private final Map<Integer, Boolean> replicaPartitionsUpdated;
     private final Logger log;
 
     /**
@@ -36,6 +36,8 @@ public class KafkaPollingThread<K, V> {
         //TODO: Check if the properties are valid, otherwise throw an exception
         String[] serversReplicas = properties.getProperty("bootstrap.servers").split(";");
         ArrayList<KafkaConsumer<K, MessageWrapper<V>>> consumers = new ArrayList<>(serversReplicas.length);
+        this.assignedPartitions = new HashMap<>(serversReplicas.length);
+        this.replicaPartitionsUpdated = new HashMap<>(serversReplicas.length);
         this.cacheReplicas = new ArrayList<>(serversReplicas.length);
         for (int i = 0; i < serversReplicas.length; i++) {
             String servers = serversReplicas[i];
@@ -44,6 +46,8 @@ public class KafkaPollingThread<K, V> {
             simplerProperties.put("bootstrap.servers", servers);
             simplerProperties.put("client.id", id);
             consumers.add(new KafkaConsumer<>(simplerProperties));
+            this.replicaPartitionsUpdated.put(i, false);
+            this.assignedPartitions.put(i, new ArrayList<>());
             this.cacheReplicas.add(new Cache<>());
         }
         this.consumers = Collections.unmodifiableList(consumers);
@@ -59,7 +63,28 @@ public class KafkaPollingThread<K, V> {
         }
     }
 
-    public void updateAssignedPartitions(int replicaIndex, List<TopicPartition> assignedPartitions) {
+    /**
+     * Pulls records from Kafka for a given replica.
+     *
+     * @param replicaIndex      the index of the replica
+     * @param revokedPartitions the partitions that were revoked from the replica
+     */
+    public void revokeAssignedPartitions(int replicaIndex, List<TopicPartition> revokedPartitions) {
+        List<TopicPartition> assignedPartitions = this.assignedPartitions.get(replicaIndex);
+        assignedPartitions.removeAll(revokedPartitions);
+        this.assignedPartitions.put(replicaIndex, assignedPartitions);
+        this.log.info("Replica {}, partitions revoked: {}", replicaIndex, revokedPartitions);
+    }
+
+    /**
+     * Updates the assigned partitions for a given replica.
+     *
+     * @param replicaIndex            the index of the replica
+     * @param newlyAssignedPartitions the partitions that were assigned to the replica
+     */
+    public void updateAssignedPartitions(int replicaIndex, List<TopicPartition> newlyAssignedPartitions) {
+        List<TopicPartition> assignedPartitions = this.assignedPartitions.get(replicaIndex);
+        assignedPartitions.addAll(newlyAssignedPartitions);
         this.assignedPartitions.put(replicaIndex, assignedPartitions);
         this.replicaPartitionsUpdated.put(replicaIndex, true);
         if (this.replicaPartitionsUpdated.values().stream().allMatch(replicaUpdated -> replicaUpdated)) {
