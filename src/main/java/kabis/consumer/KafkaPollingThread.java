@@ -72,6 +72,8 @@ public class KafkaPollingThread<K, V> {
         if (!samePartitionsForAllReplicas) {
             throw new IllegalStateException("The Kafka replicas have different assigned partitions");
         }
+        if (assignedPartitions.get(0) == null)
+            return new ArrayList<>();
         return assignedPartitions.get(0);
     }
 

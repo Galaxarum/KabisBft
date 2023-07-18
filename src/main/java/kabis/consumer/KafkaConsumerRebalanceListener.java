@@ -23,12 +23,12 @@ public class KafkaConsumerRebalanceListener<K, V> implements ConsumerRebalanceLi
 
     @Override
     public void onPartitionsRevoked(Collection<TopicPartition> partitions) {
-        this.log.info("Partitions revoked: {}", partitions);
+        this.log.info("Replica {}, partitions revoked: {}", this.replicaIndex, partitions);
     }
 
     @Override
     public void onPartitionsAssigned(Collection<TopicPartition> partitions) {
-        this.log.info("Partitions assigned: {}", partitions);
+        this.log.info("Replica {}, partitions assigned: {}", this.replicaIndex, partitions);
         this.kafkaPollingThread.updateAssignedPartitions(this.replicaIndex, new ArrayList<>(partitions));
     }
 }
