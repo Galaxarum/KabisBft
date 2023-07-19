@@ -28,6 +28,7 @@ public class KafkaPollingThread<K extends Integer, V extends String> {
     private final Map<Integer, Boolean> replicaPartitionsUpdated;
     private final Logger log;
 
+
     /**
      * Creates a new KafkaPollingThread.
      *
@@ -57,12 +58,27 @@ public class KafkaPollingThread<K extends Integer, V extends String> {
     }
 
     /**
-     * Fetches the assigned partitions to a Kafka consumer from a given replica.
+     * Calls a poll for each Kafka replica. In order to trigger a rebalance event.
      */
     public void fetchPartitions() {
         for (int replicaIndex = 0; replicaIndex < this.consumers.size(); replicaIndex++) {
             this.log.info("Fetching partitions for replica {}", replicaIndex);
             pullKafka(replicaIndex, Duration.ofSeconds(30));
+        }
+    }
+
+    /**
+     * Polls for records and stores them in the cache.
+     *
+     * @param timeout The maximum time to block (must not be greater than Long.MAX_VALUE milliseconds)
+     */
+    private void pullKafka(int replicaIndex, Duration timeout) {
+        ConsumerRecords<K, MessageWrapper<V>> records = this.consumers.get(replicaIndex).poll(timeout);
+        Cache<K, V> cache = this.cacheReplicas.get(replicaIndex);
+        for (ConsumerRecord<K, MessageWrapper<V>> record : records) {
+            TopicPartition tp = new TopicPartition(record.topic(), record.partition());
+            CacheKey key = new CacheKey(tp, record.value().getSenderId());
+            cache.offer(key, record);
         }
     }
 
@@ -79,7 +95,6 @@ public class KafkaPollingThread<K extends Integer, V extends String> {
         this.assignedPartitions.put(replicaIndex, assignedPartitions);
         this.log.info("Replica {}, partitions revoked: {}", replicaIndex, revokedPartitions);
     }
-
 
     /**
      * Updates the assigned partitions for a given replica.
@@ -103,21 +118,6 @@ public class KafkaPollingThread<K extends Integer, V extends String> {
     }
 
     /**
-     * Polls for records and stores them in the cache.
-     *
-     * @param timeout The maximum time to block (must not be greater than Long.MAX_VALUE milliseconds)
-     */
-    private void pullKafka(int replicaIndex, Duration timeout) {
-        ConsumerRecords<K, MessageWrapper<V>> records = this.consumers.get(replicaIndex).poll(timeout);
-        Cache<K, V> cache = this.cacheReplicas.get(replicaIndex);
-        for (ConsumerRecord<K, MessageWrapper<V>> record : records) {
-            TopicPartition tp = new TopicPartition(record.topic(), record.partition());
-            CacheKey key = new CacheKey(tp, record.value().getSenderId());
-            cache.offer(key, record);
-        }
-    }
-
-    /**
      * Polls for records from each Kafka replica, and returns a list of records from each replica.
      *
      * @param tp         The topic partition to poll from
@@ -130,13 +130,14 @@ public class KafkaPollingThread<K extends Integer, V extends String> {
         ArrayList<ConsumerRecord<K, MessageWrapper<V>>> res = new ArrayList<>(this.cacheReplicas.size());
         for (int replicaIndex = 0; replicaIndex < this.cacheReplicas.size(); replicaIndex++) {
             Cache<K, V> cache = this.cacheReplicas.get(replicaIndex);
-            while (!cache.hasAny(cacheKey)) {
+            while (!cache.hasAny(cacheKey) && !this.kabisConsumer.isRebalanceNeeded()) {
                 pullKafka(replicaIndex, timeout);
             }
-            res.add(cache.poll(cacheKey));
+            if (cache.hasAny(cacheKey)) res.add(cache.poll(cacheKey));
         }
         return res;
     }
+
 
     /**
      * Polls for records from each Kafka replica, and returns a list of records from each replica.

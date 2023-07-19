@@ -21,12 +21,11 @@ public class KabisConsumer<K extends Integer, V extends String> implements Kabis
     private final KafkaPollingThread<K, V> kafkaPollingThread;
     private final Validator<K, V> validator;
     private final Logger log;
+    private final List<TopicPartition> assignedPartitions = new ArrayList<>();
     //TODO: REMOVE THIS
     public int counter = 0;
-
-    private final List<TopicPartition> assignedPartitions = new ArrayList<>();
+    private PollingThread<K, V> pollingThread;
     private Boolean rebalanceNeeded = true;
-    private final PollingThread<K, V> pollingThread;
     private List<SecureIdentifier> pulledSids = new ArrayList<>();
 
     /**
@@ -41,9 +40,9 @@ public class KabisConsumer<K extends Integer, V extends String> implements Kabis
         // TODO: Add orderedPulls support
         this.serviceProxy = KabisServiceProxy.getInstance();
         this.serviceProxy.init(clientId, false);
+        properties.put("group.instance.id", String.format("%s-%d", properties.getProperty("group.id"), clientId));
         this.kafkaPollingThread = new KafkaPollingThread<>(properties, this);
         this.validator = new Validator<>(this.kafkaPollingThread);
-        this.pollingThread = new PollingThread<>(this);
     }
 
     /**
@@ -74,17 +73,50 @@ public class KabisConsumer<K extends Integer, V extends String> implements Kabis
      */
     @Override
     public ConsumerRecords<K, V> poll(Duration duration) {
-        if (this.rebalanceNeeded) return new ConsumerRecords<>(new HashMap<>());
+        if (this.rebalanceNeeded) {
+            this.log.info("Waiting for rebalance to be finished, returning empty records");
+            try {
+                Thread.sleep(10000);
+            } catch (InterruptedException e) {
+                return new ConsumerRecords<>(new HashMap<>());
+            }
+            return new ConsumerRecords<>(new HashMap<>());
+        }
 
+        this.pollingThread = new PollingThread<>(this);
         this.pollingThread.setDuration(duration);
         this.pollingThread.start();
         try {
             this.pollingThread.join();
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            this.log.warn("Polling thread interrupted, it can be due to a rebalance needed");
+            return new ConsumerRecords<>(new HashMap<>());
         }
 
         return this.pollingThread.getRecords();
+
+    }
+
+    /**
+     * Close the consumer, waiting for up to the default timeout of 30 seconds for any needed cleanup.
+     */
+    @Override
+    public void close() {
+        this.pollingThread = null;
+        this.kafkaPollingThread.close();
+        this.log.info("Consumer closed successfully");
+    }
+
+    /**
+     * Close the consumer, waiting for up to the specified timeout for any needed cleanup.
+     *
+     * @param duration The time to wait for cleanup to finish
+     */
+    @Override
+    public void close(Duration duration) {
+        this.pollingThread = null;
+        this.kafkaPollingThread.close();
+        this.kafkaPollingThread.close(duration);
     }
 
     /**
@@ -95,18 +127,16 @@ public class KabisConsumer<K extends Integer, V extends String> implements Kabis
      */
     protected ConsumerRecords<K, V> pollRecords(Duration duration) {
         if (this.pulledSids.isEmpty()) this.pulledSids = this.serviceProxy.pull();
-        this.pulledSids = this.pulledSids.stream().filter(sid -> this.assignedPartitions.contains(sid.getTopicPartition())).collect(Collectors.toList());
-
         System.out.printf("[" + this.getClass().getName() + "] Received %d sids%n", this.pulledSids.size());
+        this.filterSids();
+
+        System.out.printf("[" + this.getClass().getName() + "] After filter, received %d sids%n", this.pulledSids.size());
         //TODO: Remove counter!
         this.counter += this.pulledSids.size();
         System.out.println("[" + this.getClass().getName() + "] Total SIDS until now: " + this.counter);
 
         // TODO: Why is duration not passed to the validator? And a new one is created?
         Map<TopicPartition, List<ConsumerRecord<K, V>>> validatedRecords = this.validator.verify(this.pulledSids);
-        //System.out.printf("[" + this.getClass().getName() + "] Received %d validated records%n", validatedRecords.values().stream().map(List::size).reduce(Integer::sum).orElse(-1));
-        //if (!validatedRecords.isEmpty())
-        //System.out.println("[" + this.getClass().getName() + "] Validated records: " + validatedRecords.values());
         Map<TopicPartition, List<ConsumerRecord<K, V>>> unvalidatedRecords = this.kafkaPollingThread.pollUnvalidated(this.validatedTopics, duration);
 
         Map<TopicPartition, List<ConsumerRecord<K, V>>> mergedMap = Stream.concat(validatedRecords.entrySet().stream(), unvalidatedRecords.entrySet().stream())
@@ -120,22 +150,10 @@ public class KabisConsumer<K extends Integer, V extends String> implements Kabis
     }
 
     /**
-     * Close the consumer, waiting for up to the default timeout of 30 seconds for any needed cleanup.
+     * Filters the list of pulled SIDs, keeping only the ones that are assigned to the consumer.
      */
-    @Override
-    public void close() {
-        this.kafkaPollingThread.close();
-        this.log.info("Consumer closed successfully");
-    }
-
-    /**
-     * Close the consumer, waiting for up to the specified timeout for any needed cleanup.
-     *
-     * @param duration The time to wait for cleanup to finish
-     */
-    @Override
-    public void close(Duration duration) {
-        this.kafkaPollingThread.close(duration);
+    private void filterSids() {
+        this.pulledSids = this.pulledSids.stream().filter(sid -> this.assignedPartitions.contains(sid.getTopicPartition())).collect(Collectors.toList());
     }
 
     /**
@@ -165,20 +183,34 @@ public class KabisConsumer<K extends Integer, V extends String> implements Kabis
             this.assignedPartitions.addAll(assignedPartitions);
         }
         this.rebalanceNeeded = false;
+        this.filterSids();
+        if (this.pollingThread != null) pollingThread.notifyAll();
+
         this.log.info("Updated list of assigned partitions: {}", Utils.join(assignedPartitions, ", "));
     }
 
     public void setRebalanceNeeded() {
+        this.log.info("Rebalance event received, stopping polling thread");
         this.rebalanceNeeded = true;
-        this.pollingThread.interrupt();
+        try {
+            if (this.pollingThread != null)
+                this.pollingThread.wait();
+        } catch (InterruptedException e) {
+            this.log.error("Polling thread interrupted during rebalance event");
+        }
+
+    }
+
+    public boolean isRebalanceNeeded() {
+        return this.rebalanceNeeded;
     }
 }
 
 class PollingThread<K extends Integer, V extends String> extends Thread {
-    private Duration duration;
     private final KabisConsumer<K, V> kabisConsumer;
-    private ConsumerRecords<K, V> records;
     private final Object recordsLock = new Object();
+    private Duration duration;
+    private ConsumerRecords<K, V> records;
 
     public PollingThread(KabisConsumer<K, V> kabisConsumer) {
         this.kabisConsumer = kabisConsumer;
