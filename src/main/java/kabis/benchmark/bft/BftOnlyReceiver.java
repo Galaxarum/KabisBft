@@ -9,21 +9,12 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.security.Security;
+import java.util.ArrayList;
 
 import static kabis.benchmark.BenchmarkResult.TOPICS;
 
 public class BftOnlyReceiver {
     private static final Logger LOG = LoggerFactory.getLogger(BftOnlySender.class);
-
-    public static long measureTotalConsumeTime(KabisServiceProxy proxy, int recordsToRead) {
-        int i = 0;
-        var t1 = System.nanoTime();
-        while (i < recordsToRead) {
-            i += proxy.pull().size();
-        }
-        var t2 = System.nanoTime();
-        return t2 - t1;
-    }
 
     public static void main(String[] args) throws IOException, InterruptedException {
         if (args.length != 4) {
@@ -54,6 +45,17 @@ public class BftOnlyReceiver {
         System.out.println("Experiment result persisted");
         Thread.sleep(1000);
         System.exit(0);
+    }
+
+    public static long measureTotalConsumeTime(KabisServiceProxy proxy, int recordsToRead) {
+        int i = 0;
+        var t1 = System.nanoTime();
+        while (i < recordsToRead) {
+            // THIS WON'T WORK BECAUSE THE CLIENT MUST PASS A LIST OF TOPIC PARTITIONS IN NEW VERSIONS!
+            i += proxy.pull(new ArrayList<>()).size();
+        }
+        var t2 = System.nanoTime();
+        return t2 - t1;
     }
 
 }

@@ -1,12 +1,16 @@
 package kabis.validation;
 
 import bftsmart.tom.ServiceProxy;
+import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.errors.SerializationException;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.List;
+
+import static kabis.validation.serializers.SidListSerializer.deserializeSidList;
+import static kabis.validation.serializers.TopicPartitionListSerializer.serializeTopicPartitionList;
 
 /**
  * A singleton proxy for the KabisServiceReplica.
@@ -23,6 +27,10 @@ public class KabisServiceProxy {
     private KabisServiceProxy() {
     }
 
+    public static KabisServiceProxy getInstance() {
+        return instance;
+    }
+
     /**
      * Initializes the KabisServiceProxy with the given id and orderedPulls flag,
      * only if it has not been initialized before.
@@ -36,10 +44,6 @@ public class KabisServiceProxy {
             this.orderedPulls = orderedPulls;
             this.isInitialized = true;
         }
-    }
-
-    public static KabisServiceProxy getInstance() {
-        return instance;
     }
 
     /**
@@ -67,25 +71,18 @@ public class KabisServiceProxy {
      *
      * @return A list of SecureIdentifiers
      */
-    public List<SecureIdentifier> pull() {
+    public List<SecureIdentifier> pull(List<TopicPartition> topicPartitions) {
         try (ByteArrayOutputStream bytes = new ByteArrayOutputStream()) {
             bytes.write(OPS.PULL.ordinal());
+            //TODO ADD LIST OF TOPIC PARTITIONS
+            bytes.writeBytes(serializeTopicPartitionList(topicPartitions));
+
             bytes.writeBytes(ByteBuffer.allocate(Integer.BYTES).putInt(this.nextPullIndex).array());
             byte[] request = bytes.toByteArray();
             byte[] responseBytes = this.orderedPulls ?
                     this.bftServiceProxy.invokeOrdered(request) :
                     this.bftServiceProxy.invokeUnordered(request);
-            if (responseBytes == null || responseBytes.length == 0) {
-                //TODO: Remove this sleep?
-                try {
-                    Thread.sleep(50);
-                } catch (InterruptedException ignored) {
-                }
-                return List.of();
-            }
-            //TODO: Should deserializeSidList be decoupled from KabisServiceReplica?
-            List<SecureIdentifier> result = KabisServiceReplica.deserializeSidList(responseBytes);
-            //TODO: Move this to KabisConsumer
+            List<SecureIdentifier> result = deserializeSidList(responseBytes);
             this.nextPullIndex += result.size();
             //TODO: Remove this print
             System.out.println("Pulled " + result.size() + " SIDs, nextPullIndex = " + this.nextPullIndex);
@@ -94,5 +91,4 @@ public class KabisServiceProxy {
             throw new SerializationException(e);
         }
     }
-
 }

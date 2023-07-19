@@ -2,6 +2,9 @@
 
 This repository contains the minimal implementation developed to use Kabis with the SMaRt-BFT library.
 
+BFT_BENCHMARK NOT WORKING, A LIST OF TOPIC PARTITIONS MUST BE PASSED TO THE KABISSERVICEPROXY, BUT SINCE BFT IS ALONE,
+NO TOPICPARTITION INFO IS AVAILABLE.
+
 ## ⚙️ Environments
 
 The first time you clone the repo, copy and paste the `.env.example` file and rename it as `.env`. Then, fill the

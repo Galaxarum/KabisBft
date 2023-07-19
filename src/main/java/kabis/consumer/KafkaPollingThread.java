@@ -58,6 +58,20 @@ public class KafkaPollingThread<K extends Integer, V extends String> {
     }
 
     /**
+     * Pulls records from Kafka for a given replica.
+     *
+     * @param replicaIndex      the index of the replica
+     * @param revokedPartitions the partitions that were revoked from the replica
+     */
+    public void revokeAssignedPartitions(int replicaIndex, List<TopicPartition> revokedPartitions) {
+        this.kabisConsumer.setRebalanceNeeded();
+        List<TopicPartition> assignedPartitions = this.assignedPartitions.get(replicaIndex);
+        assignedPartitions.removeAll(revokedPartitions);
+        this.assignedPartitions.put(replicaIndex, assignedPartitions);
+        this.log.info("Replica {}, partitions revoked: {}", replicaIndex, revokedPartitions);
+    }
+
+    /**
      * Calls a poll for each Kafka replica. In order to trigger a rebalance event.
      */
     public void fetchPartitions() {
@@ -80,20 +94,6 @@ public class KafkaPollingThread<K extends Integer, V extends String> {
             CacheKey key = new CacheKey(tp, record.value().getSenderId());
             cache.offer(key, record);
         }
-    }
-
-    /**
-     * Pulls records from Kafka for a given replica.
-     *
-     * @param replicaIndex      the index of the replica
-     * @param revokedPartitions the partitions that were revoked from the replica
-     */
-    public void revokeAssignedPartitions(int replicaIndex, List<TopicPartition> revokedPartitions) {
-        this.kabisConsumer.setRebalanceNeeded();
-        List<TopicPartition> assignedPartitions = this.assignedPartitions.get(replicaIndex);
-        assignedPartitions.removeAll(revokedPartitions);
-        this.assignedPartitions.put(replicaIndex, assignedPartitions);
-        this.log.info("Replica {}, partitions revoked: {}", replicaIndex, revokedPartitions);
     }
 
     /**
@@ -130,7 +130,8 @@ public class KafkaPollingThread<K extends Integer, V extends String> {
         ArrayList<ConsumerRecord<K, MessageWrapper<V>>> res = new ArrayList<>(this.cacheReplicas.size());
         for (int replicaIndex = 0; replicaIndex < this.cacheReplicas.size(); replicaIndex++) {
             Cache<K, V> cache = this.cacheReplicas.get(replicaIndex);
-            while (!cache.hasAny(cacheKey) && !this.kabisConsumer.isRebalanceNeeded()) {
+            while (!cache.hasAny(cacheKey)) {
+                System.out.println("SON NEL WHILE with tp: " + tp + " and assigned: " + this.assignedPartitions.get(replicaIndex));
                 pullKafka(replicaIndex, timeout);
             }
             if (cache.hasAny(cacheKey)) res.add(cache.poll(cacheKey));
