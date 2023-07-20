@@ -3,6 +3,8 @@ package kabis.consumer;
 import org.apache.kafka.clients.consumer.internals.AbstractPartitionAssignor;
 import org.apache.kafka.common.Configurable;
 import org.apache.kafka.common.TopicPartition;
+import org.apache.kafka.common.config.AbstractConfig;
+import org.apache.kafka.common.config.ConfigDef;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -85,5 +87,26 @@ public class KabisPartitionAssignor extends AbstractPartitionAssignor implements
     @Override
     public void configure(Map<String, ?> configs) {
         this.config = new KabisPartitionAssignorConfig(configs);
+    }
+}
+
+class KabisPartitionAssignorConfig extends AbstractConfig {
+    public static final String GROUP_CONSUMERS_IDS_CONFIG = "group.consumers.ids";
+    public static final String GROUP_CONSUMERS_IDS_DOC = "List of consumers ids in the group, comma separated";
+
+    private static final ConfigDef CONFIG;
+
+    static {
+        CONFIG = new ConfigDef()
+                .define(GROUP_CONSUMERS_IDS_CONFIG, ConfigDef.Type.STRING, ConfigDef.NO_DEFAULT_VALUE,
+                        ConfigDef.Importance.HIGH, GROUP_CONSUMERS_IDS_DOC);
+    }
+
+    public KabisPartitionAssignorConfig(final Map<?, ?> originals) {
+        super(CONFIG, originals);
+    }
+
+    public String[] groupConsumersIds() {
+        return getString(GROUP_CONSUMERS_IDS_CONFIG).split(",");
     }
 }
