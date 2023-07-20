@@ -13,7 +13,7 @@ import java.util.Properties;
 import static java.lang.Integer.parseInt;
 
 public class SafeCorp extends ArtExhibitionProducer {
-    private static final Duration POLL_TIMEOUT = Duration.ofSeconds(1);
+    private static final Duration POLL_TIMEOUT = Duration.ofSeconds(5);
 
     protected SafeCorp(Integer clientId, Integer numberOfArtExhibitions, Integer numberOfTrueAlarms, Integer numberOfFalseAlarms, Integer numberOfUncaughtBreaches) {
         super(clientId, numberOfArtExhibitions, numberOfTrueAlarms, numberOfFalseAlarms, numberOfUncaughtBreaches);
@@ -26,7 +26,7 @@ public class SafeCorp extends ArtExhibitionProducer {
             System.exit(1);
         }
         // -- PRIMING KAFKA, CREATING TOPICS --
-        Thread.sleep(30000);
+        Thread.sleep(15000);
         // -- RUN SAFECORP INSTANCE --
         new SafeCorp(parseInt(args[0]), parseInt(args[1]), parseInt(args[2]), parseInt(args[3]), parseInt(args[4])).run();
         // -- KILL THE BENCHMARK AFTER run() --

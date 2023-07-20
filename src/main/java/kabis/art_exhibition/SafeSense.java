@@ -20,7 +20,7 @@ public class SafeSense extends ArtExhibitionProducer {
             System.exit(1);
         }
         // -- PRIMING KAFKA, CREATING TOPICS --
-        Thread.sleep(30000);
+        Thread.sleep(15000);
         new SafeSense(parseInt(args[0]), parseInt(args[1]), parseInt(args[2]), parseInt(args[3])).run();
     }
 

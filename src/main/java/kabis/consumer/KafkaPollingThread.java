@@ -5,8 +5,6 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.TopicPartition;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.util.*;
@@ -22,26 +20,16 @@ public class KafkaPollingThread<K extends Integer, V extends String> {
      */
     private final List<Cache<K, V>> cacheReplicas;
 
-    private final KabisConsumer<K, V> kabisConsumer;
-
-    private final Map<Integer, List<TopicPartition>> assignedPartitions;
-    private final Map<Integer, Boolean> replicaPartitionsUpdated;
-    private final Logger log;
-
 
     /**
      * Creates a new KafkaPollingThread.
      *
      * @param properties the properties to be used by the KafkaPollingThread
      */
-    public KafkaPollingThread(Properties properties, KabisConsumer<K, V> kabisConsumer) {
-        this.log = LoggerFactory.getLogger(KafkaPollingThread.class);
-        this.kabisConsumer = kabisConsumer;
+    public KafkaPollingThread(Properties properties) {
         //TODO: Check if the properties are valid, otherwise throw an exception
         String[] serversReplicas = properties.getProperty("bootstrap.servers").split(";");
         ArrayList<KafkaConsumer<K, MessageWrapper<V>>> consumers = new ArrayList<>(serversReplicas.length);
-        this.assignedPartitions = new HashMap<>(serversReplicas.length);
-        this.replicaPartitionsUpdated = new HashMap<>(serversReplicas.length);
         this.cacheReplicas = new ArrayList<>(serversReplicas.length);
         for (int i = 0; i < serversReplicas.length; i++) {
             String servers = serversReplicas[i];
@@ -50,35 +38,41 @@ public class KafkaPollingThread<K extends Integer, V extends String> {
             simplerProperties.put("bootstrap.servers", servers);
             simplerProperties.put("client.id", id);
             consumers.add(new KafkaConsumer<>(simplerProperties));
-            this.replicaPartitionsUpdated.put(i, false);
-            this.assignedPartitions.put(i, new ArrayList<>());
             this.cacheReplicas.add(new Cache<>());
         }
         this.consumers = Collections.unmodifiableList(consumers);
     }
 
     /**
-     * Pulls records from Kafka for a given replica.
+     * Returns the list of assigned partitions to the Kafka consumers.
      *
-     * @param replicaIndex      the index of the replica
-     * @param revokedPartitions the partitions that were revoked from the replica
+     * @return the list of assigned partitions to the Kafka consumers
+     * @throws IllegalStateException if the Kafka replicas have different assigned partitions
      */
-    public void revokeAssignedPartitions(int replicaIndex, List<TopicPartition> revokedPartitions) {
-        this.kabisConsumer.setRebalanceNeeded();
-        List<TopicPartition> assignedPartitions = this.assignedPartitions.get(replicaIndex);
-        assignedPartitions.removeAll(revokedPartitions);
-        this.assignedPartitions.put(replicaIndex, assignedPartitions);
-        this.log.info("Replica {}, partitions revoked: {}", replicaIndex, revokedPartitions);
+    public List<TopicPartition> getAssignedPartitions() {
+        Set<TopicPartition> firstReplicaAssignedPartitions = pullAndReturnAssignedPartitions(0);
+
+        for (int replicaIndex = 1; replicaIndex < this.consumers.size(); replicaIndex++) {
+            Set<TopicPartition> assignedPartitionsReplica = pullAndReturnAssignedPartitions(replicaIndex);
+            if (!assignedPartitionsReplica.equals(firstReplicaAssignedPartitions)) {
+                throw new IllegalStateException("The Kafka replicas have different assigned partitions");
+            }
+        }
+        return new ArrayList<>(firstReplicaAssignedPartitions);
     }
 
     /**
-     * Calls a poll for each Kafka replica. In order to trigger a rebalance event.
+     * Returns the list of assigned partitions to the Kafka consumer of the given replica.
+     *
+     * @return the set of assigned partitions to the Kafka consumers
      */
-    public void fetchPartitions() {
-        for (int replicaIndex = 0; replicaIndex < this.consumers.size(); replicaIndex++) {
-            this.log.info("Fetching partitions for replica {}", replicaIndex);
-            pullKafka(replicaIndex, Duration.ofSeconds(30));
+    private Set<TopicPartition> pullAndReturnAssignedPartitions(int replicaIndex) {
+        pullKafka(replicaIndex, Duration.ofSeconds(30));
+        Set<TopicPartition> assignedPartitions = this.consumers.get(replicaIndex).assignment();
+        while (assignedPartitions.isEmpty()) {
+            assignedPartitions = this.consumers.get(replicaIndex).assignment();
         }
+        return assignedPartitions;
     }
 
     /**
@@ -97,27 +91,6 @@ public class KafkaPollingThread<K extends Integer, V extends String> {
     }
 
     /**
-     * Updates the assigned partitions for a given replica.
-     *
-     * @param replicaIndex            the index of the replica
-     * @param newlyAssignedPartitions the partitions that were assigned to the replica
-     */
-    public void updateAssignedPartitions(int replicaIndex, List<TopicPartition> newlyAssignedPartitions) {
-        List<TopicPartition> assignedPartitions = this.assignedPartitions.get(replicaIndex);
-        assignedPartitions.addAll(newlyAssignedPartitions);
-        this.assignedPartitions.put(replicaIndex, assignedPartitions);
-        this.replicaPartitionsUpdated.put(replicaIndex, true);
-        if (this.replicaPartitionsUpdated.values().stream().allMatch(replicaUpdated -> replicaUpdated)) {
-            this.log.info("All replicas have updated their partitions");
-            if (this.assignedPartitions.values().stream().skip(1).allMatch(partitions -> this.assignedPartitions.get(0).equals(partitions))) {
-                this.replicaPartitionsUpdated.replaceAll((k, v) -> false);
-                this.log.info("All replicas have the same partitions");
-                kabisConsumer.updateAssignedPartitions(this.assignedPartitions.get(0));
-            }
-        }
-    }
-
-    /**
      * Polls for records from each Kafka replica, and returns a list of records from each replica.
      *
      * @param tp         The topic partition to poll from
@@ -131,7 +104,7 @@ public class KafkaPollingThread<K extends Integer, V extends String> {
         for (int replicaIndex = 0; replicaIndex < this.cacheReplicas.size(); replicaIndex++) {
             Cache<K, V> cache = this.cacheReplicas.get(replicaIndex);
             while (!cache.hasAny(cacheKey)) {
-                System.out.println("SON NEL WHILE with tp: " + tp + " and assigned: " + this.assignedPartitions.get(replicaIndex));
+                System.out.println("SON NEL WHILE with tp: " + tp);
                 pullKafka(replicaIndex, timeout);
             }
             if (cache.hasAny(cacheKey)) res.add(cache.poll(cacheKey));
@@ -168,15 +141,13 @@ public class KafkaPollingThread<K extends Integer, V extends String> {
     }
 
     /**
-     * Subscribes to the given topics.
-     * Also adds a rebalance listener to each consumer subscription, which updates the assigned partitions.
+     * Subscribe to the given list of topics to get dynamically assigned partitions.
+     * Topic subscriptions are not incremental. This list will replace the current assignment (if there is one).
      *
      * @param topics The topics to subscribe to
      */
     public void subscribe(Collection<String> topics) {
-        for (int i = 0; i < this.consumers.size(); i++) {
-            this.consumers.get(i).subscribe(topics, new KafkaConsumerRebalanceListener<>(this, i));
-        }
+        this.consumers.forEach(consumer -> consumer.subscribe(topics));
     }
 
     public void unsubscribe() {

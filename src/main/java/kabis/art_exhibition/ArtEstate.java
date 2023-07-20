@@ -19,7 +19,7 @@ public class ArtEstate extends ArtExhibitionConsumer {
             System.exit(1);
         }
         // -- PRIMING KAFKA, CREATING TOPICS --
-        Thread.sleep(30000);
+        Thread.sleep(15000);
         // -- RUN ART-ESTATE INSTANCE --
         new ArtEstate(parseInt(args[0]), parseInt(args[1]), parseInt(args[2]), parseInt(args[3]), parseInt(args[4])).run();
         // -- KILL THE BENCHMARK AFTER run() --

@@ -2,6 +2,7 @@ package kabis.validation;
 
 import bftsmart.tom.MessageContext;
 import bftsmart.tom.server.defaultservices.DefaultSingleRecoverable;
+import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.errors.SerializationException;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.slf4j.Logger;
@@ -11,12 +12,13 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.security.Security;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static kabis.validation.serializers.SidListSerializer.deserializeSidList;
 import static kabis.validation.serializers.SidListSerializer.serializeSidList;
+import static kabis.validation.serializers.TopicPartitionListSerializer.deserializeTopicPartitionList;
 
 public class KabisServiceReplica extends DefaultSingleRecoverable {
 
@@ -51,7 +53,7 @@ public class KabisServiceReplica extends DefaultSingleRecoverable {
      */
     @Override
     public byte[] getSnapshot() {
-        return pull(0);
+        return serializeSidList(this.secureIdentifierList);
     }
 
     /**
@@ -72,7 +74,8 @@ public class KabisServiceReplica extends DefaultSingleRecoverable {
                     return new byte[0];
                 case PULL:
                     int index = ByteBuffer.wrap(cmd.readNBytes(Integer.BYTES)).getInt();
-                    return pull(index);
+                    List<TopicPartition> topicPartitions = deserializeTopicPartitionList(cmd.readAllBytes());
+                    return pull(index, topicPartitions);
                 default:
                     throw new IllegalArgumentException(String.format("Illegal ordered operation requested: %s", op));
             }
@@ -94,7 +97,8 @@ public class KabisServiceReplica extends DefaultSingleRecoverable {
             int opOrdinal = cmd.read();
             if (opOrdinal == OPS.PULL.ordinal()) {
                 int index = ByteBuffer.wrap(cmd.readNBytes(Integer.BYTES)).getInt();
-                return pull(index);
+                List<TopicPartition> topicPartitions = deserializeTopicPartitionList(cmd.readAllBytes());
+                return pull(index, topicPartitions);
             }
             throw new IllegalArgumentException(String.format("Illegal ordered operation requested: %s", OPS.values()[opOrdinal]));
         } catch (IOException e) {
@@ -115,16 +119,24 @@ public class KabisServiceReplica extends DefaultSingleRecoverable {
     }
 
     /**
-     * Pulls a portion of the list of SecureIdentifiers.
+     * Pulls a portion of the list of SecureIdentifiers. Filtered by the given TopicPartitions.
      *
-     * @param index the index of the first SecureIdentifier to pull.
+     * @param index           the index to start pulling from.
+     * @param topicPartitions the list of TopicPartitions to pull.
      * @return the serialized list of SecureIdentifiers.
      */
-    private byte[] pull(int index) {
+    private byte[] pull(int index, List<TopicPartition> topicPartitions) {
         if (index > this.secureIdentifierList.size()) return new byte[0];
+        //TODO: Remove print
+        System.out.println("Pulling with topic partitions " + topicPartitions + " and index " + index);
         List<SecureIdentifier> secureIdentifierSubList;
+
         synchronized (this.secureIdentifierList) {
-            secureIdentifierSubList = new ArrayList<>(this.secureIdentifierList.subList(index, this.secureIdentifierList.size()));
+            secureIdentifierSubList = this.secureIdentifierList
+                    .subList(index, this.secureIdentifierList.size())
+                    .stream()
+                    .filter(sid -> topicPartitions.contains(sid.getTopicPartition()))
+                    .collect(Collectors.toList());
         }
         return serializeSidList(secureIdentifierSubList);
     }

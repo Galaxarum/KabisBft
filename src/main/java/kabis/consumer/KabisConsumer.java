@@ -24,7 +24,6 @@ public class KabisConsumer<K extends Integer, V extends String> implements Kabis
     private final List<TopicPartition> assignedPartitions = new ArrayList<>();
     //TODO: REMOVE THIS
     public int counter = 0;
-    private Boolean rebalanceNeeded = true;
 
     /**
      * Creates a new KabisConsumer.
@@ -38,8 +37,9 @@ public class KabisConsumer<K extends Integer, V extends String> implements Kabis
         // TODO: Add orderedPulls support
         this.serviceProxy = KabisServiceProxy.getInstance();
         this.serviceProxy.init(clientId, false);
+
         properties.put("group.instance.id", String.format("%s-%d", properties.getProperty("group.id"), clientId));
-        this.kafkaPollingThread = new KafkaPollingThread<>(properties, this);
+        this.kafkaPollingThread = new KafkaPollingThread<>(properties);
         this.validator = new Validator<>(this.kafkaPollingThread);
     }
 
@@ -70,21 +70,15 @@ public class KabisConsumer<K extends Integer, V extends String> implements Kabis
      * @return the records
      */
     public ConsumerRecords<K, V> poll(Duration duration) {
-        while (this.rebalanceNeeded) {
-            this.log.info("Waiting for rebalance to finish...");
-            this.kafkaPollingThread.fetchPartitions();
-        }
-
         List<SecureIdentifier> sids = this.serviceProxy.pull(this.assignedPartitions);
         System.out.printf("[" + this.getClass().getName() + "] Received %d sids%n", sids.size());
         sids = sids.stream().filter(sid -> this.assignedPartitions.contains(sid.getTopicPartition())).collect(Collectors.toList());
         System.out.printf("[" + this.getClass().getName() + "] After filter, received %d sids%n", sids.size());
         //TODO: Remove counter!
         this.counter += sids.size();
-        System.out.println("[" + this.getClass().getName() + "] Total SIDS until now: " + this.counter);
+        System.out.println("[" + this.getClass().getName() + "] Total filtered SIDS until now: " + this.counter);
 
-        // TODO: Why is duration not passed to the validator? And a new one is created?
-        Map<TopicPartition, List<ConsumerRecord<K, V>>> validatedRecords = this.validator.verify(sids);
+        Map<TopicPartition, List<ConsumerRecord<K, V>>> validatedRecords = this.validator.verify(sids, duration);
         Map<TopicPartition, List<ConsumerRecord<K, V>>> unvalidatedRecords = this.kafkaPollingThread.pollUnvalidated(this.validatedTopics, duration);
 
         Map<TopicPartition, List<ConsumerRecord<K, V>>> mergedMap = Stream.concat(validatedRecords.entrySet().stream(), unvalidatedRecords.entrySet().stream())
@@ -126,27 +120,8 @@ public class KabisConsumer<K extends Integer, V extends String> implements Kabis
             this.validatedTopics.clear();
             this.validatedTopics.addAll(validatedTopics);
         }
-        this.rebalanceNeeded = true;
         this.log.info("Updated list of validated topics: {}", Utils.join(validatedTopics, ", "));
-        this.kafkaPollingThread.fetchPartitions();
-    }
-
-    /**
-     * Updates the list of assigned partitions.
-     *
-     * @param assignedPartitions the new list of assigned partitions
-     */
-    public void updateAssignedPartitions(List<TopicPartition> assignedPartitions) {
-        synchronized (this.assignedPartitions) {
-            this.assignedPartitions.clear();
-            this.assignedPartitions.addAll(assignedPartitions);
-        }
-        this.rebalanceNeeded = false;
+        this.assignedPartitions.addAll(this.kafkaPollingThread.getAssignedPartitions());
         this.log.info("Updated list of assigned partitions: {}", Utils.join(assignedPartitions, ", "));
-    }
-
-    public void setRebalanceNeeded() {
-        this.log.info("Rebalance event received");
-        this.rebalanceNeeded = true;
     }
 }

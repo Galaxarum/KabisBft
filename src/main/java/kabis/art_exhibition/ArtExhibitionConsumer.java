@@ -7,7 +7,7 @@ import org.apache.kafka.clients.consumer.ConsumerRecords;
 import java.time.Duration;
 
 public abstract class ArtExhibitionConsumer extends ArtExhibitionClient {
-    private static final Duration POLL_TIMEOUT = Duration.ofSeconds(1);
+    private static final Duration POLL_TIMEOUT = Duration.ofSeconds(5);
     private final Integer clientId;
     private final Integer numberOfArtExhibitions;
     private final Integer numberOfTrueAlarms;

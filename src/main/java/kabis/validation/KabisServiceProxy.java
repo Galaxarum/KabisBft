@@ -74,18 +74,14 @@ public class KabisServiceProxy {
     public List<SecureIdentifier> pull(List<TopicPartition> topicPartitions) {
         try (ByteArrayOutputStream bytes = new ByteArrayOutputStream()) {
             bytes.write(OPS.PULL.ordinal());
-            //TODO ADD LIST OF TOPIC PARTITIONS
-            bytes.writeBytes(serializeTopicPartitionList(topicPartitions));
-
             bytes.writeBytes(ByteBuffer.allocate(Integer.BYTES).putInt(this.nextPullIndex).array());
+            bytes.writeBytes(serializeTopicPartitionList(topicPartitions));
             byte[] request = bytes.toByteArray();
             byte[] responseBytes = this.orderedPulls ?
                     this.bftServiceProxy.invokeOrdered(request) :
                     this.bftServiceProxy.invokeUnordered(request);
             List<SecureIdentifier> result = deserializeSidList(responseBytes);
             this.nextPullIndex += result.size();
-            //TODO: Remove this print
-            System.out.println("Pulled " + result.size() + " SIDs, nextPullIndex = " + this.nextPullIndex);
             return result;
         } catch (IOException e) {
             throw new SerializationException(e);
