@@ -2,6 +2,7 @@ package kabis.validation;
 
 import bftsmart.tom.MessageContext;
 import bftsmart.tom.server.defaultservices.DefaultSingleRecoverable;
+import kabis.validation.serializers.ServiceReplicaResponse;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.errors.SerializationException;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -16,8 +17,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static kabis.validation.serializers.SidListSerializer.deserializeSidList;
-import static kabis.validation.serializers.SidListSerializer.serializeSidList;
+import static kabis.validation.serializers.ServiceReplicaResponse.*;
 import static kabis.validation.serializers.TopicPartitionListSerializer.deserializeTopicPartitionList;
 
 public class KabisServiceReplica extends DefaultSingleRecoverable {
@@ -138,6 +138,6 @@ public class KabisServiceReplica extends DefaultSingleRecoverable {
                     .filter(sid -> topicPartitions.contains(sid.getTopicPartition()))
                     .collect(Collectors.toList());
         }
-        return serializeSidList(secureIdentifierSubList);
+        return serializeServiceReplicaResponse(new ServiceReplicaResponse(this.secureIdentifierList.size(), secureIdentifierSubList));
     }
 }

@@ -1,6 +1,7 @@
 package kabis.validation;
 
 import bftsmart.tom.ServiceProxy;
+import kabis.validation.serializers.ServiceReplicaResponse;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.errors.SerializationException;
 
@@ -9,7 +10,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.List;
 
-import static kabis.validation.serializers.SidListSerializer.deserializeSidList;
+import static kabis.validation.serializers.ServiceReplicaResponse.deserializeServiceReplicaResponse;
 import static kabis.validation.serializers.TopicPartitionListSerializer.serializeTopicPartitionList;
 
 /**
@@ -80,9 +81,9 @@ public class KabisServiceProxy {
             byte[] responseBytes = this.orderedPulls ?
                     this.bftServiceProxy.invokeOrdered(request) :
                     this.bftServiceProxy.invokeUnordered(request);
-            List<SecureIdentifier> result = deserializeSidList(responseBytes);
-            this.nextPullIndex += result.size();
-            return result;
+            ServiceReplicaResponse result = deserializeServiceReplicaResponse(responseBytes);
+            this.nextPullIndex = result.getLastIndex();
+            return result.getSidList();
         } catch (IOException e) {
             throw new SerializationException(e);
         }
