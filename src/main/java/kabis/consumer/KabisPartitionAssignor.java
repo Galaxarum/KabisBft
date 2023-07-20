@@ -6,7 +6,10 @@ import org.apache.kafka.common.TopicPartition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class KabisPartitionAssignor extends AbstractPartitionAssignor implements Configurable {
     public static final String KABIS_ASSIGNOR_NAME = "kabis-assignor";
@@ -21,6 +24,8 @@ public class KabisPartitionAssignor extends AbstractPartitionAssignor implements
     @Override
     public Map<String, List<TopicPartition>> assign(Map<String, Integer> partitionsPerTopic,
                                                     Map<String, Subscription> subscriptions) {
+        log.info("Assigning partitions to consumers using KabisPartitionAssignor");
+        Map<String, List<TopicPartition>> partitionsPerConsumerId = new HashMap<>();
         Map<String, List<MemberInfo>> consumersPerTopic = consumersPerTopic(subscriptions);
 
         Map<String, List<TopicPartition>> assignment = new HashMap<>();
@@ -36,28 +41,31 @@ public class KabisPartitionAssignor extends AbstractPartitionAssignor implements
                 continue;
 
             String[] consumerIds = config.groupConsumersIds();
-
             int numberOfConsumersPerGroup = consumerIds.length;
-
-            List<MemberInfo> consumersList = new ArrayList<>();
-            for (int i = 0; i < numberOfConsumersPerGroup; i++) {
-                String consumerId = consumersForTopic.get(i).groupInstanceId.orElse(null);
-                if (consumerId == null)
-                    continue;
-                consumerId = consumerId.substring(consumerId.lastIndexOf("-") + 1);
-            }
-
-            Collections.sort(consumersForTopic);
 
             int numPartitionsPerConsumer = numPartitionsForTopic / numberOfConsumersPerGroup;
             int consumersWithExtraPartition = numPartitionsForTopic % numberOfConsumersPerGroup;
             List<TopicPartition> partitions = AbstractPartitionAssignor.partitions(topic, numPartitionsForTopic);
 
-            for (int i = 0, n = consumersForTopic.size(); i < n; i++) {
+            for (int i = 0, n = consumerIds.length; i < n; i++) {
                 int start = numPartitionsPerConsumer * i + Math.min(i, consumersWithExtraPartition);
                 int length = numPartitionsPerConsumer + (i + 1 > consumersWithExtraPartition ? 0 : 1);
-                assignment.get(consumersForTopic.get(i).memberId).addAll(partitions.subList(start, start + length));
+                partitionsPerConsumerId.putIfAbsent(consumerIds[i], new ArrayList<>());
+                partitionsPerConsumerId.get(consumerIds[i]).addAll(partitions.subList(start, start + length));
             }
+            this.log.info("Partitions per consumer id: {}", partitionsPerConsumerId);
+
+
+            for (MemberInfo memberInfo : consumersForTopic) {
+                String consumerId = memberInfo.groupInstanceId.orElse(null);
+                if (consumerId == null) {
+                    this.log.error("Consumer {} does not have group instance id, skipping", memberInfo.memberId);
+                    continue;
+                }
+                consumerId = consumerId.substring(consumerId.lastIndexOf("-") + 1);
+                assignment.get(memberInfo.memberId).addAll(partitionsPerConsumerId.get(consumerId));
+            }
+            this.log.info("Assignment: {}", assignment);
         }
         return assignment;
     }
