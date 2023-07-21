@@ -52,6 +52,7 @@ public class KabisPartitionAssignor extends AbstractPartitionAssignor implements
         this.log.info("Assigning partitions to consumers using KabisPartitionAssignor");
         Map<String, List<TopicPartition>> partitionsPerConsumerId = new HashMap<>();
         Map<String, List<MemberInfo>> consumersPerTopic = consumersPerTopic(subscriptions);
+        this.log.info("Consumers per topic: {}", consumersPerTopic);
 
         Map<String, List<TopicPartition>> assignment = new HashMap<>();
         for (String memberId : subscriptions.keySet())

@@ -5,6 +5,8 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.TopicPartition;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.util.*;
@@ -19,6 +21,7 @@ public class KafkaPollingThread<K extends Integer, V extends String> {
      * List of caches, one for each Kafka replica.
      */
     private final List<Cache<K, V>> cacheReplicas;
+    private final Logger log;
 
 
     /**
@@ -27,6 +30,7 @@ public class KafkaPollingThread<K extends Integer, V extends String> {
      * @param properties the properties to be used by the KafkaPollingThread
      */
     public KafkaPollingThread(Properties properties) {
+        this.log = LoggerFactory.getLogger(KafkaPollingThread.class);
         //TODO: Check if the properties are valid, otherwise throw an exception
         String[] serversReplicas = properties.getProperty("bootstrap.servers").split(";");
         ArrayList<KafkaConsumer<K, MessageWrapper<V>>> consumers = new ArrayList<>(serversReplicas.length);
@@ -51,9 +55,11 @@ public class KafkaPollingThread<K extends Integer, V extends String> {
      */
     public List<TopicPartition> getAssignedPartitions() {
         Set<TopicPartition> firstReplicaAssignedPartitions = pullAndReturnAssignedPartitions(0);
+        this.log.debug("Replica 0, assigned partitions: {}", firstReplicaAssignedPartitions);
 
         for (int replicaIndex = 1; replicaIndex < this.consumers.size(); replicaIndex++) {
             Set<TopicPartition> assignedPartitionsReplica = pullAndReturnAssignedPartitions(replicaIndex);
+            this.log.debug("Replica {}, assigned partitions: {}", replicaIndex, assignedPartitionsReplica);
             if (!assignedPartitionsReplica.equals(firstReplicaAssignedPartitions)) {
                 throw new IllegalStateException("The Kafka replicas have different assigned partitions");
             }
@@ -104,7 +110,8 @@ public class KafkaPollingThread<K extends Integer, V extends String> {
         for (int replicaIndex = 0; replicaIndex < this.cacheReplicas.size(); replicaIndex++) {
             Cache<K, V> cache = this.cacheReplicas.get(replicaIndex);
             while (!cache.hasAny(cacheKey)) {
-                System.out.println("SON NEL WHILE with tp: " + tp);
+                //TODO: Remove this print
+                System.out.println("While deadlock with tp: " + tp);
                 pullKafka(replicaIndex, timeout);
             }
             if (cache.hasAny(cacheKey)) res.add(cache.poll(cacheKey));

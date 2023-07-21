@@ -121,6 +121,7 @@ public class KabisConsumer<K extends Integer, V extends String> implements Kabis
             this.validatedTopics.addAll(validatedTopics);
         }
         this.log.info("Updated list of validated topics: {}", Utils.join(validatedTopics, ", "));
+        this.assignedPartitions.clear();
         this.assignedPartitions.addAll(this.kafkaPollingThread.getAssignedPartitions());
         this.log.info("Updated list of assigned partitions: {}", Utils.join(assignedPartitions, ", "));
     }
