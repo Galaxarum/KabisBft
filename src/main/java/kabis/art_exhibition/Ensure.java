@@ -22,9 +22,6 @@ public class Ensure extends ArtExhibitionConsumer {
         Thread.sleep(15000);
         // -- RUN ENSURE INSTANCE --
         new Ensure(parseInt(args[0]), parseInt(args[1]), parseInt(args[2]), parseInt(args[3]), parseInt(args[4])).run();
-        // -- KILL THE BENCHMARK AFTER run() --
-        Thread.sleep(60000);
-        System.exit(0);
     }
 
     private void run() {
@@ -37,9 +34,9 @@ public class Ensure extends ArtExhibitionConsumer {
         System.out.println("[Ensure] Kabis Consumer created");
 
         System.out.println("[Ensure] Reading alarms");
-        //TODO: * getNumberOfArtExhibitions() will be removed when scaling on multiple consumers within the same consumer group,
-        // every consumer will only read its own exhibition
-        int recordsToRead = ((getNumberOfTrueAlarms() + getNumberOfFalseAlarms()) * 2 + getNumberOfUncaughtBreaches()) * getNumberOfArtExhibitions();
+        int numberOfAssignedPartitions = ensureConsumer.getAssignedPartitions().size();
+        System.out.println("[Ensure] Number of assigned exhibitions: " + numberOfAssignedPartitions);
+        int recordsToRead = ((getNumberOfTrueAlarms() + getNumberOfFalseAlarms()) * 2 + getNumberOfUncaughtBreaches()) * numberOfAssignedPartitions;
         long time = pollAndMeasure(ensureConsumer, recordsToRead);
         ensureConsumer.close();
         System.out.println("[Ensure] DONE! Consumer Closed - Saving experiments");

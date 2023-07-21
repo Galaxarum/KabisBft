@@ -13,8 +13,6 @@ import java.util.Map;
 
 public class Validator<K extends Integer, V extends String> {
     private final KafkaPollingThread<K, V> kafkaPollingThread;
-    //TODO: Remove this commented code
-    //private final Duration KAFKA_POLL_TIMEOUT = Duration.ofSeconds(1);
 
     /**
      * Creates a new Validator.

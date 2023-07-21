@@ -29,9 +29,6 @@ public class SafeCorp extends ArtExhibitionProducer {
         Thread.sleep(15000);
         // -- RUN SAFECORP INSTANCE --
         new SafeCorp(parseInt(args[0]), parseInt(args[1]), parseInt(args[2]), parseInt(args[3]), parseInt(args[4])).run();
-        // -- KILL THE BENCHMARK AFTER run() --
-        Thread.sleep(60000);
-        System.exit(0);
     }
 
     private void run() {
@@ -53,9 +50,9 @@ public class SafeCorp extends ArtExhibitionProducer {
         // -- READ TRUE AND FALSE ALARMS AND RESPOND --
         System.out.println("[SafeCorp] Reading alarms");
         String responseMessage = "[SafeCorp] ALARM RECEIVED ";
-        //TODO: * getNumberOfArtExhibitions() will be removed when scaling on multiple consumers within the same consumer group,
-        // every consumer will only read its own exhibition
-        Integer recordsToRead = (getNumberOfTrueAlarms() + getNumberOfFalseAlarms()) * getNumberOfArtExhibitions();
+        int numberOfAssignedPartitions = safeCorpConsumer.getAssignedPartitions().size();
+        System.out.println("[SafeCorp] Number of assigned exhibitions: " + numberOfAssignedPartitions);
+        int recordsToRead = (getNumberOfTrueAlarms() + getNumberOfFalseAlarms()) * numberOfAssignedPartitions;
         long receivingTime = pollAndRespondMeasure(safeCorpConsumer, safeCorpProducer, recordsToRead, responseMessage);
         safeCorpConsumer.close();
 

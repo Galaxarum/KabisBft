@@ -22,9 +22,6 @@ public class ArtEstate extends ArtExhibitionConsumer {
         Thread.sleep(15000);
         // -- RUN ART-ESTATE INSTANCE --
         new ArtEstate(parseInt(args[0]), parseInt(args[1]), parseInt(args[2]), parseInt(args[3]), parseInt(args[4])).run();
-        // -- KILL THE BENCHMARK AFTER run() --
-        Thread.sleep(60000);
-        System.exit(0);
     }
 
     private void run() {
@@ -37,9 +34,9 @@ public class ArtEstate extends ArtExhibitionConsumer {
         System.out.println("[ArtEstate] Kabis Consumer created");
 
         System.out.println("[ArtEstate] Reading alarms");
-        //TODO: * getNumberOfArtExhibitions() will be removed when scaling on multiple consumers within the same consumer group,
-        // every consumer will only read its own exhibition
-        int recordsToRead = ((getNumberOfTrueAlarms() + getNumberOfFalseAlarms()) * 2 + getNumberOfUncaughtBreaches()) * getNumberOfArtExhibitions();
+        int numberOfAssignedPartitions = artEstateConsumer.getAssignedPartitions().size();
+        System.out.println("[ArtEstate] Number of assigned exhibitions: " + numberOfAssignedPartitions);
+        int recordsToRead = ((getNumberOfTrueAlarms() + getNumberOfFalseAlarms()) * 2 + getNumberOfUncaughtBreaches()) * numberOfAssignedPartitions;
         long time = pollAndMeasure(artEstateConsumer, recordsToRead);
         artEstateConsumer.close();
         System.out.println("[ArtEstate] DONE! Consumer Closed - Saving experiments");

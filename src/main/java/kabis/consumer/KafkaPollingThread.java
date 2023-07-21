@@ -55,11 +55,11 @@ public class KafkaPollingThread<K extends Integer, V extends String> {
      */
     public List<TopicPartition> getAssignedPartitions() {
         Set<TopicPartition> firstReplicaAssignedPartitions = pullAndReturnAssignedPartitions(0);
-        this.log.debug("Replica 0, assigned partitions: {}", firstReplicaAssignedPartitions);
+        this.log.info("Replica 0, assigned partitions: {}", firstReplicaAssignedPartitions);
 
         for (int replicaIndex = 1; replicaIndex < this.consumers.size(); replicaIndex++) {
             Set<TopicPartition> assignedPartitionsReplica = pullAndReturnAssignedPartitions(replicaIndex);
-            this.log.debug("Replica {}, assigned partitions: {}", replicaIndex, assignedPartitionsReplica);
+            this.log.info("Replica {}, assigned partitions: {}", replicaIndex, assignedPartitionsReplica);
             if (!assignedPartitionsReplica.equals(firstReplicaAssignedPartitions)) {
                 throw new IllegalStateException("The Kafka replicas have different assigned partitions");
             }
@@ -76,6 +76,7 @@ public class KafkaPollingThread<K extends Integer, V extends String> {
         pullKafka(replicaIndex, Duration.ofSeconds(30));
         Set<TopicPartition> assignedPartitions = this.consumers.get(replicaIndex).assignment();
         while (assignedPartitions.isEmpty()) {
+            pullKafka(replicaIndex, Duration.ofSeconds(15));
             assignedPartitions = this.consumers.get(replicaIndex).assignment();
         }
         return assignedPartitions;
@@ -110,8 +111,6 @@ public class KafkaPollingThread<K extends Integer, V extends String> {
         for (int replicaIndex = 0; replicaIndex < this.cacheReplicas.size(); replicaIndex++) {
             Cache<K, V> cache = this.cacheReplicas.get(replicaIndex);
             while (!cache.hasAny(cacheKey)) {
-                //TODO: Remove this print
-                System.out.println("While deadlock with tp: " + tp);
                 pullKafka(replicaIndex, timeout);
             }
             if (cache.hasAny(cacheKey)) res.add(cache.poll(cacheKey));
@@ -128,7 +127,8 @@ public class KafkaPollingThread<K extends Integer, V extends String> {
      * @return the consumer records grouped by partition
      */
     public synchronized Map<TopicPartition, List<ConsumerRecord<K, V>>> pollUnvalidated(Collection<String> excludedTopics, Duration timeout) {
-        pullKafka(0, timeout);
+        for (int replicaIndex = 0; replicaIndex < this.cacheReplicas.size(); replicaIndex++)
+            pullKafka(replicaIndex, timeout);
         Cache<K, V> cache = this.cacheReplicas.get(0);
 
         Set<CacheKey> validTPs = cache.getKeys();

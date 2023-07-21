@@ -125,4 +125,8 @@ public class KabisConsumer<K extends Integer, V extends String> implements Kabis
         this.assignedPartitions.addAll(this.kafkaPollingThread.getAssignedPartitions());
         this.log.info("Updated list of assigned partitions: {}", Utils.join(assignedPartitions, ", "));
     }
+
+    public List<TopicPartition> getAssignedPartitions() {
+        return this.assignedPartitions;
+    }
 }
