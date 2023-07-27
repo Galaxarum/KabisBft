@@ -142,12 +142,7 @@ services:
       - kafka-network
       - bft-network
     depends_on:
-      - "kafka_1_3"
-      - "kafka_1_4"
-      - "kafka_2_3"
-      - "kafka_2_4"
-      - "bft-3"
-      - "bft-4"
+      - "init-kafka"
     environment:
       - CLIENT_ID=2
       - NUM_EXHIBITIONS=$NUM_EXHIBITIONS
@@ -162,12 +157,7 @@ services:
       - kafka-network
       - bft-network
     depends_on:
-      - "kafka_1_3"
-      - "kafka_1_4"
-      - "kafka_2_3"
-      - "kafka_2_4"
-      - "bft-3"
-      - "bft-4"
+      - "init-kafka"
     environment:
       - CLIENT_ID=3
       - NUM_EXHIBITIONS=$NUM_EXHIBITIONS
