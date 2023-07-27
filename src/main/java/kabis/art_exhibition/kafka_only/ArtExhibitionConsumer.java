@@ -1,8 +1,8 @@
-package kabis.art_exhibition;
+package kabis.art_exhibition.kafka_only;
 
-import kabis.consumer.KabisConsumer;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
+import org.apache.kafka.clients.consumer.KafkaConsumer;
 
 import java.time.Duration;
 
@@ -42,7 +42,7 @@ public abstract class ArtExhibitionConsumer extends ArtExhibitionClient {
         return numberOfUncaughtBreaches;
     }
 
-    protected long pollAndMeasure(KabisConsumer<Integer, String> consumer, Integer recordsToRead) {
+    protected long pollAndMeasure(KafkaConsumer<Integer, String> consumer, Integer recordsToRead) {
         int i = 0;
         long t1 = System.nanoTime();
         System.out.println("[pollAndMeasure]: recordsToRead: " + recordsToRead + " with POLL_TIMEOUT: " + POLL_TIMEOUT);
@@ -50,8 +50,8 @@ public abstract class ArtExhibitionConsumer extends ArtExhibitionClient {
             ConsumerRecords<Integer, String> records = consumer.poll(POLL_TIMEOUT);
             for (ConsumerRecord<Integer, String> record : records) {
                 i += 1;
-                System.out.println("[pollAndMeasure]: Received " + record.value() + " exhibition: " + record.partition());
-                System.out.println("[pollAndMeasure]: Total VALIDATED RECORDS until now: " + i);
+                System.out.println("[pollAndMeasure - Kafka Only]: Received " + record.value() + " exhibition: " + record.partition());
+                System.out.println("[pollAndMeasure - Kafka Only]: Total VALIDATED RECORDS until now: " + i);
             }
         }
         long t2 = System.nanoTime();

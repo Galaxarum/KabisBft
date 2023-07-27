@@ -1,4 +1,4 @@
-package kabis.art_exhibition;
+package kabis.art_exhibition.kafka_only;
 
 
 public enum Topics {
