@@ -138,9 +138,9 @@ public class KafkaPollingThread<K extends Integer, V extends String> {
         for (CacheKey tp : validTPs) {
             List<ConsumerRecord<K, MessageWrapper<V>>> queue = cache.drain(tp);
             List<ConsumerRecord<K, V>> list = map.computeIfAbsent(tp.topicPartition, ignored -> new LinkedList<>());
-            //TODO: new ConsumerRecord<> is not adding the headers and timestamp
             list.addAll(queue.stream()
-                    .map(cr -> new ConsumerRecord<>(cr.topic(), cr.partition(), cr.offset(), cr.key(), cr.value().getValue()))
+                    .map(cr -> new ConsumerRecord<>(cr.topic(), cr.partition(), cr.offset(), cr.timestamp(), cr.timestampType(), cr.serializedKeySize(),
+                            cr.serializedValueSize(), cr.key(), cr.value().getValue(), cr.headers(), cr.leaderEpoch()))
                     .collect(Collectors.toList()));
         }
         return map;

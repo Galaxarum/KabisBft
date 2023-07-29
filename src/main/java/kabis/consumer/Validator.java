@@ -37,9 +37,9 @@ public class Validator<K extends Integer, V extends String> {
             for (ConsumerRecord<K, MessageWrapper<V>> record : recordsFromDifferentReplicas) {
                 if (sid.checkProof(record)) {
                     MessageWrapper<V> wrapper = record.value();
-                    //TODO: Add timestamp to the constructor, as of now it is reset to the current time
-                    ConsumerRecord<K, V> deserializedRecord = new ConsumerRecord<>(record.topic(), record.partition(), record.offset(), record.key(), wrapper.getValue());
-                    record.headers().forEach(h -> deserializedRecord.headers().add(h));
+                    ConsumerRecord<K, V> deserializedRecord = new ConsumerRecord<>(record.topic(), record.partition(), record.offset(), record.timestamp(),
+                            record.timestampType(), record.serializedKeySize(), record.serializedValueSize(), record.key(), wrapper.getValue(),
+                            record.headers(), record.leaderEpoch());
                     topicPartitionValidatedRecords.add(deserializedRecord);
                     break;
                 }
