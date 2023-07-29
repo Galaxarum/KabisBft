@@ -13,7 +13,7 @@ DOCKERHUB_USERNAME=example-username
 
 ## ⚡️ Benchmarks
 
-> [!WARNING]  
+> ⚠️ **Warning**  
 > BFT-only benchmarks are not working with the latest version. A list of TopicPartition must be passed to the
 > KabisServiceProxy,
 > but since BTF is alone no TopicPartition info is available.
@@ -33,5 +33,5 @@ in the terminal.
 
 Now, run the `env_generator.sh` script found inside the `/docker/runner/envs` folder and you are ready to go! 🚀
 
-More infos about distributed benchmarks [here](/docker/benchmark/runner/distributed/README.md).
+More info on benchmarks [here](https://github.com/Galaxarum/KabisBft/wiki/Benchmarks).
 
