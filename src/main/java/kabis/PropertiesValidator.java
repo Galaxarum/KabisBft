@@ -1,7 +1,13 @@
 package kabis;
 
+import kabis.consumer.KabisConsumer;
+import kabis.producer.KabisProducer;
+
 import java.util.Properties;
 
+/**
+ * Validates {@link KabisProducer} and {@link KabisConsumer} properties.
+ */
 public class PropertiesValidator {
     private static final PropertiesValidator instance = new PropertiesValidator();
 
@@ -9,6 +15,12 @@ public class PropertiesValidator {
         return instance;
     }
 
+    /**
+     * Validates the given properties.
+     *
+     * @param properties the properties to be validated
+     * @throws IllegalArgumentException if the properties are invalid
+     */
     public void validate(Properties properties) {
         if (properties == null || properties.isEmpty()) {
             throw new IllegalArgumentException("Properties cannot be null or empty");
