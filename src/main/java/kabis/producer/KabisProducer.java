@@ -1,5 +1,6 @@
 package kabis.producer;
 
+import kabis.PropertiesValidator;
 import kabis.storage.MessageWrapper;
 import kabis.validation.KabisServiceProxy;
 import kabis.validation.SecureIdentifier;
@@ -39,7 +40,7 @@ public class KabisProducer<K extends Integer, V extends String> implements Kabis
      */
     public KabisProducer(Properties properties, boolean orderedPulls) {
         this.log = LoggerFactory.getLogger(KabisProducer.class);
-        //TODO: Improve the regex + check if the properties are valid, otherwise throw an exception
+        PropertiesValidator.getInstance().validate(properties);
         String[] serversReplicas = properties.getProperty("bootstrap.servers").split(";");
         this.clientId = Integer.parseInt(properties.getProperty("client.id"));
         this.kafkaProducers = new ArrayList<>(serversReplicas.length);

@@ -1,5 +1,6 @@
 package kabis.consumer;
 
+import kabis.PropertiesValidator;
 import kabis.validation.KabisServiceProxy;
 import kabis.validation.SecureIdentifier;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -36,7 +37,7 @@ public class KabisConsumer<K extends Integer, V extends String> implements Kabis
      */
     public KabisConsumer(Properties properties, boolean orderedPulls) {
         this.log = LoggerFactory.getLogger(KabisConsumer.class);
-        //TODO: Check if the properties are valid, otherwise throw an exception
+        PropertiesValidator.getInstance().validate(properties);
         int clientId = Integer.parseInt(properties.getProperty("client.id"));
         properties.put("group.instance.id", String.format("%s-%d", properties.getProperty("group.id"), clientId));
         this.serviceProxy = KabisServiceProxy.getInstance();
