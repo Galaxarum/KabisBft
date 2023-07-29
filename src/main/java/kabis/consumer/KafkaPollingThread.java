@@ -31,7 +31,6 @@ public class KafkaPollingThread<K extends Integer, V extends String> {
      */
     public KafkaPollingThread(Properties properties) {
         this.log = LoggerFactory.getLogger(KafkaPollingThread.class);
-        //TODO: Check if the properties are valid, otherwise throw an exception
         String[] serversReplicas = properties.getProperty("bootstrap.servers").split(";");
         ArrayList<KafkaConsumer<K, MessageWrapper<V>>> consumers = new ArrayList<>(serversReplicas.length);
         this.cacheReplicas = new ArrayList<>(serversReplicas.length);
