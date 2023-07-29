@@ -28,6 +28,16 @@ public class KabisProducer<K extends Integer, V extends String> implements Kabis
      * @param properties the properties to be used by the Kabis producer
      */
     public KabisProducer(Properties properties) {
+        this(properties, true);
+    }
+
+    /**
+     * Creates a new Kabis Producer.
+     *
+     * @param properties   the properties to be used by the Kabis producer
+     * @param orderedPulls whether to pull SecureIdentifiers in order or not
+     */
+    public KabisProducer(Properties properties, boolean orderedPulls) {
         this.log = LoggerFactory.getLogger(KabisProducer.class);
         //TODO: Improve the regex + check if the properties are valid, otherwise throw an exception
         String[] serversReplicas = properties.getProperty("bootstrap.servers").split(";");
@@ -41,9 +51,8 @@ public class KabisProducer<K extends Integer, V extends String> implements Kabis
             simplerProperties.put("client.id", id);
             this.kafkaProducers.add(new KafkaProducer<>(simplerProperties));
         }
-        // TODO: Add orderedPulls support
         this.serviceProxy = KabisServiceProxy.getInstance();
-        this.serviceProxy.init(this.clientId, false);
+        this.serviceProxy.init(this.clientId, orderedPulls);
     }
 
     /**

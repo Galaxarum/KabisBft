@@ -56,7 +56,10 @@ public class KabisServiceProxy {
         try (ByteArrayOutputStream bytes = new ByteArrayOutputStream()) {
             bytes.write(OPS.PUSH.ordinal());
             bytes.writeBytes(sid.serialize());
-            this.bftServiceProxy.invokeOrdered(bytes.toByteArray());
+            if (this.orderedPulls)
+                this.bftServiceProxy.invokeOrdered(bytes.toByteArray());
+            else
+                this.bftServiceProxy.invokeUnordered(bytes.toByteArray());
         } catch (IOException e) {
             throw new SerializationException(e);
         }
