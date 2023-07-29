@@ -2,9 +2,6 @@
 
 This repository contains the minimal implementation developed to use Kabis with the SMaRt-BFT library.
 
-BFT_BENCHMARK NOT WORKING, A LIST OF TOPIC PARTITIONS MUST BE PASSED TO THE KABISSERVICEPROXY, BUT SINCE BFT IS ALONE,
-NO TOPICPARTITION INFO IS AVAILABLE.
-
 ## ⚙️ Environments
 
 The first time you clone the repo, copy and paste the `.env.example` file and rename it as `.env`. Then, fill the
@@ -15,6 +12,11 @@ DOCKERHUB_USERNAME=example-username
 ```
 
 ## ⚡️ Benchmarks
+
+> [!WARNING]  
+> BFT-only benchmarks are not working with the latest version. A list of TopicPartition must be passed to the
+> KabisServiceProxy,
+> but since BTF is alone no TopicPartition info is available.
 
 If you want to modify the benchmarks, apply your modifications and rebuild the _jar_ files utilizing the _gradle_
 scripts. Then, push your newly built jars
