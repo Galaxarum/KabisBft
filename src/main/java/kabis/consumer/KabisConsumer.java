@@ -25,20 +25,22 @@ public class KabisConsumer<K extends Integer, V extends String> implements Kabis
     //TODO: REMOVE THIS
     public int counter = 0;
 
+    public KabisConsumer(Properties properties) {
+        this(properties, true);
+    }
+
     /**
      * Creates a new KabisConsumer.
      *
      * @param properties the properties to be used by the Kabis consumer
      */
-    public KabisConsumer(Properties properties) {
+    public KabisConsumer(Properties properties, boolean orderedPulls) {
         this.log = LoggerFactory.getLogger(KabisConsumer.class);
         //TODO: Check if the properties are valid, otherwise throw an exception
         int clientId = Integer.parseInt(properties.getProperty("client.id"));
-        // TODO: Add orderedPulls support
-        this.serviceProxy = KabisServiceProxy.getInstance();
-        this.serviceProxy.init(clientId, false);
-
         properties.put("group.instance.id", String.format("%s-%d", properties.getProperty("group.id"), clientId));
+        this.serviceProxy = KabisServiceProxy.getInstance();
+        this.serviceProxy.init(clientId, orderedPulls);
         this.kafkaPollingThread = new KafkaPollingThread<>(properties);
         this.validator = new Validator<>(this.kafkaPollingThread);
     }
