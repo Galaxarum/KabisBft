@@ -26,22 +26,26 @@ public class KabisConsumer<K extends Integer, V extends String> implements Kabis
     //TODO: REMOVE THIS
     public int counter = 0;
 
-    public KabisConsumer(Properties properties) {
-        this(properties, true);
-    }
-
     /**
      * Creates a new KabisConsumer.
      *
      * @param properties the properties to be used by the Kabis consumer
      */
-    public KabisConsumer(Properties properties, boolean orderedPulls) {
+    public KabisConsumer(Properties properties) {
         this.log = LoggerFactory.getLogger(KabisConsumer.class);
         PropertiesValidator.getInstance().validate(properties);
         int clientId = Integer.parseInt(properties.getProperty("client.id"));
-        properties.put("group.instance.id", String.format("%s-%d", properties.getProperty("group.id"), clientId));
+        if (properties.containsKey("group.id")) {
+            properties.put("group.instance.id", String.format("%s-%d", properties.getProperty("group.id"), clientId));
+        }
         this.serviceProxy = KabisServiceProxy.getInstance();
-        this.serviceProxy.init(clientId, orderedPulls);
+        if (properties.containsKey("ordered.pulls")) {
+            boolean orderedPulls = Boolean.parseBoolean(properties.getProperty("ordered.pulls"));
+            this.serviceProxy.init(clientId, orderedPulls);
+        } else {
+            this.serviceProxy.init(clientId, false);
+        }
+
         this.kafkaPollingThread = new KafkaPollingThread<>(properties);
         this.validator = new Validator<>(this.kafkaPollingThread);
     }
@@ -75,6 +79,7 @@ public class KabisConsumer<K extends Integer, V extends String> implements Kabis
     public ConsumerRecords<K, V> poll(Duration duration) {
         List<SecureIdentifier> sids = this.serviceProxy.pull(this.assignedPartitions);
         System.out.printf("[" + this.getClass().getName() + "] Received %d sids%n", sids.size());
+        // TODO: Remove this filter?
         sids = sids.stream().filter(sid -> this.assignedPartitions.contains(sid.getTopicPartition())).collect(Collectors.toList());
         System.out.printf("[" + this.getClass().getName() + "] After filter, received %d sids%n", sids.size());
         //TODO: Remove counter!
@@ -129,6 +134,11 @@ public class KabisConsumer<K extends Integer, V extends String> implements Kabis
         this.log.info("Updated list of assigned partitions: {}", Utils.join(assignedPartitions, ", "));
     }
 
+    /**
+     * Returns the list of assigned partitions to the consumer.
+     *
+     * @return the list of assigned partitions
+     */
     public List<TopicPartition> getAssignedPartitions() {
         return this.assignedPartitions;
     }
