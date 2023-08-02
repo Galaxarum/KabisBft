@@ -2,6 +2,7 @@ package kabis.art_exhibition.kafka_only;
 
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 
+import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.Properties;
 
@@ -36,12 +37,13 @@ public class Ensure extends ArtExhibitionConsumer {
         int numberOfAssignedPartitions = ensureConsumer.assignment().size();
         System.out.println("[Ensure - Kafka Only] Number of assigned exhibitions: " + numberOfAssignedPartitions);
         int recordsToRead = ((getNumberOfTrueAlarms() + getNumberOfFalseAlarms()) * 2 + getNumberOfUncaughtBreaches()) * numberOfAssignedPartitions;
-        long time = pollAndMeasure(ensureConsumer, recordsToRead);
+        LocalTime[] timeResults = pollAndMeasure(ensureConsumer, recordsToRead);
+
         ensureConsumer.close();
         System.out.println("[Ensure - Kafka Only] DONE! Consumer Closed - Saving experiments");
 
-        ArtExhibitionBenchmarkResult.storeThroughputToDisk(Arrays.asList("#EXHIBITIONS", "#TOTAL ALARMS", "TOTAL TIME [ns]"),
-                Arrays.asList(Integer.toString(getNumberOfArtExhibitions()), Integer.toString(recordsToRead), Long.toString(time)));
+        ArtExhibitionBenchmarkResult.storeThroughputToDisk(Arrays.asList("#EXHIBITIONS", "#TOTAL ALARMS", "START TIME", "END TIME"),
+                Arrays.asList(Integer.toString(getNumberOfArtExhibitions()), Integer.toString(recordsToRead), timeResults[0].toString(), timeResults[1].toString()));
         System.out.println("[Ensure - Kafka Only] Experiments persisted!");
     }
 }

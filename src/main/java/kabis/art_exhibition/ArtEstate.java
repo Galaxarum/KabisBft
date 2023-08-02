@@ -39,6 +39,7 @@ public class ArtEstate extends ArtExhibitionConsumer {
         System.out.println("[ArtEstate] Number of assigned exhibitions: " + numberOfAssignedPartitions);
         int recordsToRead = ((getNumberOfTrueAlarms() + getNumberOfFalseAlarms()) * 2 + getNumberOfUncaughtBreaches()) * numberOfAssignedPartitions;
         LocalTime[] timeResults = pollAndMeasure(artEstateConsumer, recordsToRead);
+
         artEstateConsumer.close();
         System.out.println("[ArtEstate] DONE! Consumer Closed - Saving experiments");
 
