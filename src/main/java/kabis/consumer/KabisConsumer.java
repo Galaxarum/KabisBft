@@ -2,11 +2,13 @@ package kabis.consumer;
 
 import kabis.configs.KabisConsumerConfig;
 import kabis.configs.PropertiesValidator;
+import kabis.storage.StringMessageWrapperDeserializer;
 import kabis.validation.KabisServiceProxy;
 import kabis.validation.SecureIdentifier;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.common.TopicPartition;
+import org.apache.kafka.common.serialization.IntegerDeserializer;
 import org.apache.kafka.common.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,9 +36,13 @@ public class KabisConsumer<K extends Integer, V extends String> implements Kabis
     public KabisConsumer(Properties properties) {
         this.log = LoggerFactory.getLogger(KabisConsumer.class);
         PropertiesValidator.getInstance().validate(properties);
+        // TODO: Leave these properties hardcoded?
+        properties.put(KabisConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, IntegerDeserializer.class.getName());
+        properties.put(KabisConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringMessageWrapperDeserializer.class.getName());
         int clientId = Integer.parseInt(properties.getProperty(KabisConsumerConfig.CLIENT_ID_CONFIG));
         if (properties.containsKey(KabisConsumerConfig.GROUP_ID_CONFIG)) {
             properties.put(KabisConsumerConfig.GROUP_INSTANCE_ID_CONFIG, String.format("%s-%d", properties.getProperty(KabisConsumerConfig.GROUP_ID_CONFIG), clientId));
+            // TODO: Leave this property hardcoded?
             properties.put(KabisConsumerConfig.PARTITION_ASSIGNMENT_STRATEGY_CONFIG, KabisPartitionAssignor.class.getName());
         }
         this.serviceProxy = KabisServiceProxy.getInstance();

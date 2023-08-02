@@ -22,9 +22,32 @@ public class PropertiesValidator {
      * @throws IllegalArgumentException if the properties are invalid
      */
     public void validate(Properties properties) {
-        //TODO: Validate key.deserializer, value.deserializer, key.serializer, value.serializer
         if (properties == null || properties.isEmpty()) {
             throw new IllegalArgumentException("Properties cannot be null or empty");
+        }
+        if (properties.containsKey("key.deserializer")) {
+            String keyDeserializer = properties.getProperty("key.deserializer");
+            if (!keyDeserializer.matches("org\\.apache\\.kafka\\.common\\.serialization\\.IntegerDeserializer")) {
+                throw new IllegalArgumentException("key.deserializer property must match org.apache.kafka.common.serialization.IntegerDeserializer");
+            }
+        }
+        if (properties.containsKey("value.deserializer")) {
+            String valueDeserializer = properties.getProperty("value.deserializer");
+            if (!valueDeserializer.matches("kabis\\.storage\\.StringMessageWrapperDeserializer")) {
+                throw new IllegalArgumentException("value.deserializer property must match kabis.storage.StringMessageWrapperDeserializer");
+            }
+        }
+        if (properties.containsKey("key.serializer")) {
+            String keySerializer = properties.getProperty("key.serializer");
+            if (!keySerializer.matches("org\\.apache\\.kafka\\.common\\.serialization\\.IntegerSerializer")) {
+                throw new IllegalArgumentException("key.serializer property must match org.apache.kafka.common.serialization.IntegerSerializer");
+            }
+        }
+        if (properties.containsKey("value.serializer")) {
+            String valueSerializer = properties.getProperty("value.serializer");
+            if (!valueSerializer.matches("kabis\\.storage\\.StringMessageWrapperSerializer")) {
+                throw new IllegalArgumentException("value.serializer property must match kabis.storage.StringMessageWrapperSerializer");
+            }
         }
         if (properties.containsKey("bootstrap.servers")) {
             String bootstrapServers = properties.getProperty("bootstrap.servers");

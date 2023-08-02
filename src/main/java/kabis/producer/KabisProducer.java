@@ -3,11 +3,13 @@ package kabis.producer;
 import kabis.configs.KabisProducerConfig;
 import kabis.configs.PropertiesValidator;
 import kabis.storage.MessageWrapper;
+import kabis.storage.StringMessageWrapperSerializer;
 import kabis.validation.KabisServiceProxy;
 import kabis.validation.SecureIdentifier;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
+import org.apache.kafka.common.serialization.IntegerSerializer;
 import org.apache.kafka.common.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +35,9 @@ public class KabisProducer<K extends Integer, V extends String> implements Kabis
     public KabisProducer(Properties properties) {
         this.log = LoggerFactory.getLogger(KabisProducer.class);
         PropertiesValidator.getInstance().validate(properties);
+        // TODO: Leave these properties hardcoded?
+        properties.put(KabisProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, IntegerSerializer.class.getName());
+        properties.put(KabisProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringMessageWrapperSerializer.class.getName());
         String[] serversReplicas = properties.getProperty(KabisProducerConfig.BOOTSTRAP_SERVERS_CONFIG).split(";");
         this.clientId = Integer.parseInt(properties.getProperty(KabisProducerConfig.CLIENT_ID_CONFIG));
         this.kafkaProducers = new ArrayList<>(serversReplicas.length);
