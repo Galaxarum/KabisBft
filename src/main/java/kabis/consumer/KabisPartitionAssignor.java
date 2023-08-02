@@ -1,10 +1,9 @@
 package kabis.consumer;
 
+import kabis.configs.KabisPartitionAssignorConfig;
 import org.apache.kafka.clients.consumer.internals.AbstractPartitionAssignor;
 import org.apache.kafka.common.Configurable;
 import org.apache.kafka.common.TopicPartition;
-import org.apache.kafka.common.config.AbstractConfig;
-import org.apache.kafka.common.config.ConfigDef;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,7 +24,10 @@ import java.util.Map;
 public class KabisPartitionAssignor extends AbstractPartitionAssignor implements Configurable {
     public static final String KABIS_ASSIGNOR_NAME = "kabis-assignor";
     private final Logger log = LoggerFactory.getLogger(KabisPartitionAssignor.class);
-    private KabisPartitionAssignorConfig config; // The configs specified by the user in the properties file
+    /**
+     * The configuration for the KabisPartitionAssignor.
+     */
+    private KabisPartitionAssignorConfig config;
 
     /**
      * Returns the name of the KabisPartitionAssignor.
@@ -122,29 +124,5 @@ public class KabisPartitionAssignor extends AbstractPartitionAssignor implements
     @Override
     public void configure(Map<String, ?> configs) {
         this.config = new KabisPartitionAssignorConfig(configs);
-    }
-}
-
-/**
- * A custom config for the {@link KabisPartitionAssignor}. It contains the list of consumers ids in the group.
- */
-class KabisPartitionAssignorConfig extends AbstractConfig {
-    public static final String GROUP_CONSUMERS_IDS_CONFIG = "group.consumers.ids";
-    public static final String GROUP_CONSUMERS_IDS_DOC = "List of consumers ids in the group, comma separated";
-
-    private static final ConfigDef CONFIG;
-
-    static {
-        CONFIG = new ConfigDef()
-                .define(GROUP_CONSUMERS_IDS_CONFIG, ConfigDef.Type.STRING, ConfigDef.NO_DEFAULT_VALUE,
-                        ConfigDef.Importance.HIGH, GROUP_CONSUMERS_IDS_DOC);
-    }
-
-    public KabisPartitionAssignorConfig(final Map<?, ?> originals) {
-        super(CONFIG, originals);
-    }
-
-    public String[] groupConsumersIds() {
-        return getString(GROUP_CONSUMERS_IDS_CONFIG).split(",");
     }
 }

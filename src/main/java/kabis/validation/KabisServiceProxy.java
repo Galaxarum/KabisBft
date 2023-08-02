@@ -25,9 +25,6 @@ public class KabisServiceProxy {
     private boolean orderedPulls;
     private int nextPullIndex = 0;
 
-    private KabisServiceProxy() {
-    }
-
     public static KabisServiceProxy getInstance() {
         return instance;
     }
@@ -45,6 +42,13 @@ public class KabisServiceProxy {
             this.orderedPulls = orderedPulls;
             this.isInitialized = true;
         }
+    }
+
+    /**
+     * Resets the nextPullIndex to 0.
+     */
+    public void resetNextPullIndex() {
+        this.nextPullIndex = 0;
     }
 
     /**
@@ -73,6 +77,7 @@ public class KabisServiceProxy {
      * Ordered pulls are slower, but guarantee that the SecureIdentifiers are returned in the order they were pushed.
      * Unordered pulls are faster, but do not guarantee the order of the SecureIdentifiers.
      *
+     * @param topicPartitions The topic partitions to pull from
      * @return A list of SecureIdentifiers
      */
     public List<SecureIdentifier> pull(List<TopicPartition> topicPartitions) {

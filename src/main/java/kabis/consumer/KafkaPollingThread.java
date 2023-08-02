@@ -1,6 +1,7 @@
 package kabis.consumer;
 
 import kabis.storage.MessageWrapper;
+import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
@@ -23,6 +24,8 @@ public class KafkaPollingThread<K extends Integer, V extends String> {
     private final List<Cache<K, V>> cacheReplicas;
     private final Logger log;
 
+    private final Map<Integer, List<TopicPartition>> replicaAssignedPartitions = new HashMap<>();
+
 
     /**
      * Creates a new KafkaPollingThread.
@@ -31,17 +34,18 @@ public class KafkaPollingThread<K extends Integer, V extends String> {
      */
     public KafkaPollingThread(Properties properties) {
         this.log = LoggerFactory.getLogger(KafkaPollingThread.class);
-        String[] serversReplicas = properties.getProperty("bootstrap.servers").split(";");
+        String[] serversReplicas = properties.getProperty(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG).split(";");
         ArrayList<KafkaConsumer<K, MessageWrapper<V>>> consumers = new ArrayList<>(serversReplicas.length);
         this.cacheReplicas = new ArrayList<>(serversReplicas.length);
         for (int i = 0; i < serversReplicas.length; i++) {
             String servers = serversReplicas[i];
             String id = String.format("%s-consumer-%d", properties.getProperty("client.id"), i);
             Properties simplerProperties = (Properties) properties.clone();
-            simplerProperties.put("bootstrap.servers", servers);
-            simplerProperties.put("client.id", id);
+            simplerProperties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, servers);
+            simplerProperties.put(ConsumerConfig.CLIENT_ID_CONFIG, id);
             consumers.add(new KafkaConsumer<>(simplerProperties));
             this.cacheReplicas.add(new Cache<>());
+            this.replicaAssignedPartitions.put(i, new ArrayList<>());
         }
         this.consumers = Collections.unmodifiableList(consumers);
     }
@@ -78,6 +82,14 @@ public class KafkaPollingThread<K extends Integer, V extends String> {
             pullKafka(replicaIndex, Duration.ofSeconds(15));
             assignedPartitions = this.consumers.get(replicaIndex).assignment();
         }
+        List<TopicPartition> assignedPartitionsList = this.replicaAssignedPartitions.get(replicaIndex);
+        assignedPartitions.forEach(tp -> {
+            if (!assignedPartitionsList.contains(tp)) {
+                this.log.info("Replica {}, new assigned partition: {}, seeking to offset 0", replicaIndex, tp);
+                this.consumers.get(replicaIndex).seek(tp, 0);
+                assignedPartitionsList.add(tp);
+            }
+        });
         return assignedPartitions;
     }
 

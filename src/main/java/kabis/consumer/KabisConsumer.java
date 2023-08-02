@@ -1,6 +1,7 @@
 package kabis.consumer;
 
-import kabis.PropertiesValidator;
+import kabis.configs.KabisConsumerConfig;
+import kabis.configs.PropertiesValidator;
 import kabis.validation.KabisServiceProxy;
 import kabis.validation.SecureIdentifier;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -16,7 +17,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class KabisConsumer<K extends Integer, V extends String> implements KabisConsumerI<K, V> {
-
     private final Set<String> validatedTopics = new HashSet<>();
     private final KabisServiceProxy serviceProxy;
     private final KafkaPollingThread<K, V> kafkaPollingThread;
@@ -34,16 +34,17 @@ public class KabisConsumer<K extends Integer, V extends String> implements Kabis
     public KabisConsumer(Properties properties) {
         this.log = LoggerFactory.getLogger(KabisConsumer.class);
         PropertiesValidator.getInstance().validate(properties);
-        int clientId = Integer.parseInt(properties.getProperty("client.id"));
-        if (properties.containsKey("group.id")) {
-            properties.put("group.instance.id", String.format("%s-%d", properties.getProperty("group.id"), clientId));
+        int clientId = Integer.parseInt(properties.getProperty(KabisConsumerConfig.CLIENT_ID_CONFIG));
+        if (properties.containsKey(KabisConsumerConfig.GROUP_ID_CONFIG)) {
+            properties.put(KabisConsumerConfig.GROUP_INSTANCE_ID_CONFIG, String.format("%s-%d", properties.getProperty(KabisConsumerConfig.GROUP_ID_CONFIG), clientId));
+            properties.put(KabisConsumerConfig.PARTITION_ASSIGNMENT_STRATEGY_CONFIG, KabisPartitionAssignor.class.getName());
         }
         this.serviceProxy = KabisServiceProxy.getInstance();
-        if (properties.containsKey("ordered.pulls")) {
-            boolean orderedPulls = Boolean.parseBoolean(properties.getProperty("ordered.pulls"));
+        if (properties.containsKey(KabisConsumerConfig.ORDERED_PULLS_CONFIG)) {
+            boolean orderedPulls = Boolean.parseBoolean(properties.getProperty(KabisConsumerConfig.ORDERED_PULLS_CONFIG));
             this.serviceProxy.init(clientId, orderedPulls);
         } else {
-            this.serviceProxy.init(clientId, false);
+            this.serviceProxy.init(clientId, true);
         }
 
         this.kafkaPollingThread = new KafkaPollingThread<>(properties);
@@ -104,6 +105,7 @@ public class KabisConsumer<K extends Integer, V extends String> implements Kabis
     @Override
     public void close() {
         this.kafkaPollingThread.close();
+        this.serviceProxy.resetNextPullIndex();
         this.log.info("Consumer closed successfully");
     }
 
@@ -115,6 +117,8 @@ public class KabisConsumer<K extends Integer, V extends String> implements Kabis
     @Override
     public void close(Duration duration) {
         this.kafkaPollingThread.close(duration);
+        this.serviceProxy.resetNextPullIndex();
+        this.log.info("Consumer closed successfully");
     }
 
     /**

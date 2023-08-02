@@ -1,6 +1,7 @@
 package kabis.producer;
 
-import kabis.PropertiesValidator;
+import kabis.configs.KabisProducerConfig;
+import kabis.configs.PropertiesValidator;
 import kabis.storage.MessageWrapper;
 import kabis.validation.KabisServiceProxy;
 import kabis.validation.SecureIdentifier;
@@ -23,37 +24,33 @@ public class KabisProducer<K extends Integer, V extends String> implements Kabis
     private final int clientId;
     private final Logger log;
 
+
     /**
      * Creates a new Kabis Producer.
      *
      * @param properties the properties to be used by the Kabis producer
      */
     public KabisProducer(Properties properties) {
-        this(properties, true);
-    }
-
-    /**
-     * Creates a new Kabis Producer.
-     *
-     * @param properties   the properties to be used by the Kabis producer
-     * @param orderedPulls whether to pull SecureIdentifiers in order or not
-     */
-    public KabisProducer(Properties properties, boolean orderedPulls) {
         this.log = LoggerFactory.getLogger(KabisProducer.class);
         PropertiesValidator.getInstance().validate(properties);
-        String[] serversReplicas = properties.getProperty("bootstrap.servers").split(";");
-        this.clientId = Integer.parseInt(properties.getProperty("client.id"));
+        String[] serversReplicas = properties.getProperty(KabisProducerConfig.BOOTSTRAP_SERVERS_CONFIG).split(";");
+        this.clientId = Integer.parseInt(properties.getProperty(KabisProducerConfig.CLIENT_ID_CONFIG));
         this.kafkaProducers = new ArrayList<>(serversReplicas.length);
         for (int i = 0; i < serversReplicas.length; i++) {
             String servers = serversReplicas[i];
             String id = String.format("%d-producer-%d", this.clientId, i);
             Properties simplerProperties = (Properties) properties.clone();
-            simplerProperties.put("bootstrap.servers", servers);
-            simplerProperties.put("client.id", id);
+            simplerProperties.put(KabisProducerConfig.BOOTSTRAP_SERVERS_CONFIG, servers);
+            simplerProperties.put(KabisProducerConfig.CLIENT_ID_CONFIG, id);
             this.kafkaProducers.add(new KafkaProducer<>(simplerProperties));
         }
         this.serviceProxy = KabisServiceProxy.getInstance();
-        this.serviceProxy.init(this.clientId, orderedPulls);
+        if (properties.containsKey(KabisProducerConfig.ORDERED_PULLS_CONFIG)) {
+            boolean orderedPulls = Boolean.parseBoolean(properties.getProperty(KabisProducerConfig.ORDERED_PULLS_CONFIG));
+            this.serviceProxy.init(clientId, orderedPulls);
+        } else {
+            this.serviceProxy.init(clientId, true);
+        }
     }
 
     /**
