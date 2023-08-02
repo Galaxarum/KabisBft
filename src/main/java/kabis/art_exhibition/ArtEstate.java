@@ -2,6 +2,7 @@ package kabis.art_exhibition;
 
 import kabis.consumer.KabisConsumer;
 
+import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.Properties;
 
@@ -37,12 +38,12 @@ public class ArtEstate extends ArtExhibitionConsumer {
         int numberOfAssignedPartitions = artEstateConsumer.getAssignedPartitions().size();
         System.out.println("[ArtEstate] Number of assigned exhibitions: " + numberOfAssignedPartitions);
         int recordsToRead = ((getNumberOfTrueAlarms() + getNumberOfFalseAlarms()) * 2 + getNumberOfUncaughtBreaches()) * numberOfAssignedPartitions;
-        long time = pollAndMeasure(artEstateConsumer, recordsToRead);
+        LocalTime[] timeResults = pollAndMeasure(artEstateConsumer, recordsToRead);
         artEstateConsumer.close();
         System.out.println("[ArtEstate] DONE! Consumer Closed - Saving experiments");
 
-        ArtExhibitionBenchmarkResult.storeThroughputToDisk(Arrays.asList("#EXHIBITIONS", "#TOTAL ALARMS", "TOTAL TIME [ns]"),
-                Arrays.asList(Integer.toString(getNumberOfArtExhibitions()), Integer.toString(recordsToRead), Long.toString(time)));
+        ArtExhibitionBenchmarkResult.storeThroughputToDisk(Arrays.asList("#EXHIBITIONS", "#TOTAL ALARMS", "START TIME", "END TIME"),
+                Arrays.asList(Integer.toString(getNumberOfArtExhibitions()), Integer.toString(recordsToRead), timeResults[0].toString(), timeResults[1].toString()));
         System.out.println("[ArtEstate] Experiments persisted!");
     }
 }

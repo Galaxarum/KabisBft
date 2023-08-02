@@ -5,6 +5,7 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 
 import java.time.Duration;
+import java.time.LocalTime;
 
 public abstract class ArtExhibitionConsumer extends ArtExhibitionClient {
     private static final Duration POLL_TIMEOUT = Duration.ofSeconds(5);
@@ -42,9 +43,9 @@ public abstract class ArtExhibitionConsumer extends ArtExhibitionClient {
         return numberOfUncaughtBreaches;
     }
 
-    protected long pollAndMeasure(KabisConsumer<Integer, String> consumer, Integer recordsToRead) {
+    protected LocalTime[] pollAndMeasure(KabisConsumer<Integer, String> consumer, Integer recordsToRead) {
         int i = 0;
-        long t1 = System.nanoTime();
+        LocalTime startTime = LocalTime.now();
         System.out.println("[pollAndMeasure]: recordsToRead: " + recordsToRead + " with POLL_TIMEOUT: " + POLL_TIMEOUT);
         while (i < recordsToRead) {
             ConsumerRecords<Integer, String> records = consumer.poll(POLL_TIMEOUT);
@@ -54,9 +55,8 @@ public abstract class ArtExhibitionConsumer extends ArtExhibitionClient {
                 System.out.println("[pollAndMeasure]: Total VALIDATED RECORDS until now: " + i);
             }
         }
-        long t2 = System.nanoTime();
+        LocalTime endTime = LocalTime.now();
         System.out.println("[pollAndMeasure]: All messages read!");
-
-        return t2 - t1;
+        return new LocalTime[]{startTime, endTime};
     }
 }
