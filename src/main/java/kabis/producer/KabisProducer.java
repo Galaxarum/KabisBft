@@ -51,6 +51,7 @@ public class KabisProducer<K extends Integer, V extends String> implements Kabis
 
     /**
      * Updates the list of validated topics.
+     * The update of the topology is not incremental. The given list will replace the current assignment (if there is one).
      *
      * @param validatedTopics the new list of validated topics
      */
@@ -132,7 +133,8 @@ public class KabisProducer<K extends Integer, V extends String> implements Kabis
     }
 
     /**
-     * Flushes all Kafka producers.
+     * Flushes the producer.
+     * Invoking this method makes all buffered records immediately available to send (even if linger.ms is greater than 0) and blocks on the completion of the requests associated with these records.
      */
     @Override
     public void flush() {
@@ -140,7 +142,8 @@ public class KabisProducer<K extends Integer, V extends String> implements Kabis
     }
 
     /**
-     * Closes all Kafka producers.
+     * Closes the producer.
+     * This method blocks until all previously sent requests complete.
      */
     @Override
     public void close() {
@@ -149,7 +152,8 @@ public class KabisProducer<K extends Integer, V extends String> implements Kabis
     }
 
     /**
-     * Closes all Kafka producers.
+     * Closes the producer.
+     * This method waits up to timeout for the producer to complete the sending of all incomplete requests.
      *
      * @param duration the duration to wait for the close operation to complete
      */

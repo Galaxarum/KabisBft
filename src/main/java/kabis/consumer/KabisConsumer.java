@@ -44,6 +44,7 @@ public class KabisConsumer<K extends Integer, V extends String> implements Kabis
 
     /**
      * Subscribes to a collection of topics.
+     * Topic subscriptions are not incremental. The given list will replace the current assignment (if there is one).
      *
      * @param topics the topics to subscribe to
      */
@@ -113,7 +114,8 @@ public class KabisConsumer<K extends Integer, V extends String> implements Kabis
     }
 
     /**
-     * Empties the list of validated topics and updates it with the new list.
+     * Updates the list of validated topics.
+     * The update of the topology is not incremental. The given list will replace the current assignment (if there is one).
      *
      * @param validatedTopics the new list of validated topics
      */

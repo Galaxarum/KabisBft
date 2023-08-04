@@ -155,7 +155,7 @@ services:
       - NUM_FALSE_ALARMS=$NUM_FALSE_ALARMS
       - NUM_UNCAUGHT_BREACHES=$NUM_UNCAUGHT_BREACHES
     volumes:
-      - ./results/art-estate:/usr/kabis/result
+      - ./results/art-estate-2:/usr/kabis/result
   ensure:
     image: "${DOCKERHUB_USERNAME}/ensure:latest"
     networks:
@@ -175,4 +175,4 @@ services:
       - NUM_FALSE_ALARMS=$NUM_FALSE_ALARMS
       - NUM_UNCAUGHT_BREACHES=$NUM_UNCAUGHT_BREACHES
     volumes:
-      - ./results/ensure:/usr/kabis/result
+      - ./results/ensure-3:/usr/kabis/result
