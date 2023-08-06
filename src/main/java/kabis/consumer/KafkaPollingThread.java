@@ -140,8 +140,7 @@ public class KafkaPollingThread<K extends Integer, V extends String> {
      * @return the consumer records grouped by partition
      */
     public synchronized Map<TopicPartition, List<ConsumerRecord<K, V>>> pollUnvalidated(Collection<String> excludedTopics, Duration timeout) {
-        for (int replicaIndex = 0; replicaIndex < this.cacheReplicas.size(); replicaIndex++)
-            pullKafka(replicaIndex, timeout, true);
+        pullKafka(0, timeout, true);
         Cache<K, V> cache = this.cacheReplicas.get(0);
 
         Set<CacheKey> validTPs = cache.getKeys();
