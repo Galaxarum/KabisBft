@@ -136,7 +136,7 @@ services:
       - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka_2_4:9092
 
   #Clients
-  art-estate:
+  art-estate-1:
     image: "${DOCKERHUB_USERNAME}/art-estate:latest"
     networks:
       - kafka-network
@@ -155,9 +155,9 @@ services:
       - NUM_FALSE_ALARMS=$NUM_FALSE_ALARMS
       - NUM_UNCAUGHT_BREACHES=$NUM_UNCAUGHT_BREACHES
     volumes:
-      - ./results/art-estate-2:/usr/kabis/result
-  ensure:
-    image: "${DOCKERHUB_USERNAME}/ensure:latest"
+      - ./results/art-estate-1:/usr/kabis/result
+  art-estate-2:
+    image: "${DOCKERHUB_USERNAME}/art-estate:latest"
     networks:
       - kafka-network
       - bft-network
@@ -175,4 +175,164 @@ services:
       - NUM_FALSE_ALARMS=$NUM_FALSE_ALARMS
       - NUM_UNCAUGHT_BREACHES=$NUM_UNCAUGHT_BREACHES
     volumes:
+      - ./results/art-estate-2:/usr/kabis/result
+  art-estate-3:
+    image: "${DOCKERHUB_USERNAME}/art-estate:latest"
+    networks:
+      - kafka-network
+      - bft-network
+    depends_on:
+      - "kafka_1_3"
+      - "kafka_1_4"
+      - "kafka_2_3"
+      - "kafka_2_4"
+      - "bft-3"
+      - "bft-4"
+    environment:
+      - CLIENT_ID=4
+      - NUM_EXHIBITIONS=$NUM_EXHIBITIONS
+      - NUM_TRUE_ALARMS=$NUM_TRUE_ALARMS
+      - NUM_FALSE_ALARMS=$NUM_FALSE_ALARMS
+      - NUM_UNCAUGHT_BREACHES=$NUM_UNCAUGHT_BREACHES
+    volumes:
+      - ./results/art-estate-3:/usr/kabis/result
+  art-estate-4:
+    image: "${DOCKERHUB_USERNAME}/art-estate:latest"
+    networks:
+      - kafka-network
+      - bft-network
+    depends_on:
+      - "kafka_1_3"
+      - "kafka_1_4"
+      - "kafka_2_3"
+      - "kafka_2_4"
+      - "bft-3"
+      - "bft-4"
+    environment:
+      - CLIENT_ID=5
+      - NUM_EXHIBITIONS=$NUM_EXHIBITIONS
+      - NUM_TRUE_ALARMS=$NUM_TRUE_ALARMS
+      - NUM_FALSE_ALARMS=$NUM_FALSE_ALARMS
+      - NUM_UNCAUGHT_BREACHES=$NUM_UNCAUGHT_BREACHES
+    volumes:
+      - ./results/art-estate-4:/usr/kabis/result
+  art-estate-5:
+    image: "${DOCKERHUB_USERNAME}/art-estate:latest"
+    networks:
+      - kafka-network
+      - bft-network
+    depends_on:
+      - "kafka_1_3"
+      - "kafka_1_4"
+      - "kafka_2_3"
+      - "kafka_2_4"
+      - "bft-3"
+      - "bft-4"
+    environment:
+      - CLIENT_ID=6
+      - NUM_EXHIBITIONS=$NUM_EXHIBITIONS
+      - NUM_TRUE_ALARMS=$NUM_TRUE_ALARMS
+      - NUM_FALSE_ALARMS=$NUM_FALSE_ALARMS
+      - NUM_UNCAUGHT_BREACHES=$NUM_UNCAUGHT_BREACHES
+    volumes:
+      - ./results/art-estate-5:/usr/kabis/result
+  ensure-1:
+    image: "${DOCKERHUB_USERNAME}/ensure:latest"
+    networks:
+      - kafka-network
+      - bft-network
+    depends_on:
+      - "kafka_1_3"
+      - "kafka_1_4"
+      - "kafka_2_3"
+      - "kafka_2_4"
+      - "bft-3"
+      - "bft-4"
+    environment:
+      - CLIENT_ID=7
+      - NUM_EXHIBITIONS=$NUM_EXHIBITIONS
+      - NUM_TRUE_ALARMS=$NUM_TRUE_ALARMS
+      - NUM_FALSE_ALARMS=$NUM_FALSE_ALARMS
+      - NUM_UNCAUGHT_BREACHES=$NUM_UNCAUGHT_BREACHES
+    volumes:
+      - ./results/ensure-1:/usr/kabis/result
+  ensure-2:
+    image: "${DOCKERHUB_USERNAME}/ensure:latest"
+    networks:
+      - kafka-network
+      - bft-network
+    depends_on:
+      - "kafka_1_3"
+      - "kafka_1_4"
+      - "kafka_2_3"
+      - "kafka_2_4"
+      - "bft-3"
+      - "bft-4"
+    environment:
+      - CLIENT_ID=8
+      - NUM_EXHIBITIONS=$NUM_EXHIBITIONS
+      - NUM_TRUE_ALARMS=$NUM_TRUE_ALARMS
+      - NUM_FALSE_ALARMS=$NUM_FALSE_ALARMS
+      - NUM_UNCAUGHT_BREACHES=$NUM_UNCAUGHT_BREACHES
+    volumes:
+      - ./results/ensure-2:/usr/kabis/result
+  ensure-3:
+    image: "${DOCKERHUB_USERNAME}/ensure:latest"
+    networks:
+      - kafka-network
+      - bft-network
+    depends_on:
+      - "kafka_1_3"
+      - "kafka_1_4"
+      - "kafka_2_3"
+      - "kafka_2_4"
+      - "bft-3"
+      - "bft-4"
+    environment:
+      - CLIENT_ID=9
+      - NUM_EXHIBITIONS=$NUM_EXHIBITIONS
+      - NUM_TRUE_ALARMS=$NUM_TRUE_ALARMS
+      - NUM_FALSE_ALARMS=$NUM_FALSE_ALARMS
+      - NUM_UNCAUGHT_BREACHES=$NUM_UNCAUGHT_BREACHES
+    volumes:
       - ./results/ensure-3:/usr/kabis/result
+  ensure-4:
+    image: "${DOCKERHUB_USERNAME}/ensure:latest"
+    networks:
+      - kafka-network
+      - bft-network
+    depends_on:
+      - "kafka_1_3"
+      - "kafka_1_4"
+      - "kafka_2_3"
+      - "kafka_2_4"
+      - "bft-3"
+      - "bft-4"
+    environment:
+      - CLIENT_ID=10
+      - NUM_EXHIBITIONS=$NUM_EXHIBITIONS
+      - NUM_TRUE_ALARMS=$NUM_TRUE_ALARMS
+      - NUM_FALSE_ALARMS=$NUM_FALSE_ALARMS
+      - NUM_UNCAUGHT_BREACHES=$NUM_UNCAUGHT_BREACHES
+    volumes:
+      - ./results/ensure-4:/usr/kabis/result
+  ensure-5:
+    image: "${DOCKERHUB_USERNAME}/ensure:latest"
+    networks:
+      - kafka-network
+      - bft-network
+    depends_on:
+      - "kafka_1_3"
+      - "kafka_1_4"
+      - "kafka_2_3"
+      - "kafka_2_4"
+      - "bft-3"
+      - "bft-4"
+    environment:
+      - CLIENT_ID=11
+      - NUM_EXHIBITIONS=$NUM_EXHIBITIONS
+      - NUM_TRUE_ALARMS=$NUM_TRUE_ALARMS
+      - NUM_FALSE_ALARMS=$NUM_FALSE_ALARMS
+      - NUM_UNCAUGHT_BREACHES=$NUM_UNCAUGHT_BREACHES
+    volumes:
+      - ./results/ensure-5:/usr/kabis/result

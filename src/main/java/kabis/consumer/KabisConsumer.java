@@ -74,7 +74,6 @@ public class KabisConsumer<K extends Integer, V extends String> implements Kabis
         System.out.printf("[" + this.getClass().getName() + "] Received %d sids%n", sids.size());
         // TODO: Remove this filter?
         sids = sids.stream().filter(sid -> this.assignedPartitions.contains(sid.getTopicPartition())).collect(Collectors.toList());
-        System.out.printf("[" + this.getClass().getName() + "] After filter, received %d sids%n", sids.size());
         //TODO: Remove counter!
         this.counter += sids.size();
         System.out.println("[" + this.getClass().getName() + "] Total filtered SIDS until now: " + this.counter);

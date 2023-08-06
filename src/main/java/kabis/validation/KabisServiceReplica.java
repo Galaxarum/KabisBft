@@ -127,8 +127,6 @@ public class KabisServiceReplica extends DefaultSingleRecoverable {
      */
     private byte[] pull(int index, List<TopicPartition> topicPartitions) {
         if (index > this.secureIdentifierList.size()) return new byte[0];
-        //TODO: Remove print
-        System.out.println("Pulling with topic partitions " + topicPartitions + " and index " + index);
         List<SecureIdentifier> secureIdentifierSubList;
 
         synchronized (this.secureIdentifierList) {

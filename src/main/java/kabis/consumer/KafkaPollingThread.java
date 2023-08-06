@@ -76,10 +76,10 @@ public class KafkaPollingThread<K extends Integer, V extends String> {
      * @return the set of assigned partitions to the Kafka consumers
      */
     private Set<TopicPartition> pullAndReturnAssignedPartitions(int replicaIndex) {
-        pullKafka(replicaIndex, Duration.ofSeconds(30));
+        pullKafka(replicaIndex, Duration.ofSeconds(30), false);
         Set<TopicPartition> assignedPartitions = this.consumers.get(replicaIndex).assignment();
         while (assignedPartitions.isEmpty()) {
-            pullKafka(replicaIndex, Duration.ofSeconds(15));
+            pullKafka(replicaIndex, Duration.ofSeconds(30), false);
             assignedPartitions = this.consumers.get(replicaIndex).assignment();
         }
         List<TopicPartition> assignedPartitionsList = this.replicaAssignedPartitions.get(replicaIndex);
@@ -98,13 +98,15 @@ public class KafkaPollingThread<K extends Integer, V extends String> {
      *
      * @param timeout The maximum time to block (must not be greater than Long.MAX_VALUE milliseconds)
      */
-    private void pullKafka(int replicaIndex, Duration timeout) {
+    private void pullKafka(int replicaIndex, Duration timeout, boolean updateCache) {
         ConsumerRecords<K, MessageWrapper<V>> records = this.consumers.get(replicaIndex).poll(timeout);
-        Cache<K, V> cache = this.cacheReplicas.get(replicaIndex);
-        for (ConsumerRecord<K, MessageWrapper<V>> record : records) {
-            TopicPartition tp = new TopicPartition(record.topic(), record.partition());
-            CacheKey key = new CacheKey(tp, record.value().getSenderId());
-            cache.offer(key, record);
+        if (updateCache) {
+            Cache<K, V> cache = this.cacheReplicas.get(replicaIndex);
+            for (ConsumerRecord<K, MessageWrapper<V>> record : records) {
+                TopicPartition tp = new TopicPartition(record.topic(), record.partition());
+                CacheKey key = new CacheKey(tp, record.value().getSenderId());
+                cache.offer(key, record);
+            }
         }
     }
 
@@ -122,7 +124,7 @@ public class KafkaPollingThread<K extends Integer, V extends String> {
         for (int replicaIndex = 0; replicaIndex < this.cacheReplicas.size(); replicaIndex++) {
             Cache<K, V> cache = this.cacheReplicas.get(replicaIndex);
             while (!cache.hasAny(cacheKey)) {
-                pullKafka(replicaIndex, timeout);
+                pullKafka(replicaIndex, timeout, true);
             }
             if (cache.hasAny(cacheKey)) res.add(cache.poll(cacheKey));
         }
@@ -139,7 +141,7 @@ public class KafkaPollingThread<K extends Integer, V extends String> {
      */
     public synchronized Map<TopicPartition, List<ConsumerRecord<K, V>>> pollUnvalidated(Collection<String> excludedTopics, Duration timeout) {
         for (int replicaIndex = 0; replicaIndex < this.cacheReplicas.size(); replicaIndex++)
-            pullKafka(replicaIndex, timeout);
+            pullKafka(replicaIndex, timeout, true);
         Cache<K, V> cache = this.cacheReplicas.get(0);
 
         Set<CacheKey> validTPs = cache.getKeys();

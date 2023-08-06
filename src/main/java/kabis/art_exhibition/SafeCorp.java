@@ -79,13 +79,12 @@ public class SafeCorp extends ArtExhibitionProducer {
         System.out.println("[pollAndRespondMeasure]: recordsToRead: " + recordsToRead + " with POLL_TIMEOUT: " + POLL_TIMEOUT);
         while (i < recordsToRead) {
             ConsumerRecords<Integer, String> records = consumer.poll(POLL_TIMEOUT);
-            System.out.println("[pollAndRespondMeasure]: Received " + records.count() + " records");
             for (ConsumerRecord<Integer, String> record : records) {
                 String recordMessage = record.value();
                 if (!recordMessage.contains("[SafeCorp]")) {
                     i += 1;
                     ProducerRecord<Integer, String> responseRecord = new ProducerRecord<>(Topics.ART_EXHIBITION.toString(), record.partition(), record.key(), message + recordMessage);
-                    System.out.println("[pollAndRespondMeasure]: Sending " + responseRecord.value() + " exhibition: " + responseRecord.key());
+                    System.out.println("[pollAndRespondMeasure]: Sending " + responseRecord.value() + " exhibition: " + responseRecord.partition());
                     producer.push(responseRecord);
                 }
             }
