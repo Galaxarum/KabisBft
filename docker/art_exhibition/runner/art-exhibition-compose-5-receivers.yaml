@@ -149,7 +149,7 @@ services:
       - "bft-3"
       - "bft-4"
     environment:
-      - CLIENT_ID=2
+      - CLIENT_ID=6
       - NUM_EXHIBITIONS=$NUM_EXHIBITIONS
       - NUM_TRUE_ALARMS=$NUM_TRUE_ALARMS
       - NUM_FALSE_ALARMS=$NUM_FALSE_ALARMS
@@ -169,7 +169,7 @@ services:
       - "bft-3"
       - "bft-4"
     environment:
-      - CLIENT_ID=3
+      - CLIENT_ID=7
       - NUM_EXHIBITIONS=$NUM_EXHIBITIONS
       - NUM_TRUE_ALARMS=$NUM_TRUE_ALARMS
       - NUM_FALSE_ALARMS=$NUM_FALSE_ALARMS
@@ -189,7 +189,7 @@ services:
       - "bft-3"
       - "bft-4"
     environment:
-      - CLIENT_ID=4
+      - CLIENT_ID=8
       - NUM_EXHIBITIONS=$NUM_EXHIBITIONS
       - NUM_TRUE_ALARMS=$NUM_TRUE_ALARMS
       - NUM_FALSE_ALARMS=$NUM_FALSE_ALARMS
@@ -209,7 +209,7 @@ services:
       - "bft-3"
       - "bft-4"
     environment:
-      - CLIENT_ID=5
+      - CLIENT_ID=9
       - NUM_EXHIBITIONS=$NUM_EXHIBITIONS
       - NUM_TRUE_ALARMS=$NUM_TRUE_ALARMS
       - NUM_FALSE_ALARMS=$NUM_FALSE_ALARMS
@@ -229,7 +229,7 @@ services:
       - "bft-3"
       - "bft-4"
     environment:
-      - CLIENT_ID=6
+      - CLIENT_ID=10
       - NUM_EXHIBITIONS=$NUM_EXHIBITIONS
       - NUM_TRUE_ALARMS=$NUM_TRUE_ALARMS
       - NUM_FALSE_ALARMS=$NUM_FALSE_ALARMS
@@ -249,7 +249,7 @@ services:
       - "bft-3"
       - "bft-4"
     environment:
-      - CLIENT_ID=7
+      - CLIENT_ID=11
       - NUM_EXHIBITIONS=$NUM_EXHIBITIONS
       - NUM_TRUE_ALARMS=$NUM_TRUE_ALARMS
       - NUM_FALSE_ALARMS=$NUM_FALSE_ALARMS
@@ -269,7 +269,7 @@ services:
       - "bft-3"
       - "bft-4"
     environment:
-      - CLIENT_ID=8
+      - CLIENT_ID=12
       - NUM_EXHIBITIONS=$NUM_EXHIBITIONS
       - NUM_TRUE_ALARMS=$NUM_TRUE_ALARMS
       - NUM_FALSE_ALARMS=$NUM_FALSE_ALARMS
@@ -289,7 +289,7 @@ services:
       - "bft-3"
       - "bft-4"
     environment:
-      - CLIENT_ID=9
+      - CLIENT_ID=13
       - NUM_EXHIBITIONS=$NUM_EXHIBITIONS
       - NUM_TRUE_ALARMS=$NUM_TRUE_ALARMS
       - NUM_FALSE_ALARMS=$NUM_FALSE_ALARMS
@@ -309,7 +309,7 @@ services:
       - "bft-3"
       - "bft-4"
     environment:
-      - CLIENT_ID=10
+      - CLIENT_ID=14
       - NUM_EXHIBITIONS=$NUM_EXHIBITIONS
       - NUM_TRUE_ALARMS=$NUM_TRUE_ALARMS
       - NUM_FALSE_ALARMS=$NUM_FALSE_ALARMS
@@ -329,7 +329,7 @@ services:
       - "bft-3"
       - "bft-4"
     environment:
-      - CLIENT_ID=11
+      - CLIENT_ID=15
       - NUM_EXHIBITIONS=$NUM_EXHIBITIONS
       - NUM_TRUE_ALARMS=$NUM_TRUE_ALARMS
       - NUM_FALSE_ALARMS=$NUM_FALSE_ALARMS
