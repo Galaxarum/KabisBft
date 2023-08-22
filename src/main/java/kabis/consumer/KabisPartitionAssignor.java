@@ -72,12 +72,12 @@ public class KabisPartitionAssignor extends AbstractPartitionAssignor implements
             int numberOfConsumersPerGroup = consumerIds.length;
 
             int numPartitionsPerConsumer = numPartitionsForTopic / numberOfConsumersPerGroup;
-            int consumersWithExtraPartition = numPartitionsForTopic % numberOfConsumersPerGroup;
+            int remainderPartitions = numPartitionsForTopic % numberOfConsumersPerGroup;
             List<TopicPartition> partitions = AbstractPartitionAssignor.partitions(topic, numPartitionsForTopic);
 
             for (int i = 0, n = consumerIds.length; i < n; i++) {
-                int start = numPartitionsPerConsumer * i + Math.min(i, consumersWithExtraPartition);
-                int length = numPartitionsPerConsumer + (i + 1 > consumersWithExtraPartition ? 0 : 1);
+                int start = numPartitionsPerConsumer * i + Math.min(i, remainderPartitions);
+                int length = numPartitionsPerConsumer + (i + 1 > remainderPartitions ? 0 : 1);
                 partitionsPerConsumerId.putIfAbsent(consumerIds[i], new ArrayList<>());
                 partitionsPerConsumerId.get(consumerIds[i]).addAll(partitions.subList(start, start + length));
             }
