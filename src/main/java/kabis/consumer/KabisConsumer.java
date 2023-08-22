@@ -23,8 +23,6 @@ public class KabisConsumer<K extends Integer, V extends String> implements Kabis
     private final Validator<K, V> validator;
     private final Logger log;
     private final List<TopicPartition> assignedPartitions = new ArrayList<>();
-    //TODO: REMOVE THIS
-    public int counter = 0;
 
     /**
      * Creates a new KabisConsumer.
@@ -71,12 +69,7 @@ public class KabisConsumer<K extends Integer, V extends String> implements Kabis
      */
     public ConsumerRecords<K, V> poll(Duration duration) {
         List<SecureIdentifier> sids = this.serviceProxy.pull(this.assignedPartitions);
-        System.out.printf("[" + this.getClass().getName() + "] Received %d sids%n", sids.size());
-        // TODO: Remove this filter?
         sids = sids.stream().filter(sid -> this.assignedPartitions.contains(sid.getTopicPartition())).collect(Collectors.toList());
-        //TODO: Remove counter!
-        this.counter += sids.size();
-        System.out.println("[" + this.getClass().getName() + "] Total filtered SIDS until now: " + this.counter);
 
         Map<TopicPartition, List<ConsumerRecord<K, V>>> validatedRecords = this.validator.verify(sids, duration);
         Map<TopicPartition, List<ConsumerRecord<K, V>>> unvalidatedRecords = this.kafkaPollingThread.pollUnvalidated(this.validatedTopics, duration);
