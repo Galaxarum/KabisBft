@@ -59,6 +59,7 @@ public class KafkaPollingThread<K extends Integer, V extends String> {
     public List<TopicPartition> getAssignedPartitions() {
         Set<TopicPartition> firstReplicaAssignedPartitions = pullAndReturnAssignedPartitions(0);
         this.log.info("Replica 0, assigned partitions: {}", firstReplicaAssignedPartitions);
+        seekPartitionToBeginning(0, firstReplicaAssignedPartitions);
 
         for (int replicaIndex = 1; replicaIndex < this.consumers.size(); replicaIndex++) {
             Set<TopicPartition> assignedPartitionsReplica = pullAndReturnAssignedPartitions(replicaIndex);
@@ -66,6 +67,8 @@ public class KafkaPollingThread<K extends Integer, V extends String> {
             if (!assignedPartitionsReplica.equals(firstReplicaAssignedPartitions)) {
                 throw new IllegalStateException("The Kafka replicas have different assigned partitions");
             }
+
+            seekPartitionToBeginning(replicaIndex, assignedPartitionsReplica);
         }
         return new ArrayList<>(firstReplicaAssignedPartitions);
     }
@@ -76,21 +79,26 @@ public class KafkaPollingThread<K extends Integer, V extends String> {
      * @return the set of assigned partitions to the Kafka consumers
      */
     private Set<TopicPartition> pullAndReturnAssignedPartitions(int replicaIndex) {
+        this.log.info("Replica {}, waiting for assigned partitions", replicaIndex);
         pullKafka(replicaIndex, Duration.ofSeconds(30), false);
         Set<TopicPartition> assignedPartitions = this.consumers.get(replicaIndex).assignment();
         while (assignedPartitions.isEmpty()) {
+            this.log.info("Replica {}, waiting for assigned partitions", replicaIndex);
             pullKafka(replicaIndex, Duration.ofSeconds(30), false);
             assignedPartitions = this.consumers.get(replicaIndex).assignment();
         }
+        return assignedPartitions;
+    }
+
+    private void seekPartitionToBeginning(int replicaIndex, Set<TopicPartition> assignedPartitionsFromReplica) {
         List<TopicPartition> assignedPartitionsList = this.replicaAssignedPartitions.get(replicaIndex);
-        assignedPartitions.forEach(tp -> {
+        assignedPartitionsFromReplica.forEach(tp -> {
             if (!assignedPartitionsList.contains(tp)) {
                 this.log.info("Replica {}, new assigned partition: {}, seeking to offset 0", replicaIndex, tp);
                 this.consumers.get(replicaIndex).seek(tp, 0);
                 assignedPartitionsList.add(tp);
             }
         });
-        return assignedPartitions;
     }
 
     /**

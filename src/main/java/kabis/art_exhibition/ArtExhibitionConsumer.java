@@ -6,9 +6,11 @@ import org.apache.kafka.clients.consumer.ConsumerRecords;
 
 import java.time.Duration;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 
 public abstract class ArtExhibitionConsumer extends ArtExhibitionClient {
-    private static final Duration POLL_TIMEOUT = Duration.ofSeconds(1);
+    private static final Duration POLL_TIMEOUT = Duration.ofMillis(1000); //0.25s if latency test, 1s otherwise
     private final Integer clientId;
     private final Integer numberOfArtExhibitions;
     private final Integer numberOfTrueAlarms;
@@ -43,6 +45,13 @@ public abstract class ArtExhibitionConsumer extends ArtExhibitionClient {
         return numberOfUncaughtBreaches;
     }
 
+    /**
+     * Polls and measures the time it takes to receive all the messages.
+     *
+     * @param consumer      the consumer to poll from
+     * @param recordsToRead the number of records to read
+     * @return the start and end time of the polling
+     */
     protected LocalTime[] pollAndMeasure(KabisConsumer<Integer, String> consumer, Integer recordsToRead) {
         int i = 0;
         LocalTime startTime = LocalTime.now();
@@ -58,5 +67,30 @@ public abstract class ArtExhibitionConsumer extends ArtExhibitionClient {
         LocalTime endTime = LocalTime.now();
         System.out.println("[pollAndMeasure]: All messages read!");
         return new LocalTime[]{startTime, endTime};
+    }
+
+    /**
+     * Polls and measures the latency of the messages received.
+     *
+     * @param consumer      the consumer to poll from
+     * @param recordsToRead the number of records to read
+     * @return the average latency of the messages received
+     */
+    protected long pollAndMeasureLatencyTest(KabisConsumer<Integer, String> consumer, Integer recordsToRead) {
+        int i = 0;
+        List<Long> latencies = new ArrayList<>();
+        System.out.println("[pollAndMeasureLatencyTest]: recordsToRead: " + recordsToRead + " with POLL_TIMEOUT: " + POLL_TIMEOUT);
+        while (i < recordsToRead) {
+            System.out.println("[pollAndMeasureLatencyTest]: Pulling....");
+            ConsumerRecords<Integer, String> records = consumer.poll(POLL_TIMEOUT);
+            for (ConsumerRecord<Integer, String> record : records) {
+                i += 1;
+                long latency = System.currentTimeMillis() - record.timestamp();
+                System.out.println("[pollAndMeasureLatencyTest]: Latency: " + latency + "ms" + " exhibition: " + record.partition() + " VALIDATED RECORDS until now: " + i);
+                latencies.add(latency);
+            }
+        }
+        System.out.println("[pollAndMeasureLatencyTest]: All messages read!");
+        return latencies.stream().mapToLong(Long::longValue).sum() / latencies.size();
     }
 }
