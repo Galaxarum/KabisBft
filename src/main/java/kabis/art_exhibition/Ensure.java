@@ -20,7 +20,7 @@ public class Ensure extends ArtExhibitionConsumer {
             System.exit(1);
         }
         // -- PRIMING KAFKA, CREATING TOPICS --
-        Thread.sleep(20000);
+        Thread.sleep(15000);
         // -- 14 MIN SLEEP TO WAIT FOR ALL THE MESSAGES TO BE SENT --
         //System.out.println("[Ensure] Sleeping for 14 minutes to allow the system to warm up");
         //Thread.sleep(840000);

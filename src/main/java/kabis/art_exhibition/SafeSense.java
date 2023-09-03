@@ -22,11 +22,11 @@ public class SafeSense extends ArtExhibitionProducer {
             System.exit(1);
         }
         // -- PRIMING KAFKA, CREATING TOPICS --
-        Thread.sleep(120000); //2m to wait for consumers to be ready, 15s otherwise
+        Thread.sleep(15000); //2m to wait for consumers to be ready, 15s otherwise
         new SafeSense(parseInt(args[0]), parseInt(args[1]), parseInt(args[2]), parseInt(args[3])).run();
     }
 
-    private void run() throws InterruptedException {
+    private void run() {
         Properties properties = readProperties();
         properties.setProperty("client.id", String.valueOf(getClientId()));
 
