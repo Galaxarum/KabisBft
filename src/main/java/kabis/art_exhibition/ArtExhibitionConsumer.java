@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class ArtExhibitionConsumer extends ArtExhibitionClient {
-    private static final Duration POLL_TIMEOUT = Duration.ofMillis(1000); //0.25s if latency test, 1s otherwise
+    private static final Duration POLL_TIMEOUT = Duration.ofSeconds(1); //ZERO if latency test, 1s otherwise
     private final Integer clientId;
     private final Integer numberOfArtExhibitions;
     private final Integer numberOfTrueAlarms;
@@ -85,8 +85,9 @@ public abstract class ArtExhibitionConsumer extends ArtExhibitionClient {
             ConsumerRecords<Integer, String> records = consumer.poll(POLL_TIMEOUT);
             for (ConsumerRecord<Integer, String> record : records) {
                 i += 1;
-                long latency = System.currentTimeMillis() - record.timestamp();
-                System.out.println("[pollAndMeasureLatencyTest]: Latency: " + latency + "ms" + " exhibition: " + record.partition() + " VALIDATED RECORDS until now: " + i);
+                LocalTime timestamp = LocalTime.parse(record.value());
+                long latency = Duration.between(timestamp, LocalTime.now()).toNanos();
+                System.out.println("[pollAndMeasureLatencyTest]: Latency: " + latency + "ns" + " exhibition: " + record.partition() + " VALIDATED RECORDS until now: " + i);
                 latencies.add(latency);
             }
         }

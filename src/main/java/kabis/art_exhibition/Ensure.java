@@ -51,7 +51,7 @@ public class Ensure extends ArtExhibitionConsumer {
         // *** LATENCY/THROUGHPUT EXPERIMENT ***
         int recordsToRead = getNumberOfTrueAlarms() * numberOfAssignedPartitions;
         long avgLatency = pollAndMeasureLatencyTest(ensureConsumer, recordsToRead);
-         */
+        */
 
         ensureConsumer.close();
         System.out.println("[Ensure] DONE! Consumer Closed - Saving experiments");
@@ -63,9 +63,9 @@ public class Ensure extends ArtExhibitionConsumer {
 
         /*
         // *** LATENCY/THROUGHPUT EXPERIMENT SAVE ***
-        ArtExhibitionBenchmarkResult.storeThroughputToDisk(Arrays.asList("#EXHIBITIONS", "#TOTAL ALARMS", "AVG LATENCY"),
+        ArtExhibitionBenchmarkResult.storeThroughputToDisk(Arrays.asList("#EXHIBITIONS", "#TOTAL ALARMS", "AVG LATENCY [ns]"),
                 Arrays.asList(Integer.toString(getNumberOfArtExhibitions()), Integer.toString(recordsToRead), Long.toString(avgLatency)));
-        */
+         */
         System.out.println("[Ensure] Experiments persisted!");
     }
 }
