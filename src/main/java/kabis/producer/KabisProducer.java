@@ -1,5 +1,7 @@
 package kabis.producer;
 
+import kabis.configs.KabisProducerConfig;
+import kabis.configs.properties_validators.KabisProducerPropertiesValidator;
 import kabis.storage.MessageWrapper;
 import kabis.validation.KabisServiceProxy;
 import kabis.validation.SecureIdentifier;
@@ -22,6 +24,7 @@ public class KabisProducer<K extends Integer, V extends String> implements Kabis
     private final int clientId;
     private final Logger log;
 
+
     /**
      * Creates a new Kabis Producer.
      *
@@ -29,25 +32,26 @@ public class KabisProducer<K extends Integer, V extends String> implements Kabis
      */
     public KabisProducer(Properties properties) {
         this.log = LoggerFactory.getLogger(KabisProducer.class);
-        //TODO: Improve the regex + check if the properties are valid, otherwise throw an exception
-        String[] serversReplicas = properties.getProperty("bootstrap.servers").split(";");
-        this.clientId = Integer.parseInt(properties.getProperty("client.id"));
+        properties = KabisProducerPropertiesValidator.getInstance().validate(properties);
+        String[] serversReplicas = properties.getProperty(KabisProducerConfig.BOOTSTRAP_SERVERS_CONFIG).split(";");
+        this.clientId = Integer.parseInt(properties.getProperty(KabisProducerConfig.CLIENT_ID_CONFIG));
         this.kafkaProducers = new ArrayList<>(serversReplicas.length);
         for (int i = 0; i < serversReplicas.length; i++) {
             String servers = serversReplicas[i];
             String id = String.format("%d-producer-%d", this.clientId, i);
             Properties simplerProperties = (Properties) properties.clone();
-            simplerProperties.put("bootstrap.servers", servers);
-            simplerProperties.put("client.id", id);
+            simplerProperties.put(KabisProducerConfig.BOOTSTRAP_SERVERS_CONFIG, servers);
+            simplerProperties.put(KabisProducerConfig.CLIENT_ID_CONFIG, id);
             this.kafkaProducers.add(new KafkaProducer<>(simplerProperties));
         }
-        // TODO: Add orderedPulls support
         this.serviceProxy = KabisServiceProxy.getInstance();
-        this.serviceProxy.init(this.clientId, false);
+        boolean orderedPulls = Boolean.parseBoolean(properties.getProperty(KabisProducerConfig.ORDERED_PULLS_CONFIG));
+        this.serviceProxy.init(clientId, orderedPulls);
     }
 
     /**
      * Updates the list of validated topics.
+     * The update of the topology is not incremental. The given list will replace the current assignment (if there is one).
      *
      * @param validatedTopics the new list of validated topics
      */
@@ -129,7 +133,8 @@ public class KabisProducer<K extends Integer, V extends String> implements Kabis
     }
 
     /**
-     * Flushes all Kafka producers.
+     * Flushes the producer.
+     * Invoking this method makes all buffered records immediately available to send (even if linger.ms is greater than 0) and blocks on the completion of the requests associated with these records.
      */
     @Override
     public void flush() {
@@ -137,7 +142,8 @@ public class KabisProducer<K extends Integer, V extends String> implements Kabis
     }
 
     /**
-     * Closes all Kafka producers.
+     * Closes the producer.
+     * This method blocks until all previously sent requests complete.
      */
     @Override
     public void close() {
@@ -146,7 +152,8 @@ public class KabisProducer<K extends Integer, V extends String> implements Kabis
     }
 
     /**
-     * Closes all Kafka producers.
+     * Closes the producer.
+     * This method waits up to timeout for the producer to complete the sending of all incomplete requests.
      *
      * @param duration the duration to wait for the close operation to complete
      */

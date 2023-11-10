@@ -1,12 +1,17 @@
 package kabis.validation;
 
 import bftsmart.tom.ServiceProxy;
+import kabis.validation.serializers.ServiceReplicaResponse;
+import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.errors.SerializationException;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.List;
+
+import static kabis.validation.serializers.ServiceReplicaResponse.deserializeServiceReplicaResponse;
+import static kabis.validation.serializers.TopicPartitionListSerializer.serializeTopicPartitionList;
 
 /**
  * A singleton proxy for the KabisServiceReplica.
@@ -20,7 +25,8 @@ public class KabisServiceProxy {
     private boolean orderedPulls;
     private int nextPullIndex = 0;
 
-    private KabisServiceProxy() {
+    public static KabisServiceProxy getInstance() {
+        return instance;
     }
 
     /**
@@ -38,8 +44,11 @@ public class KabisServiceProxy {
         }
     }
 
-    public static KabisServiceProxy getInstance() {
-        return instance;
+    /**
+     * Resets the nextPullIndex to 0.
+     */
+    public void resetNextPullIndex() {
+        this.nextPullIndex = 0;
     }
 
     /**
@@ -51,7 +60,10 @@ public class KabisServiceProxy {
         try (ByteArrayOutputStream bytes = new ByteArrayOutputStream()) {
             bytes.write(OPS.PUSH.ordinal());
             bytes.writeBytes(sid.serialize());
-            this.bftServiceProxy.invokeOrdered(bytes.toByteArray());
+            if (this.orderedPulls)
+                this.bftServiceProxy.invokeOrdered(bytes.toByteArray());
+            else
+                this.bftServiceProxy.invokeUnordered(bytes.toByteArray());
         } catch (IOException e) {
             throw new SerializationException(e);
         }
@@ -65,33 +77,23 @@ public class KabisServiceProxy {
      * Ordered pulls are slower, but guarantee that the SecureIdentifiers are returned in the order they were pushed.
      * Unordered pulls are faster, but do not guarantee the order of the SecureIdentifiers.
      *
+     * @param topicPartitions The topic partitions to pull from
      * @return A list of SecureIdentifiers
      */
-    public List<SecureIdentifier> pull() {
+    public List<SecureIdentifier> pull(List<TopicPartition> topicPartitions) {
         try (ByteArrayOutputStream bytes = new ByteArrayOutputStream()) {
             bytes.write(OPS.PULL.ordinal());
             bytes.writeBytes(ByteBuffer.allocate(Integer.BYTES).putInt(this.nextPullIndex).array());
+            bytes.writeBytes(serializeTopicPartitionList(topicPartitions));
             byte[] request = bytes.toByteArray();
             byte[] responseBytes = this.orderedPulls ?
                     this.bftServiceProxy.invokeOrdered(request) :
                     this.bftServiceProxy.invokeUnordered(request);
-            if (responseBytes == null || responseBytes.length == 0) {
-                //TODO: Remove this sleep?
-                try {
-                    Thread.sleep(50);
-                } catch (InterruptedException ignored) {
-                }
-                return List.of();
-            }
-            //TODO: Should deserializeSidList be decoupled from KabisServiceReplica?
-            List<SecureIdentifier> result = KabisServiceReplica.deserializeSidList(responseBytes);
-            this.nextPullIndex += result.size();
-            //TODO: Remove this print
-            System.out.println("Pulled " + result.size() + " SIDs, nextPullIndex = " + this.nextPullIndex);
-            return result;
+            ServiceReplicaResponse result = deserializeServiceReplicaResponse(responseBytes);
+            this.nextPullIndex = result.getLastIndex();
+            return result.getSidList();
         } catch (IOException e) {
             throw new SerializationException(e);
         }
     }
-
 }

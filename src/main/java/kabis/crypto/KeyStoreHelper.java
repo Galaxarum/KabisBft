@@ -25,7 +25,6 @@ public class KeyStoreHelper {
      */
     private KeyStoreHelper() {
         try {
-            //TODO: Add support to multiple algorithms
             String pathName = "config/keysECDSA";
             File[] files = new File(pathName).listFiles();
             if (files == null || files.length == 0)
@@ -59,7 +58,6 @@ public class KeyStoreHelper {
      */
     public byte[] signBytes(int signerId, byte[] values) {
         try {
-            //TODO: Add support to multiple algorithms
             Signature sign = Signature.getInstance("SHA256withECDSA");
             sign.initSign(this.keyPairs.get(signerId).getPrivate());
             sign.update(values);
@@ -83,7 +81,6 @@ public class KeyStoreHelper {
      */
     public boolean validateSignature(int signerId, byte[] value, byte[] sign) {
         try {
-            //TODO: Add support to multiple algorithms
             Signature signature = Signature.getInstance("SHA256withECDSA");
             signature.initVerify(this.keyPairs.get(signerId).getPublic());
             signature.update(value);

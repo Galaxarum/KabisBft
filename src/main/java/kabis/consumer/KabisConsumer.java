@@ -1,5 +1,7 @@
 package kabis.consumer;
 
+import kabis.configs.KabisConsumerConfig;
+import kabis.configs.properties_validators.KabisConsumerPropertiesValidator;
 import kabis.validation.KabisServiceProxy;
 import kabis.validation.SecureIdentifier;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -15,14 +17,12 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class KabisConsumer<K extends Integer, V extends String> implements KabisConsumerI<K, V> {
-
     private final Set<String> validatedTopics = new HashSet<>();
     private final KabisServiceProxy serviceProxy;
     private final KafkaPollingThread<K, V> kafkaPollingThread;
     private final Validator<K, V> validator;
     private final Logger log;
-    //TODO: REMOVE THIS
-    public int counter = 0;
+    private final List<TopicPartition> assignedPartitions = new ArrayList<>();
 
     /**
      * Creates a new KabisConsumer.
@@ -31,17 +31,18 @@ public class KabisConsumer<K extends Integer, V extends String> implements Kabis
      */
     public KabisConsumer(Properties properties) {
         this.log = LoggerFactory.getLogger(KabisConsumer.class);
-        //TODO: Check if the properties are valid, otherwise throw an exception
-        int clientId = Integer.parseInt(properties.getProperty("client.id"));
-        // TODO: Add orderedPulls support
+        properties = KabisConsumerPropertiesValidator.getInstance().validate(properties);
+        int clientId = Integer.parseInt(properties.getProperty(KabisConsumerConfig.CLIENT_ID_CONFIG));
         this.serviceProxy = KabisServiceProxy.getInstance();
-        this.serviceProxy.init(clientId, false);
+        boolean orderedPulls = Boolean.parseBoolean(properties.getProperty(KabisConsumerConfig.ORDERED_PULLS_CONFIG));
+        this.serviceProxy.init(clientId, orderedPulls);
         this.kafkaPollingThread = new KafkaPollingThread<>(properties);
         this.validator = new Validator<>(this.kafkaPollingThread);
     }
 
     /**
      * Subscribes to a collection of topics.
+     * Topic subscriptions are not incremental. The given list will replace the current assignment (if there is one).
      *
      * @param topics the topics to subscribe to
      */
@@ -66,20 +67,11 @@ public class KabisConsumer<K extends Integer, V extends String> implements Kabis
      * @param duration The maximum time to block (must not be greater than Long.MAX_VALUE milliseconds)
      * @return the records
      */
-    @Override
     public ConsumerRecords<K, V> poll(Duration duration) {
-        //TODO: Remove all the prints
-        List<SecureIdentifier> sids = this.serviceProxy.pull();
-        System.out.printf("[" + this.getClass().getName() + "] Received %d sids%n", sids.size());
-        //TODO: Remove counter!
-        this.counter += sids.size();
-        System.out.println("[" + this.getClass().getName() + "] Total SIDS until now: " + this.counter);
+        List<SecureIdentifier> sids = this.serviceProxy.pull(this.assignedPartitions);
+        sids = sids.stream().filter(sid -> this.assignedPartitions.contains(sid.getTopicPartition())).collect(Collectors.toList());
 
-        // TODO: Why is duration not passed to the validator? And a new one is created?
-        Map<TopicPartition, List<ConsumerRecord<K, V>>> validatedRecords = this.validator.verify(sids);
-        //System.out.printf("[" + this.getClass().getName() + "] Received %d validated records%n", validatedRecords.values().stream().map(List::size).reduce(Integer::sum).orElse(-1));
-        //if (!validatedRecords.isEmpty())
-        //System.out.println("[" + this.getClass().getName() + "] Validated records: " + validatedRecords.values());
+        Map<TopicPartition, List<ConsumerRecord<K, V>>> validatedRecords = this.validator.verify(sids, duration);
         Map<TopicPartition, List<ConsumerRecord<K, V>>> unvalidatedRecords = this.kafkaPollingThread.pollUnvalidated(this.validatedTopics, duration);
 
         Map<TopicPartition, List<ConsumerRecord<K, V>>> mergedMap = Stream.concat(validatedRecords.entrySet().stream(), unvalidatedRecords.entrySet().stream())
@@ -89,7 +81,6 @@ public class KabisConsumer<K extends Integer, V extends String> implements Kabis
                 );
 
         return new ConsumerRecords<>(mergedMap);
-
     }
 
     /**
@@ -98,6 +89,7 @@ public class KabisConsumer<K extends Integer, V extends String> implements Kabis
     @Override
     public void close() {
         this.kafkaPollingThread.close();
+        this.serviceProxy.resetNextPullIndex();
         this.log.info("Consumer closed successfully");
     }
 
@@ -109,10 +101,13 @@ public class KabisConsumer<K extends Integer, V extends String> implements Kabis
     @Override
     public void close(Duration duration) {
         this.kafkaPollingThread.close(duration);
+        this.serviceProxy.resetNextPullIndex();
+        this.log.info("Consumer closed successfully");
     }
 
     /**
-     * Empties the list of validated topics and updates it with the new list.
+     * Updates the list of validated topics.
+     * The update of the topology is not incremental. The given list will replace the current assignment (if there is one).
      *
      * @param validatedTopics the new list of validated topics
      */
@@ -122,5 +117,18 @@ public class KabisConsumer<K extends Integer, V extends String> implements Kabis
             this.validatedTopics.clear();
             this.validatedTopics.addAll(validatedTopics);
         }
+        this.log.info("Updated list of validated topics: {}", Utils.join(validatedTopics, ", "));
+        this.assignedPartitions.clear();
+        this.assignedPartitions.addAll(this.kafkaPollingThread.getAssignedPartitions());
+        this.log.info("Updated list of assigned partitions: {}", Utils.join(assignedPartitions, ", "));
+    }
+
+    /**
+     * Returns the list of assigned partitions to the consumer.
+     *
+     * @return the list of assigned partitions
+     */
+    public List<TopicPartition> getAssignedPartitions() {
+        return this.assignedPartitions;
     }
 }

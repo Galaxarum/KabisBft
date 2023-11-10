@@ -13,6 +13,11 @@ DOCKERHUB_USERNAME=example-username
 
 ## ⚡️ Benchmarks
 
+> ⚠️ **Warning**  
+> BFT-only benchmarks are not working with the latest version. A list of TopicPartition must be passed to the
+> KabisServiceProxy,
+> but since BTF is alone no TopicPartition info is available.
+
 If you want to modify the benchmarks, apply your modifications and rebuild the _jar_ files utilizing the _gradle_
 scripts. Then, push your newly built jars
 to the DockerHub via the `build_and_push_all_images.sh` script found inside the `/docker` folder.
@@ -28,5 +33,5 @@ in the terminal.
 
 Now, run the `env_generator.sh` script found inside the `/docker/runner/envs` folder and you are ready to go! 🚀
 
-More infos about distributed benchmarks [here](/docker/benchmark/runner/distributed/README.md).
+More info on benchmarks [here](https://github.com/Galaxarum/KabisBft/wiki/Benchmarks).
 

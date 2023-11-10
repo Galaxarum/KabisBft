@@ -13,7 +13,6 @@ import java.util.Map;
 
 public class Validator<K extends Integer, V extends String> {
     private final KafkaPollingThread<K, V> kafkaPollingThread;
-    private final Duration KAFKA_POLL_TIMEOUT = Duration.ofSeconds(1);
 
     /**
      * Creates a new Validator.
@@ -30,17 +29,17 @@ public class Validator<K extends Integer, V extends String> {
      * @param sids the SecureIdentifiers to be verified
      * @return a map of TopicPartitions to lists of ConsumerRecords
      */
-    public Map<TopicPartition, List<ConsumerRecord<K, V>>> verify(List<SecureIdentifier> sids) {
+    public Map<TopicPartition, List<ConsumerRecord<K, V>>> verify(List<SecureIdentifier> sids, Duration duration) {
         Map<TopicPartition, List<ConsumerRecord<K, V>>> mapTopicPartitionValidatedRecords = new HashMap<>();
         for (SecureIdentifier sid : sids) {
             List<ConsumerRecord<K, V>> topicPartitionValidatedRecords = mapTopicPartitionValidatedRecords.computeIfAbsent(sid.getTopicPartition(), tp -> new LinkedList<>());
-            List<ConsumerRecord<K, MessageWrapper<V>>> recordsFromDifferentReplicas = this.kafkaPollingThread.poll(sid.getTopicPartition(), sid.getSenderId(), this.KAFKA_POLL_TIMEOUT);
+            List<ConsumerRecord<K, MessageWrapper<V>>> recordsFromDifferentReplicas = this.kafkaPollingThread.poll(sid.getTopicPartition(), sid.getSenderId(), duration);
             for (ConsumerRecord<K, MessageWrapper<V>> record : recordsFromDifferentReplicas) {
                 if (sid.checkProof(record)) {
                     MessageWrapper<V> wrapper = record.value();
-                    //TODO: Add timestamp to the constructor, as of now it is reset to the current time
-                    ConsumerRecord<K, V> deserializedRecord = new ConsumerRecord<>(record.topic(), record.partition(), record.offset(), record.key(), wrapper.getValue());
-                    record.headers().forEach(h -> deserializedRecord.headers().add(h));
+                    ConsumerRecord<K, V> deserializedRecord = new ConsumerRecord<>(record.topic(), record.partition(), record.offset(), record.timestamp(),
+                            record.timestampType(), record.serializedKeySize(), record.serializedValueSize(), record.key(), wrapper.getValue(),
+                            record.headers(), record.leaderEpoch());
                     topicPartitionValidatedRecords.add(deserializedRecord);
                     break;
                 }
